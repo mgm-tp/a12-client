@@ -1,0 +1,127 @@
+{
+  "header": {
+    "id": "modal-region.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "ui_handling.modal-region",
+        "menu": {
+          "name": "ui_handling.modal-region",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Modal Region"
+            },
+            {
+              "locale": "de",
+              "text": "Modal Region"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "UIHandling",
+              "feature": "ModalRegion"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "ui_handling.modal-region",
+            "scenes": [
+              {
+                "name": "ModalRegion",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "UIHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "ModalRegion"
+                  },
+                  {
+                    "key": "modal",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ModalRegion"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "ModalRegionModal",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "UIHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "ModalRegion"
+                  },
+                  {
+                    "key": "modal",
+                    "mustEqual": "true"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ModalRegion",
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

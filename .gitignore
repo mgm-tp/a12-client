@@ -1,0 +1,56 @@
+# npm / yarn
+.npm
+node_modules
+npm-debug.log*
+yarn.lock
+
+# prevents checking in temporary local npm packages created with npm pack
+*.tgz
+
+# Gradle
+build
+target
+.gradle
+/gradle
+/gradlew
+/gradlew.bat
+
+# IDE (including symlinks)
+.idea
+.classpath
+.settings
+.metadata
+.project
+*.iml
+*.launch
+atlassian-ide-plugin.xml
+
+# Other
+*.log
+.DS_Store
+
+# Build artifact
+TEST-com.mgmtp.a12.client-*.xml
+TEST-UI-com.mgmtp.a12.client-*.xml
+IdeaLearningProject
+devapp/resources/server/gradle/wrapper/gradle-wrapper.jar
+devapp/resources/server/gradle/wrapper/gradle-wrapper.properties
+devapp/resources/server/gradlew.bat
+devapp/resources/server/gradlew
+cyclonedx.json
+
+# Atlas Bundles
+atlas-archives
+
+.eslintcache
+
+# core
+/platform-server.log*
+/services-server.log*
+/dataservices-server.log*
+
+lib/
+dist/
+coverage/
+!bin/
+*.tsbuildinfo

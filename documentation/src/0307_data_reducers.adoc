@@ -1,0 +1,203 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/basics/data-reducers]
+= Data Reducers
+
+A DataReducer is a Client-specific extension of the reducer concept from Redux.
+
+[NOTE]
+====
+It is recommended to put as much logic as possible in reducers as can be read in the https://redux.js.org/style-guide/#put-as-much-logic-as-possible-in-reducers[redux best practice style guide,role=external,window=_blank].
+====
+
+Like a standard Redux reducer it is triggered by Redux actions. However, since DataReducers are only concerned with the data slice of an activity, they can only handle activity-related actions and then, once triggered, calculate the update of all DataHolders of the respective activity.
+
+The interface of a DataReducer is quite similar to that of a DataHandler, but only consists of the `reduce` method. This function changes the given DataHolders in the Redux store.
+
+[source,tsx]
+----
+export interface DataReducer {
+	/**
+		* Can be registered as sub-reducers within the activity reducer. It enables you to perform any kind of dataHolder update, e.g.
+		* - adding dataHolder(s)
+		* - changing dataHolder(s)
+		* - removing dataHolder(s)
+		*
+		* @param dataHolders All dataHolders for the activity specified by the id in the action payload.
+		* @param action The triggering action
+		* @param defaultDataHolder The default dataHolder of the activity, `undefined` if none exists
+		* to keep the existing behavior of `isDefaultDataHolder`
+		*/
+	reduce(
+		dataHolders: Activity.DataHolder[],
+		action: ActivityActions.DataReducerAction,
+		defaultDataHolder?: Activity.DataHolder
+	): Activity.DataHolder[];
+}
+----
+
+[#/basics/adding-data-reducer]
+== Adding a DataReducer
+
+Below is a sample implementation of a DataReducer that reacts to a specific action and then handles its respective payload.
+The exemplary DataReducer is implemented in a way that it will only update a specific DataHolder of the activity.
+
+[source,tsx]
+----
+include::assets/typescript/features/data-reducer.ts[tags="dataReducerAPI"]
+----
+
+[NOTE]
+====
+It is important to note that the trigger action should either extend `ActivityActions.ActivityActionPayload` or `ActivityActions.AsyncActivityActionPayload`.
+Otherwise, the action payload would not contain the activity identifier and thus would not link it to any activity in the Redux store.
+====
+
+The integration of a DataReducer can happen in two ways:
+
+. The DataReducer can be provided with the `ApplicationFactories.Config` object as a part of the general application setup using the `ApplicationFactories.createApplicationSetup` function.
+. The DataReducer can be provided via the <</advanced/module-api,Module API>> as a module-specific DataReducer.
+
+[WARNING]
+====
+When writing DataReducers, care must be taken in order to avoid unwanted state changes. Consider the following example (same as above):
+
+[source,tsx]
+----
+// this reducer only looks for a specific action and just returns the unchanged dataHolders array otherwise
+const addTodoReducer: ActivityReducers.DataReducer = {
+	reduce(dataHolders, action) {
+		return TodoActions.addTodo.match(action) ? dataHolders?.map(handleAddTodo(action)) : dataHolders;
+	}
+}
+----
+This reducer will NOT change the state if the action type does not match by returning the same object reference. This allows any activity-related actions (e.g. "loadData") that need to be handled by Client's own reducer to actually "reach" them.
+
+In comparison, consider this reducer:
+
+[source,tsx]
+----
+// this reducer always changes the state, regardless of the action! DO NOT COPY THIS!
+const doNotUseThisReducer: ActivityReducers.DataReducer = {
+	reduce(dataHolders, action) {
+		return dataHolders?.map(dh => TodoActions.addTodo.match(action) ? handleAddTodo(action)(dh) : dh);
+	}
+}
+----
+
+Because mapping an array always creates a new object reference, this reducer will create a state change for ALL activity-related actions, even in cases where the actual DataHolder content will not be touched at all.
+
+Now, none of the Client-internal actions will ever reach their intended reducer, because all of them are already handled. **Registering reducers using this pattern effectively breaks Client!**
+====
+
+== Using the Default DataHolder
+The `reduce()` method of the API contains the defaultDataHolder as a third parameter. When iterating over the existing DataHolders, you can use this to check whether the current DataHolder is the default one. 
+For example like this:
+[source,tsx]
+----
+const addTodoReducer: ActivityReducers.DataReducer = {
+		reduce(dataHolders, action, defaultDataHolder) {
+			return TodoActions.addTodo.match(action) ? dataHolders.map(dh => dh === defaultDataHolder ? updateDataHolder(dh, action) : dh) : dataHolders;
+		}
+	}
+----
+In case your setup contains multiple DataReducers that all want to change the default DataHolder, checking for its existence as shown above will not work, because the first reducer will create a new object reference for it. In such cases, you will need to perform the check on a lower level (e.g. by comparing the descriptors).
+
+[NOTE]
+====
+The `defaultDataHolder` parameter will be `undefined` if no default DataHolder exists for the activity.
+====
+
+== How to Add New DataHolders
+The API is capable of creating DataHolders.
+Additionally, if your setup requires you to add multiple data holders at the same time, switching from multiple dispatched actions to a single data reducer might be a performance gain.
+
+Consider the following example:
+
+[source,tsx]
+----
+function addDataHolders(action: Action<CustomTriggerPayload>, dataHolders: Activity.DataHolder[]) {
+
+	// based on the action payload, create new DHs here
+	const newDataHolders = []
+
+	// add them to the existing ones 
+	return [
+		...dataHolders,
+		...newDataHolders
+	]
+}
+
+const customTriggerReducer: ActivityReducers.DataReducer = {
+		reduce(dataHolders, action) {
+			return customTriggerAction.match(action) ? addDataHolders(action, dataHolders) : dataHolders;
+		}
+	}
+----
+
+Because a reducer is just a function without side effects, the code can easily be unit-tested.
+
+In case the creation of a DataHolder from inside your existing saga depends on other data from state, you can either:
+. select the data beforehand and pass it as payload when dispatching your trigger action
+. select the data inside your reducer factory function. Note that this only works for module-specific DataReducers (added via the <</advanced/module-api,Module API>>).
+
+[#/basics/access-models-in-scene]
+== Accessing models of the current scene
+
+To work with the referenced models of the current activity scene, A12 Client automatically injects all models of the scene together with the <</features/modelgraph, Model Graph>> into the payloads of activity actions.
+
+Inside your reducer, the models can then be accessed like this:
+
+[source,typescript]
+----
+export const customReducer: ActivityReducers.DataReducer = {
+	reduce(dataHolders, action) {
+
+		// or use AsyncActivityActionPayload
+		if (ActivityActions.isActivityActionWithModelsInScenePayload(action.payload)) {
+			const { modelGraph, modelsInScene } = action.payload;
+
+			// use modelsInScene
+		}
+
+		return dataHolders;
+	}
+};
+----
+
+In case the scene does not include any models, `modelsInScene` will be an empty array.
+Note that depending on the loading state, each element in `modelsInScene` can be one of:
+
+* the loaded model
+* a model error, when loading was already attempted and failed
+* a model descriptor, when the model was not loaded yet (in this case the Model Graph could be used, e.g. to find references)

@@ -1,0 +1,277 @@
+THIRD_PARTY_NOTICES
+
+Component: A12 Client
+Generated: 2026-03-17 for mgm A12 Platform 2025.06-ext5
+
+The mgm A12 Platform is developed by mgm technology partners GmbH.
+
+https://www.mgm-tp.com.
+
+This file lists third-party software components included in this
+distribution of the mgm A12 Platform and the licenses that apply
+to them.
+
+Component Overview
+-------------------
+
+The following third-party components are included in this distribution:
+
+
+
+- c8 10.1.3, licensed under ISC
+	Copyright (c) 2017, Contributors
+	Source: https://github.com/bcoe/c8
+- @com.mgmtp.a12.base/base-model-api 29.2.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.dataservices/dataservices-access 38.3.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/build-tools 1.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/codemod 2.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/eslint-config 3.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/prettier-config 1.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/react 0.2.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/tsconfig 1.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.devtools/why-did-you-render 2.1.0-rc.1, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.kernel/kernel-core-runtime-api-ts 30.7.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.kernel/kernel-md-facade 30.7.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.migrationtool/migrationtool-core 2.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.migrationtool/migrationtool-utils 2.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-collections 6.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-connector 8.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-localization 7.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-localization-react 7.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.utils/utils-logging 6.1.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- @com.mgmtp.a12.widgets/widgets-core 38.2.0, licensed under EUPL v1.2
+	Copyright (C) 2012-2026 mgm technology partners GmbH
+	Source: https://github.com/mgm-tp
+- concurrently 9.2.1, licensed under MIT
+	Copyright (c) 2015 Kimmo Brunfeldt
+	Source: https://github.com/open-cli-tools/concurrently
+- cspell 9.7.0, licensed under MIT
+	Copyright (c) 2017 Jason Dent
+	Source: https://github.com/streetsidesoftware/cspell
+- eslint 9.39.4, licensed under MIT
+	Copyright OpenJS Foundation and other contributors
+	Source: https://github.com/eslint/eslint
+- @eslint/config-inspector 1.4.2, licensed under Apache-2.0
+	Copyright OpenJS Foundation and other contributors, <www.openjsf.org>
+	Source: https://github.com/eslint/config-inspector
+- eslint-plugin-jsdoc 50.6.17, licensed under BSD-3-Clause
+	Copyright (c) 2018, Gajus Kuizinas (http://gajus.com/)
+	Source: https://github.com/gajus/eslint-plugin-jsdoc
+- eslint-plugin-mocha 11.2.0, licensed under MIT
+	Copyright (c) 2014 Mathias Schreck <schreck.mathias@gmail.com>
+	Source: https://github.com/lo1tuma/eslint-plugin-mocha
+- eslint-plugin-notice 1.0.0, licensed under MIT
+	Copyright (c) 2017 Nick Deis
+	Source: https://github.com/nickdeis/eslint-plugin-notice
+- eslint-plugin-use-effect-no-deps 1.1.2, licensed under MIT
+	Copyright (c) 2019 Alex Henry
+	Source: https://github.com/alxHenry/eslint-plugin-use-effect-no-deps
+- eslint-plugin-workspaces 0.11.1, licensed under MIT
+	Copyright (c) 2019 Joshua Jacobowitz
+	Source: https://github.com/joshuajaco/eslint-plugin-workspaces
+- fast-deep-equal 3.1.3, licensed under MIT
+	Copyright (c) 2017 Evgeny Poberezkin
+	Source: https://github.com/epoberezkin/fast-deep-equal
+- fp-ts 2.16.11, licensed under MIT
+	Copyright (c) 2017-present Giulio Canti
+	Source: https://github.com/gcanti/fp-ts
+- @fp-ts/optic 0.25.0, licensed under MIT
+	Copyright (c) 2017-present Giulio Canti
+	Source: https://github.com/fp-ts/optic
+- global-jsdom 27.0.0, licensed under MIT
+	Copyright for portions of global-jsdom are held by Rico Sta. Cruz, 2016 as part of jsdom-global. All other copyright for global-jsdom are held by jonathan schatz, 2017.
+	Source: https://github.com/modosc/global-jsdom
+- @jambit/eslint-plugin-typed-redux-saga 0.4.0, licensed under MIT
+	Copyright (c) 2020 Jambit GmbH
+	Source: https://github.com/jambit/eslint-plugin-typed-redux-saga
+- jsdom 27.0.1, licensed under MIT
+	Copyright (c) 2010 Elijah Insua
+	Source: https://github.com/jsdom/jsdom
+- lodash.merge 4.6.2, licensed under MIT
+	Copyright OpenJS Foundation and other contributors <https://openjsf.org/> and copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors <http://underscorejs.org/>
+	Source: https://github.com/lodash/lodash
+- @microsoft/api-extractor 7.57.6, licensed under MIT
+	Copyright (c) Microsoft Corporation. All rights reserved.
+	Source: https://github.com/microsoft/rushstack
+- mocha 11.7.5, licensed under MIT
+	Copyright (c) 2011-2024 OpenJS Foundation and contributors, https://openjsf.org
+	Source: https://github.com/mochajs/mocha
+- monocle-ts 2.3.13, licensed under MIT
+	Copyright (c) 2017 Giulio Canti
+	Source: https://github.com/gcanti/monocle-ts
+- prettier 3.8.1, licensed under MIT
+	Copyright © James Long and contributors
+	Source: https://github.com/prettier/prettier
+- react 19.2.3, licensed under MIT
+	Copyright (c) Meta Platforms, Inc. and affiliates
+	Source: https://github.com/facebook/react
+- react-dnd 16.0.1, licensed under MIT
+	Copyright (c) 2016 Dan Abramov
+	Source: https://github.com/facebook/react
+- react-dom 19.2.3, licensed under MIT
+	Copyright (c) Meta Platforms, Inc. and affiliates
+	Source: https://github.com/facebook/react
+- react-redux 7.2.9, licensed under MIT
+	Copyright (c) 2015-present Dan Abramov
+	Source: https://github.com/reduxjs/react-redux
+- redux 4.2.1, licensed under MIT
+	Copyright (c) 2015-present Dan Abramov
+	Source: https://github.com/reduxjs/redux
+- @redux-devtools/extension 3.3.0, licensed under MIT
+	Copyright (c) 2015-present Dan Abramov
+	Source: https://github.com/reduxjs/redux-devtools
+- redux-saga 1.3.0, licensed under MIT
+	Copyright (c) Redux-Saga team and other contributors
+	Source: https://github.com/redux-saga/redux-saga
+- redux-saga-test-plan 4.0.6, licensed under MIT
+	Copyright (c) 2016 Jeremy Fairbank
+	Source: https://github.com/jfairbank/redux-saga-test-plan
+- rimraf 6.1.2, licensed under ISC
+	Copyright (c) 2011-2023 Isaac Z. Schlueter and Contributors
+	Source: https://github.com/isaacs/rimraf
+- @rsbuild/core 2.0.0-alpha.2, licensed under MIT
+	Copyright (c) 2023-present Bytedance, Inc. and its affiliates.
+	Source: https://github.com/web-infra-dev/rsbuild
+- @rsbuild/plugin-react 1.4.3, licensed under MIT
+	Copyright (c) 2023-present Bytedance, Inc. and its affiliates.
+	Source: https://github.com/web-infra-dev/rsbuild
+- @rsdoctor/rspack-plugin 1.5.0, licensed under MIT
+	Copyright (c) 2023-present Bytedance, Inc. and its affiliates.
+	Source: https://github.com/web-infra-dev/rsdoctor
+- semver 7.7.3, licensed under ISC
+	Copyright (c) Isaac Z. Schlueter and Contributors
+	Source: https://github.com/npm/node-semver
+- source-map-loader 5.0.0, licensed under MIT
+	Copyright JS Foundation and other contributors
+	Source: https://github.com/webpack-contrib/source-map-loader
+- source-map-support 0.5.21, licensed under MIT
+	Copyright (c) 2014 Evan Wallace
+	Source: https://github.com/evanw/node-source-map-support
+- styled-components 6.1.19, licensed under MIT
+	Copyright (c) 2016-present Glen Maddern and Maximilian Stoiber
+	Source: https://github.com/styled-components/styled-components
+- @testing-library/dom 10.4.1, licensed under MIT
+	Copyright (c) 2017 Kent C. Dodds
+	Source: https://github.com/testing-library/dom-testing-library
+- @testing-library/react 16.3.2, licensed under MIT
+	Copyright (c) 2017-Present Kent C. Dodds
+	Source: https://github.com/testing-library/react-testing-library
+- @testing-library/user-event 14.6.1, licensed under MIT
+	Copyright (c) 2020 Giorgio Polvara
+	Source: https://github.com/testing-library/user-event
+- ts-morph 27.0.2, licensed under MIT
+	Copyright (c) 2017 David Sherret
+	Source: https://github.com/dsherret/ts-morph
+- typedoc 0.28.17, licensed under Apache-2.0
+	No explicit copyright notice found in LICENSE file
+	Source: https://github.com/TypeStrong/TypeDoc
+- typedoc-plugin-missing-exports 4.1.2, licensed under MIT
+	Copyright 2021 Gerrit Birkeland
+	Source: https://github.com/Gerrit0/typedoc-plugin-missing-exports
+- typed-redux-saga 1.4.0, licensed under MIT
+	Copyright (c) 2019 Agile Digital
+	Source: https://github.com/agiledigital/typed-redux-saga
+- typescript 5.9.3, licensed under Apache-2.0
+	Copyright (c) Microsoft Corporation
+	Source: https://github.com/microsoft/TypeScript
+- typescript-fsa 3.0.0, licensed under MIT
+	Copyright (c) 2016 Daniel Lytkin
+	Source: https://github.com/aikoven/typescript-fsa
+- @types/lodash.merge 4.6.9, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/mocha 10.0.10, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/node 24.10.4, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/react 19.2.8, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/react-dom 19.2.3, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/react-redux 7.1.34, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/semver 7.7.1, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- @types/source-map-support 0.5.10, licensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped
+- yaml 2.8.2, licensed under ISC
+	Copyright Eemeli Aro <eemeli@gmail.com>
+	Source: https://github.com/eemeli/yaml
+
+- org.asciidoctor/asciidoctorj 2.5.7, licensed under Apache-2.0
+	Copyright Dan Allen, Ryan Waldron and the Asciidoctor Project
+	Source: https://github.com/asciidoctor/asciidoctorj
+
+Code snippets of the following projects have been used in this distribution:
+
+- lodash, licensed under MIT
+	Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+	Source: https://github.com/lodash/lodash
+
+- @types/lodash, lisensed under MIT
+	Copyrights are respective of each contributor listed at the beginning of each definition file.
+	Source: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/lodash/common/function.d.ts
+
+
+License Texts
+-------------
+
+Complete license texts for all included third-party components can
+be found in the licenses/ directory, attributions in file NOTICES.
+
+
+General Notice
+--------------
+
+The mgm A12 Platform is dual-licensed under the EUPL-1.2 or a
+commercial license. Third-party components remain under their
+respective licenses. For details, see the file LICENSE.
+
+“mgm A12” is a registered trademark of mgm technology partners GmbH
+(EU/DE). All other trademarks are the property of their respective
+owners.
+
+End of THIRD_PARTY_NOTICES

@@ -1,0 +1,129 @@
+{
+  "header": {
+    "id": "errorHandling.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "error_handling.general",
+        "menu": {
+          "name": "error_handling.general",
+          "label": [
+            {
+              "locale": "en",
+              "text": "General Error Handling"
+            },
+            {
+              "locale": "de",
+              "text": "Allgemeines Error Handling"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "ErrorHandling",
+              "feature": "GeneralErrorHandling"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "error_handling.general",
+            "scenes": [
+              {
+                "name": "error_handling.general",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "ErrorHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "GeneralErrorHandling"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "GeneralErrorHandling"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "error_handling.general.detail",
+                "priorScene": "error_handling.general",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "ErrorHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "GeneralErrorHandling"
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Person-document"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "BrokenForm",
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "Person-document"
+                        },
+                        {
+                          "modelType": "form",
+                          "name": "Person-form"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

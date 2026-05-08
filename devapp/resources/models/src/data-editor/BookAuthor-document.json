@@ -1,0 +1,252 @@
+{
+  "header": {
+    "id": "BookAuthor-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin,systemAdmin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Book-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Book-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "BookAuthor-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "G2",
+          "name": "Author",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "F8",
+                "name": "id",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Id"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Id"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F3",
+                "name": "name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Vorname"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F4",
+                "name": "surname",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Name"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Surname"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "G9",
+                "name": "Books",
+                "Group": {
+                  "repeatability": 1000,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "I7",
+                      "name": "BookDetails",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "F11",
+                            "name": "id",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Id"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Id"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "F7",
+                            "name": "title",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Title"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Titel"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "F9",
+                            "name": "publicationYear",
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "de",
+                                  "text": "Erscheinungsdatum"
+                                },
+                                {
+                                  "locale": "en",
+                                  "text": "Year of publication"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "F10",
+                            "name": "pages",
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType",
+                                "NumberType": {
+                                  "minValue": 1
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Number of pages"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Seitenanzahl"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "F12",
+                            "name": "description",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "de",
+                                  "text": "Beschreibung"
+                                },
+                                {
+                                  "locale": "en",
+                                  "text": "Description"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

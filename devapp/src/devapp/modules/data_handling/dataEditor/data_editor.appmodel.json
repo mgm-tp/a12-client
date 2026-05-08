@@ -1,0 +1,182 @@
+{
+  "header": {
+    "id": "data_editor.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Null"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "data_handling.data-editor",
+        "menu": {
+          "name": "data_handling.data-editor",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Data Editor"
+            },
+            {
+              "locale": "de",
+              "text": "Data Editor"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "DataHandling",
+              "feature": "DataEditor"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "DataHandling",
+            "scenes": [
+              {
+                "name": "DataEditor",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "DataHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "DataEditor"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DataEditorFeature"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "DataEditor - Overview",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "BookAuthor-document"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DataEditorSourceOverview",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "BookAuthor-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "DataEditor - Source",
+                "description": "Source of data for DataEditor",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "priorScene": "DataEditor - Overview",
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DataEditorSource",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "BookAuthor-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "DataEditor - Consumer",
+                "description": "Consumer of data in DataEditor",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Book"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "priorScene": "DataEditor - Source",
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DataEditorConsumer",
+                      "region": [
+                        "MODAL"
+                      ],
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "header": {
+    "id": "SubType_FastFood-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Fast Food"
+      },
+      {
+        "locale": "de",
+        "text": "Fast Food"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "SubType_Unhealthy-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "SubType_Unhealthy-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SubType_FastFood-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_f19ae",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_b21e8",
+                "name": "Food",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "SubType_Unhealthy-document"
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_21617",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

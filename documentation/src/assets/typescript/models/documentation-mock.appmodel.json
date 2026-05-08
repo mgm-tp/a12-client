@@ -1,0 +1,86 @@
+{
+  "header": {
+    "id": "documentation-mock.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "SIDEBAR",
+          "layout": {
+            "name": "Null"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "WelcomeModule",
+        "menu": {
+          "name": "welcome",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Welcome"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "page": "welcome_page"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "WelcomeFlow",
+            "scenes": [
+              {
+                "name": "WelcomeScene",
+                "matchConditions": [
+                  {
+                    "key": "page",
+                    "mustEqual": "welcome_page"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "WelcomePage"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

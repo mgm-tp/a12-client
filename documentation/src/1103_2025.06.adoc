@@ -1,0 +1,273 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= 2025.06
+
+== Breaking Changes
+
+=== Integration of Dependencies
+The versions of the A12 dependencies were increased. Please check the documentation of the respective components for further migration instructions.
+
+=== App Model Migration
+
+For the following change, the App Model version was increased. Please refer to the general <</migration/application-model,Application Model migration>> section to find out how to perform the migration.
+
+=== Removed OnExit Directive From App Model Cases
+
+The ability to set an `onExit` directive for *cases* was removed from the Application Model, because while the typing allowed it, the runtime code never evaluated these directives.
+You therefore should not encounter any change in behavior after migrating your models.
+
+Note that the `onExit` directive for *scenes* was not changed and works as before. See the <</basics/application-model/scene-changes,documentation about scenes>> for more information.
+
+=== Removal Of Deprecated FrameProgressIndicator API
+Following their link:/docs/2024.06/ext0/CLIENT/client-documentation-bundle/index.html#_frameprogressindicator_propstype[deprecation,role=external,window=_blank] in Client 15, the namespace `FrameProgressIndicator` and the ability to pass in predicates to the factory `FrameFactories.createProgressComponentProvider` were removed. Please see the deprecation notes for motivation.
+
+If you want to make the loading state dependent on more then just the `busy` flag (which is the default), you need to write a custom `ProgressIndicator` component and extract the information from the activity by a selector directly and evaluate it.
+
+Consider this example:
+
+[source,tsx]
+----
+import type { Activity } from "@com.mgmtp.a12.client/client-core/lib/core/activity";
+import { FrameFactories } from "@com.mgmtp.a12.client/client-core/lib/core/frame";
+
+function isFirstDataHolderEmpty(a: Activity): boolean {
+	return a.dataHolders.at(0)?.data === undefined;
+}
+
+FrameFactories.createProgressComponentProvider([isFirstDataHolderEmpty])
+----
+
+Here, the `predicates` parameter was used to express a loading state while the first DataHolder of the activity has no data.
+
+When migrating, this predicate function can be reused by calling it inside a selector, e.g. like this:
+
+[source,tsx]
+----
+import { ActivitySelectors } from "@com.mgmtp.a12.client/client-core/lib/core/activity";
+import { ViewViews, type View } from "@com.mgmtp.a12.client/client-core/lib/core/view";
+
+function CustomProgressComponent({ activityId, children }: View.ProgressComponentProvider.PropsType) {
+	const customCondition = useSelector(ActivitySelectors.activityPropById(activityId, isFirstDataHolderEmpty))
+
+	return (
+		<ViewViews.ProgressIndicator progress={customCondition ? "loading" : "none"}>
+			{children}
+		</ViewViews.ProgressIndicator>
+	);
+}
+
+// instead of the default factory, provide your custom component
+----
+
+By extracting the relevant information inside the selector, your component will only re-render when necessary (for this example, when the data state of the DataHolder changes).
+
+=== Type-Only Exports Are Now Marked As Such
+
+A12 Client now correctly exports all type-only APIs using the `type` keyword, which can improve bundling. While there is no change in functionality, this may be a breaking change for some of your import statements, depending on how you create type aliases.
+
+Consider the following example:
+
+[source,tsx]
+----
+import { DataProvider } from "@com.mgmtp.a12.client/client-core/lib/core/data";
+
+// creating a type alias
+type DataProviderConfig = DataProvider.CanHandleConfig;
+
+// different syntax, same result!
+import CanHandleConfig = DataProvider.CanHandleConfig
+----
+
+Using the second syntax (creating a type alias via the `import` keyword) will not work anymore for the following APIs:
+
+[source,tsx]
+----
+import { ApplicationSaga } from "@com.mgmtp.a12.client/client-core/lib/core/application";
+import { DataEditor, DataProvider } from "@com.mgmtp.a12.client/client-core/lib/core/data";
+import { ModelResult } from "@com.mgmtp.a12.client/client-core/lib/core/model";
+import { View } from "@com.mgmtp.a12.client/client-core/lib/core/view";
+----
+
+To migrate these cases, simply use the first syntax instead (creating a type alias via the `type` keyword).
+
+==== Codemod command
+
+A codemod command is provided to rewrite all of the affected import statements. Make sure to review the changes after running it.
+
+To run the command, run `npx @com.mgmtp.a12.client/client-codemod imports <tsConfigDir>`.
+
+=== Removed Container API
+
+The experimental `configuration` package of Client, most notably including the `Container` API, was removed to reduce dependencies.
+There is no new API as replacement. Instead, existing A12 APIs can be used.
+
+==== Locales
+
+The available locales of the application now need to be set as a property for the `LocaleSelect` component. For example:
+
+[source,tsx]
+----
+import { LocaleSelect } from "@com.mgmtp.a12.client/client-core/lib/core/frame";
+
+const APP_LOCALES = [
+	Locale.fromString("de_DE") as Locale,
+	Locale.fromString("en_US") as Locale
+];
+
+function CustomLocaleSwitcher(): JSX.Element {
+	return <LocaleSelect locales={APP_LOCALES} />;
+}
+----
+
+When passing an initial locale to `ApplicationFactories.createApplicationSetup`, make sure to also include that locale here.
+
+==== Logging
+
+The logging strategy can be set using the `utils-logging` library. See the documentation there for more information. For example:
+
+[source,tsx]
+----
+import { Settings } from "@com.mgmtp.a12.utils/utils-logging/lib/Settings";
+
+Settings.LogStrategy = new MyCustomStrategy();
+
+// to restore the default
+Settings.resetLogStrategy();
+----
+
+==== UI Settings
+
+Settings for the Progress Indicator can be set as properties on the React component. The migration depends on whether you already customized the `ProgressIndicator` component from the `ViewViews` namespace:
+
+* if yes, add your custom UI Setting properties directly on the component
+* otherwise: write your own `ProgressIndicator` component and render it in your application setup. See the following code for an example, where all three properties of the `UISettings` object are customized:
+
+[source,tsx]
+----
+import type { JSX } from "react";
+import { ViewViews } from "@com.mgmtp.a12.client/client-core/lib/core/view";
+import type { ProgressIndicatorProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/progress-indicator/main/progress-indicator.api";
+import { ProgressIndicator } from "@com.mgmtp.a12.widgets/widgets-core/lib/progress-indicator/main/progress-indicator.view";
+
+// somewhere in your render tree
+function CustomProgressIndicator(): JSX.Element {
+	return (
+		<ViewViews.ProgressIndicator
+			progress="loading"
+			ProgressIndicatorComponent={CustomWidget}
+			labelKey="customLabelKey"
+		/>
+	);
+}
+
+// customizing the actual indicator widget
+function CustomWidget(props: ProgressIndicatorProps): JSX.Element {
+	const customFastAppear = true;
+	const customDelay = 100;
+
+	return <ProgressIndicator {...props} fastAppear={customFastAppear} openingDelay={customDelay} />;
+}
+----
+
+==== Codemod command
+
+A codemod command is provided to help with the migration of common usage patterns of the `Container` API. Note that depending of the usage,
+the command might not be able to migrate all instances completely. Make sure to review the changes after running it.
+
+To run the command, run `npx @com.mgmtp.a12.client/client-codemod container <tsConfigDirectory>`.
+
+The command will try migrating the following patterns:
+
+* bind locales: removed. When the `LocaleSelect` component is used, the locales will be set as a prop there.
+* unbind locales: removed
+* bind or rebind logging strategy: The logging strategy will be set with the utils-logging API instead.
+* unbind logging strategy: The logging strategy will be set to a noop (via utils-logging API).
+
+=== Migration to ESM
+
+The npm artifacts `@com.mgmtp.a12.client/client-core` and `@com.mgmtp.a12.client/client-application-model-migration` were migrated from CommonJS to link:https://nodejs.org/api/esm.html#modules-ecmascript-modules[ESM]. When using Node `22.12+` and modern build tools, there should be no changes necessary to your bundler setup. 
+
+[NOTE]
+====
+If your tests depend on mocking/stubbing Client API, consult the documentation of your test runner on how to work with ES modules. 
+====
+
+Migrating your own application to ESM is not required, but recommended. Consult the documentation of your bundler for specifics.
+
+=== Updating to ES2024
+
+The javascript output of the npm artifacts was updated from `ES2020` to `ES2024` to be able to use latest language features. When using supported browsers, there is no change necessary. If support for older browsers is required, make sure to include necessary polyfills.
+
+=== React 19
+
+We dropped the support for React 18 and older and now require React 19 as our peerDependency. This means you have to perform the React 19 migration, which is described in great detail in the official link:https://react.dev/blog/2024/04/25/react-19-upgrade-guide[React 19 Upgrade Guide]. They have codemods that should make the transition straightforward.
+
+As a result of the upgrade, there are some small breaking changes in our API. They only affect you, if you customize Client specific React components.
+
+* props typed as React.MutableRefObject are now typed as React.RefObject
+** Normal ref objects are now mutable. You can safely update the type, there is no change in functionality.
+
+* props typed as React.ReactElement are now implicitly typed as React.ReactElement<unknown> instead of the previous default React.ReactElement<any>
+** This should only be a problem, if you do component introspection to get the components props. This is a highly discouraged pattern. If you insist on doing this, you have to write type guards for the props.
+
+Additionally, we have decided to not also include a Redux update, to minimize the migration effort. The "react-redux" library does not have React 19 as a peerDependency, but still works fine with it. One solution is to override the dependency in your package.json. You also have to update the corresponding "@types/react-redux" typings to at least 7.1.34.
+
+[source,json]
+----
+{
+	"overrides": {
+		"react-redux": {
+			"react": "^19"
+		}
+	},
+	"devDependencies": {
+		"@types/react-redux": 7.1.34
+	}
+}
+----
+
+=== Removal of Static-Page Extension
+
+Following its deprecation in A12 Client 15.2.0, the static-page extension is now removed, including:
+
+* the typing for the `StaticPageExternalViewProvider`
+* the namespace object `StaticPageFactories` and all of its properties (the ViewProvider and the factory functions)
+
+Note that there is no direct replacement. For detailed migration instructions, see the link:/docs/2024.06/ext0/CLIENT/client-documentation-bundle/index.html#_deprecation_static-page[deprecation,role=external,window=_blank] note.
+
+=== Removal of ActivitiesView from VetoDialog
+
+Following its deprecation in A12 Client 14.3.0, the activitiesView property of the VetoDialog is now removed, including the L10N key unsavedOrLockedActivities.
+
+Note that there is no replacement, since the VetoDialog was generalized. If you would want to customize this dialog, you would have to implement your own.
+

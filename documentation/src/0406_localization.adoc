@@ -1,0 +1,119 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/advanced/localization]
+= Localization
+
+Localization in A12 is done by using the `Localizer`, which is accessible from a `LocalizerContext` react context.
+This react context has to wrap all the react components of the Client application that need to localize any texts.
+The Client library does not create this context itself. The application code has to add it to the react component tree itself.
+It is suggested to add this context as one of the outermost react components of the application.
+
+
+[#/advanced/localization/current-locale]
+== Current Locale
+
+The current locale is part of the application state and as such managed in the Redux store.
+Defining an initial locale of the application is done by dispatching the `LocaleActions.set` action with the wanted
+ locale during the setup phase. This can be achieved by adding this action to `ApplicationFactories.createApplicationSetup`.
+
+== Available Locales
+
+A12 Client provides a ready-to-use component `LocaleSelect` to update the locale. The available locales need to be set as a property on that component.
+Note that an initial locale set via application setup also needs to be part of that list.
+
+[#/advanced/localization/localizer]
+== Localizer
+
+The localizer is defined by the A12 localization API and represents the core of it. Please refer the documentation of the
+`@com.mgmtp.a12.utils/utils-localization` library for more in-depth information.
+
+[source,tsx]
+----
+export interface Localizer {
+	(...localizable: Localizable[]): string | undefined;
+}
+----
+
+All A12-related localizations are covered by the default texts that the `Localizable` objects can contain. I.e. any localizable
+that is created by A12-internal logic will always bring the default translations for the English and German locale.
+Additional texts to override or extend the A12-default texts can be passed to e.g. the `defaultLocalizerFactory` when creating
+ an application-specific `Localizer` function.
+Please refer to documentation of the `@com.mgmtp.a12.utils/utils-localization` library for more details on how this can be achieved.
+
+== Localization Keys
+
+The main identification aspect of localizables are the localization keys. Every `Localizable` that is provided to a localizer
+must have a localization key!
+How the different localization keys are generated depends on their producer. Therefore, it may be necessary to read the
+documentation of other components like Form Engine and Overview Engine.
+
+=== Static Resources
+
+For static resources the keys are provided by the constant `LOCALE_RESOURCE_KEYS` which is located in `core/locale`. This
+constant provides the keys as well as the documentation of their usage.
+For extensions similar constants exist and are provided by the extensions. Please consult the documentation of the extensions
+ for more details.
+
+=== Application Model
+
+Please note that you can also provide localization texts directly in the Application Model. Every entry is localizable by
+providing different texts in a map. The key is hereby the string representation of the `Locale` object.
+
+[#/advanced/localization/menu-entries]
+==== Menu Entries
+
+The key of each menu entry has the pattern
+`application-model.\{application-model-name\}.\{module-name\}.\{menu-name\}\(.{sub-menu-name\})`* .
+
+[#/advanced/localization/cases]
+==== Cases
+
+The key of each case has the pattern
+`application-model.\{application-model-name\}.\{module-name\}.\{flow-name\}.\{scene-name\}.\{case-name\}`.
+
+== Single Locale Setup
+
+In order to setup the Client with a single locale that is not the default `en_US`, you have to set the
+<</advanced/localization/current-locale,current locale>> in the Redux store to the desired locale, e.g. `fr_FR`.
+
+[WARNING]
+====
+The Client only provides default texts and configurations for `en` and `de`. For every other locale it is necessary to
+provide the necessary texts and configurations. This can be achieved by providing the texts in the models (form, overview,
+document, and application) or by using the <</advanced/localization/localizer,A12 localization API>>.
+====
+
+== Hidden Accessibility Texts
+
+For the localization of hidden accessibility texts, we rely on the Widgets. In order to provide your custom localization
+you have to use the `A11YLanguageContext` component, which is provided by Widgets. This component should be used next to the `Provider` component from React-Redux. Please see the accessibility section in the Widgets documentation for more details.

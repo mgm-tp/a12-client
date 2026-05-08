@@ -1,0 +1,43 @@
+{
+	"folders": [
+		{
+			"name": "client",
+			"path": "."
+		},
+		{
+			"name": "codemod",
+			"path": "codemod"
+		},
+		{
+			"name": "core",
+			"path": "core"
+		},
+		{
+			"name": "data",
+			"path": "data"
+		},
+		{
+			"name": "devapp",
+			"path": "devapp"
+		},
+		{
+			"name": "appmodel-migration",
+			"path": "appmodel-migration"
+		},
+		{
+			"name": "documentation",
+			"path": "documentation"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "core/node_modules/typescript/lib",
+		"files.exclude": {
+			"appmodel-migration": true,
+			"codemod": true,
+			"core": true,
+			"data": true,
+			"devapp": true,
+			"documentation": true
+		}
+	}
+}

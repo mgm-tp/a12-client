@@ -1,0 +1,172 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/basics/data-loading]
+= Data Loading
+
+The Client provides a powerful data loading concept. Whenever a scene gets activated for an activity the Client evaluates if data loading is needed. This evaluation can be described as the following:
+
+. If the matching scene has models defined, e.g. `models: [{ modelType: "form", name: "Product" }]`, the runtime automatically performs model and data loading in parallel.
+. If the matching scene has no models defined, but the boolean flag `loadData: true`, the runtime automatically performs data loading.
+. In all other cases, no data loading is performed.
+
+You can always, dispatch an `ActivityActions.loadData` to trigger the data loading for a specific activity id.
+
+[#/basics/data-handler]
+== DataHandlers
+
+The Client supports three kinds of DataHandlers: DataLoader, DataEditor and DataProvider. They are described in more detail in the upcoming sections.
+Additionally, a union type `DataHandler` is provided for convenience, combining the three types.
+
+By using DataLoader or DataEditor, the runtime provides some default behavior for some data operation.
+
+* *save:* after saving, it dispatches an ActivityActions.reload of the current activity. If you pass the `updateActivityData` flag to the action's payload of save/commit, the Client updates the activity's data with the response data of the save request.
+* *delete:* before executing the delete request, the Client first tries to cancel all child activities of the current one. After the delete operation, it triggers a reload for the overview activity, if there is one.
+
+If you do not want to have any of these, you should implement the data operation with a DataProvider. There is no default behavior for DataProvider. The runtime simply calls the `provideData()` function.
+
+=== Registration and Order of Execution
+
+DataHandlers are registered in the application setup. For each data operation, the runtime tries to find a matching DataHandler in the following order:
+
+. DataProviders and DataEditors provided via the <</advanced/module-api,Module API>> (in order of Module registration)
+. DataEditors provided in the application setup (regardless of their position in the array!)
+. DataProviders and DataLoaders provided in the application setup (following their position in the array)
+
+The runtime first evaluates DataProviders and DataEditors for all registered modules, before looking at the handlers from the application setup. Note that while the order of the setup is important, any DataEditors in the array will always be evaluated first.
+In the following example, the runtime would first query the `DocumentDataEditor`, then the `DataLoader` and afterwards the `DataProvider`, if one of them can handle a DataHolder of the current activity. The first matching DataHandler is going to perform the data operation.
+
+[source,tsx]
+----
+const dataHandlers: DataHandler[] = [
+	new DocumentDataEditor(),
+	new DataLoader(),
+	new DataProvider()
+	/* ... */
+]
+
+----
+
+=== DataLoader and DataEditor
+
+DataLoaders handle the exchange of business data with external systems. DataEditors on the other hand handle exchange of business data between activities.
+
+DataLoaders support the following actions:
+
+* load
+* save
+* delete
+
+DataEditors support the following actions:
+
+* read
+* write
+
+Any number of DataLoaders and DataEditors can be configured but for every data action, only one DataLoader or DataEditor will be used. The selection happens as follows:
+
+* Each DataLoader is asked if it can handle the current Activity. The first matching DataLoader is executed .
+* Each DataEditor is checked if it matches the current Activity and an ancestor of it using  <</basics/views/match-conditions,match conditions>>. 
+A DataEditor defines parent and child match conditions. It matches for an activity if all the child match conditions of the editor match the Activity Descriptor and if all the parent match conditions match an Activity Descriptor of an ancestor (defined by the initiating activity id) of this activity. The ancestor activities are checked bottom to top (first the direct parent of the activity). The first matching DataEditor is executed and the data is read/written from/to the matched ancestor activity.
+
+Both DataLoaders and DataEditors only handle the data of the activity's default DataHolder, which is the one that has the same descriptor as the activity. Handling the data of additional DataHolders is supported via DataProviders.
+
+=== DataProvider
+
+A DataProvider can also handle the exchange of business data with external systems as well as the exchange of data between activities. Since it is a wrapper around a redux-saga function, it can fetch data, access the Redux store via selectors or dispatch actions via action creators.
+
+DataProviders support the following actions:
+
+* load
+* save
+* delete
+
+Any number of DataProviders can be registered in the application setup. Every DataProvider is asked if it can handle a DataHolder for the current activity. A DataProvider can handle an arbitrary number of DataHolders, but each DataHolder can only be handled by one DataProvider.
+
+[NOTE]
+====
+Among other properties, the triggering action is passed to the `canHandle` method of each Data Provider. This makes it possible to limit the scope of a Data Provider based on the presence of certain model types in a scene. See the <</basics/access-models-in-scene,documentation about DataReducer>> on how to extract them from the action payload.
+====
+
+After the selection of all DataHolders is finished, each DataProvider gets its list of DataHolders to load. Additionally, each provider has access to the payload of the action that triggered it via the `details` property (see example below).
+
+If a `"loading"` or `"saving"` error should be set to a specific non-default DataHolder, then a custom action and custom DataReducers are required.
+
+==== When to use a DataProvider compared to a DataLoader
+DataLoaders are intended for simple use cases like "loading a single document" or "loading a list of documents". Since the methods are asynchronous, requests can be made to fetch some data, which will then be stored in the default DataHolder of the activity.
+Only if your logic is more complicated than that, the more low-level API of a DataProvider should be used. Since these methods are implemented as sagas, they have full access to the redux state of the application, which allows them for example to handle different DataHolders.
+
+==== Empty Document DataProvider
+
+In order to enable the creation of empty document by the Client itself, the form-engine extension provides a DataProvider factory function (`createEmptyDocumentDataProvider`). This factory returns a DataProvider that creates an empty document with initial values and pre-computed values if a new document should be loaded.
+
+[WARNING]
+====
+Without this DataProvider another DataHandler has to handle the request for loading a new document.
+====
+
+==== Example
+
+The following example shows an implementation of a DataProvider to load documents from an API and putting them into the current activity's data property.
+
+[source,tsx]
+----
+const DocumentsDataProvider: DataProvider = {
+	name: "DocumentsDataProvider",
+	canHandle({ dataHolder, operation }) {
+		switch (operation) {
+			case "load":
+				return dataHolder.descriptor.instance !== undefined;
+			case "save":
+			case "delete":
+				return false;
+			default:
+				throw new Error(`No support for ${operation}.`);
+		}
+	},
+	*provideData({ activityId, dataHolders, operation, details }) {
+		switch (operation) {
+			case "load":
+				const documents = yield all(
+					dataHolders.map(({ descriptor }) =>
+						// getDocumentById fetches data from a external source and returns a promise
+						call(getDocumentById, `/documents/${descriptor.instance}`)
+					));
+				yield put(ActivityActions.setData({ activityId, data: documents }));
+				break;
+			case "save":
+			case "delete":
+			default:
+				throw new Error(`No support for ${operation}.`);
+		}
+	}
+};
+----

@@ -1,0 +1,8 @@
+username: dev
+firstname: dev
+lastname: loper
+email: test.dev@testing.org
+password: dev
+authorities:
+  - admin
+  - systemAdmin

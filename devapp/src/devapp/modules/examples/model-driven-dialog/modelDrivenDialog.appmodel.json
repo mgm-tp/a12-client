@@ -1,0 +1,120 @@
+{
+  "header": {
+    "id": "modelDrivenDialog.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "examples.model-driven-dialog",
+        "menu": {
+          "name": "examples.model-driven-dialog",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Model-driven Dialogs"
+            },
+            {
+              "locale": "de",
+              "text": "Modellgetriebene Dialoge"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "Examples",
+              "example": "ModelDrivenDialog"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "examples.model-driven-dialog.flow",
+            "scenes": [
+              {
+                "name": "ModelDrivenDialog",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "Examples"
+                  },
+                  {
+                    "key": "example",
+                    "mustEqual": "ModelDrivenDialog"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ModelDrivenDialogOverview"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "ModelDrivenDialogDetail",
+                "description": "ModelDrivenDialog",
+                "priorScene": "ModelDrivenDialog",
+                "matchConditions": [
+                  {
+                    "key": "dialog",
+                    "mustEqual": "example"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ModelDrivenDialogForm",
+                      "region": [
+                        "MODAL"
+                      ],
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "ModelDrivenDialog-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

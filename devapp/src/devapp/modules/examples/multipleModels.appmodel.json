@@ -1,0 +1,103 @@
+{
+  "header": {
+    "id": "multipleModels.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "examples.multiple-models",
+        "menu": {
+          "name": "examples.multiple-models",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Multiple Models"
+            },
+            {
+              "locale": "de",
+              "text": "Zusätzliche Modelle"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "Examples",
+              "example": "MultipleModels",
+              "model": "Book-document"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "examples.multiple-models.flow",
+            "scenes": [
+              {
+                "name": "MultipleModelsScene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "Examples"
+                  },
+                  {
+                    "key": "example",
+                    "mustEqual": "MultipleModels"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "MultipleModelsFeature",
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "Book-document"
+                        },
+                        {
+                          "modelType": "document",
+                          "name": "BookAuthor-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/features/heterogeneity]
+= Heterogeneity
+
+Heterogeneity is an experimental feature in A12 that allows the handling of sets of Documents of different types.
+
+First, the involved parts are described. Then it is shown how to create a setup using the commerce sample domain.
+
+In the following, the terms _Type_ and _Document Model_ are used synonymously. However, they serve different purposes. _Document Model_ is the well-known way in which the inner structure of Documents are defined. _Type_ is a new way to describe Dependencies between entities without caring about their inner structure. Types "live" inside the Model Graph.
+
+
+== Subtype Dependency
+
+The Subtype Dependency declares an "is a" relationship from one Document Model to another. The intention is to instantiate and process Documents which have an "is a" relationship in a uniform way.
+
+[NOTE]
+====
+The Subtype Dependency only declares the relationship. It does *not* imply or even require inheritance of fields/groups/rules. If your business logic requires inheritance, then you have to ensure it yourself, e.g. by using includes or copying fields/groups/rules.
+====
+
+You declare a Subtype Dependency by adding an Annotation with name `subTypes` to the metadata section of the supertype. The value of the Annotation is a comma separated list of the names of the subtypes.
+
+The following concepts are *not* implemented in the current version:
+
+* Multiple Inheritance
+* Metadata on subtypes (e.g. to filter subtypes)
+
+
+== Model Graph Loading
+
+With the introduction of heterogeneity, every Client holds a Model Graph inside its state.
+
+To use heterogeneity, you must load and set the Model Graph. See the <</features/modelgraph, Model Graph>> documentation for an example.
+
+
+== Heterogeneous Overviews
+
+To list a heterogeneous set of Documents, you can assign the common super type as the Document Model of the Overview Model. The A12 Server will then take all Documents of that super type and all sub types into account.
+
+
+== Creating New Documents
+
+In heterogeneous overview, newly created Documents can be of different types.
+
+The CRUD extension detects that the type associated with the Overview Model has sub types. It then displays a dialog to select the type of the new Document. The offered types are the same as those used for heterogeneous overviews.
+
+
+== Document Model-Dependent Forms
+
+When editing a Document from a heterogeneous set, you probably want to define a single Application Model Scene, but still use different forms for Documents of different types.
+
+In order to achieve this, you need to limit the usage of a Form Model to a specific Document type. This can be done by adding a Document Model constraint to the referenced Form Model in the respective Scene of the Application Model.
+
+Limitations:
+
+- For each Document type, you must provide a Form Model entry, except if all Document types should share the same Form Model - then you must only provide exactly one Form Model without Document Model.
+- All declared Form Models are loaded on the first usage of the Scene. This can be slow the first time if you have many Sub Types.
+
+
+== Example Setup (Simple CRUD)
+
+The following section describes the necessary changes to make use of heterogeneity in the A12 sample domain "commerce". You can find the full, working setup in the Relationships example of the Client DevApp.
+
+It is a simple setup that makes use of the CRUD component, which contains
+pre-configured versions of the heterogeneity building blocks.
+
+[NOTE]
+====
+You can find all models in the source code of the Client DevApp in the folder `core/resources/models/`.
+====
+
+=== Modeling
+- In the Document Model `DomainProduct`, set `DomainBundle` as subtype.
+- Setup a Scene using the Overview Model `Product-overview` and the view `OverviewCRUD`.
+- Setup a Scene using the Form Models `Product` and `Brand` (constrained to the respective type) and the view `RelationshipFormEngine`.
+
+=== Application Setup
+- Set the Model Graph. See <</features/modelgraph, Model Graph>> documentation on how to do it.
+
+
+== Example Setup (Detailed)
+
+In order to tailor the heterogeneity functionality to project specific needs,
+you can combine the provided building blocks, or replace them with your own implementation.
+
+All modeling in Document or Application Models is done exactly in the same way as described in the CRUD example above. Therefore, here, only the coding API is explained.
+
+The currently available building blocks are:
+
+- Variant selection mapper: a function that maps given types to a tree of selection options
+- Variant selection UI: a component to render an UI to select a type for given selection options
+
+[NOTE]
+====
+You can find the fully working example in the source code of the Client DevApp in the folder `core/src/devApp/src/modules/data_handling/heterogeneity` of the Client repository.
+====
+
+=== Variant Selection Mapper
+
+The provided default variant selection mapper is a function that accepts a single root type and creates a tree of selection options from it.
+
+The root type defines, which part of the type hierarchy you want to render.
+
+The resulting tree defines the available options, if they are abstract or concrete, as well as their nesting, order, and labels.
+
+You can pass the result of the mapping to the default variant selection React component to render a selection UI.
+
+The provided callback of the default selection UI will be invoked with the name of the selected type, which can then be used to e.g. start a new Activity.
+
+[WARNING]
+====
+When starting a new Activity for a heterogeneous Scene containing Engines, make sure to set the _model_ property in the Descriptor. The Client needs it to pick the right engine models.
+====
+
+[source,tsx]
+----
+include::assets/typescript/features/heterogeneity.tsx[tags="example",indent=0]
+----
+
+In order to change the enablement, nesting, order or labels of types, you can replace/compose the default mapper.
+
+In order to change the rendering, you can replace/compose the default React component.

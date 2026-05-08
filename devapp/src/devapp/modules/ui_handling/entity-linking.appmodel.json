@@ -1,0 +1,115 @@
+{
+  "header": {
+    "id": "entity-linking.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "ui_handling.entity-linking",
+        "menu": {
+          "name": "ui_handling.entity-linking",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Deep (Entity) Linking"
+            },
+            {
+              "locale": "de",
+              "text": "Deep (Entity) Linking"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "UIHandling",
+              "feature": "EntityLinking"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "ui_handling.entity-linking",
+            "scenes": [
+              {
+                "name": "EntityLinking.Overview",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "UIHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "EntityLinking"
+                  },
+                  {
+                    "key": "detail",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "EntityLinking.Overview"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "EntityLinking.Detail",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "UIHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "EntityLinking"
+                  },
+                  {
+                    "key": "detail",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "EntityLinking.Detail"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

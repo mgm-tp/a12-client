@@ -1,0 +1,16 @@
+= Introduction
+
+This is a stub of the documentation for the "simple data graph" (SDG) component.
+
+== Simple Data Graph vs Engines
+
+General
+- Data access and mutation API separate from UI Engines
+- No direct access to raw data
+- No direct access to documents or groups (except field-like groups)
+
+Specific
+- "ui hidden" data is validated (no coupling to ui, SDG has no notion of "hidden")
+- clear value and remove row are symmetric
+  - Nothing -> setValue -> clearValue -> Nothing
+  - Nothing -> addRow -> removeRow -> Nothing

@@ -1,0 +1,30 @@
+buildscript {
+    dependencies {
+        classpath platform(a12Libs.dataservices.bom)
+
+        classpath a12Libs.kernel.md.model
+        classpath a12Libs.kernel.md.facade
+        classpath a12Libs.kernel.migration
+    }
+}
+
+plugins {
+    alias(a12Libs.plugins.prepare.models)
+}
+
+tasks.register('cleanTestModels', Delete) {
+    delete layout.buildDirectory
+    delete layout.projectDirectory.dir('../../target/models')
+}
+
+tasks.named('clean') {
+    dependsOn tasks.named('cleanTestModels')
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('prepareModels')
+}
+
+tasks.named('jar') {
+    enabled = false
+}

@@ -1,0 +1,231 @@
+{
+  "header": {
+    "id": "SubType_Unhealthy-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Unhealthy"
+      },
+      {
+        "locale": "de",
+        "text": "Ungesund"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "subTypes",
+        "value": "SubType_FastFood-document"
+      },
+      {
+        "name": "abstract",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Supertype_Food-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Supertype_Food-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SubType_Unhealthy-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_88a21",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_c558e",
+                "name": "Food",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "Supertype_Food-document"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_3f03b",
+                "name": "Disadvantages",
+                "Group": {
+                  "repeatability": 999999,
+                  "usageType": "multi-select",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_48f7d",
+                      "name": "value",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "key1",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "May lead to weight gain"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Kann zu Gewichtszunahme führen"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "key2",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Increased risk of health issues"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Erhöhtes Risiko für Gesundheitsprobleme"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Side Effects of Excessive Consumption"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Nebenwirkungen bei übermäßigem Konsum"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_82a5c",
+                "name": "Occasions",
+                "Group": {
+                  "repeatability": 999999,
+                  "usageType": "multi-select",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_ed8f8",
+                      "name": "value",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "key1",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Special treat for festivities"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Besondere Leckereien zu festlichen Anlässen"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "key2",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Satisfying cravings"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Heißhunger stillen"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Indulgence Occasions"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Gelegenheiten zum Genießen"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b62d6",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

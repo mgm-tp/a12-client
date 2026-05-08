@@ -1,0 +1,321 @@
+{
+  "header": {
+    "id": "NotificationExample-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin,systemAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "NotificationExample-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_348aa",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_77691",
+                "name": "scope",
+                "externalDescription": [
+                  {
+                    "locale": "en",
+                    "text": "Select a scope in which the notification will live in."
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Scope"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_bb31d",
+                "name": "severity",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "info",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Info"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "success",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Success"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "warning",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Warning"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "error",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Error"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Severity"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_f7ef5",
+                "name": "display_time",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "permanent",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Permanent"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "temporary",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Temporary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Display Time"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b61ee",
+                "name": "duration",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minValue": 0
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Duration"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_4e762",
+                "name": "durationRequiredOnDisplayTimeTemporary",
+                "Rule": {
+                  "errorEntityRelPath": "../duration",
+                  "errorCode": "Error rule_4e762",
+                  "errorCondition": "FieldFilled(display_time) and [display_time] == \"temporary\" and FieldNotFilled(duration)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "A duration is required."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b4dcd",
+                "name": "position",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "top-left",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Top-Left"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "top-right",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Top-Right"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "bottom-right",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Bottom-Right"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "bottom-left",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Bottom-Left"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Position"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_f84e4",
+                "name": "title",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Title"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_2af74",
+                "name": "message",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Message"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_3fbc2",
+                "name": "icon",
+                "externalDescription": [
+                  {
+                    "locale": "en",
+                    "text": "Name of the Material Icon. https://fonts.google.com/icons?selected=Material+Icons"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Icon"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

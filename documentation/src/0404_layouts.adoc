@@ -1,0 +1,241 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/advanced/layouts]
+= Layouts
+
+_Layouts_ define how views are visually arranged inside a Region. The following layouts are provided by default:
+
+== MasterDetail
+
+Arrangement of views side-by-side, where only one or two views are visible at the same time.
+
+Via the VIEW_ADD directive in the Application Model it is possible to add a constraint for the preferred width of the right view. The view can take from 1 to 11 of the 12 available layout grid slots, leaving the remaining space for another view visible on the left. If only one view is visible, it uses all available space.
+
+For more details, see the https://www.mgm-tp.com/a12.htmlshowcase/#/widgets/layout/master-detail[Widget Showcase,role=external,window=_blank].
+
+== Dashboard
+
+All views are arranged in tiles which are positioned in rows and columns. Please consult the Widgets documentation for more details.
+
+== ApplicationFrame
+
+This layout is only intended to be used for the root region of the application. It renders
+
+* a header showing a logo and a title as well as additional header items which can be defined by the project.
+* a sidebar showing the views assigned to the region "SIDEBAR"
+* a content part showing the views assigned to the region "CONTENT"
+
+=== Header
+
+The application frame contains a header which by default shows the title of the application.
+It can be adapted by the following properties:
+
+* `logoURL`: The URL to the image which should be shown as logo.
+* `additionalHeaderItems`: Additional header items, defined by a react component and an orientation.
+
+=== Main Menu
+
+The application frame contains the main menu. In order to customize this aspect a custom main menu component can be provided to the application frame via its `mainMenuComponent` property. Additionally, the main menu button, that is rendered in mobile mode, can be customized by using the `ClientWidgetMap`.
+
+[NOTE]
+====
+When customizing generic Widgets like a `Button`, make sure to wrap your custom context as "close to its usage" as possible, since all instances of a Widget rendered by Client will always use the closest parent context.
+In this example, this would mean that if you were to wrap the whole application with your custom context, every Button rendered by Client would be customized (which is probably not what you want).
+====
+
+[source,tsx]
+----
+import { useContext } from "react";
+
+import { ButtonProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.api";
+import { ClientWidgetMapContext } from "@com.mgmtp.a12.client/client-core/lib/core/ClientWidgetMap.js";
+
+interface PropsType {
+	readonly mobileMode: boolean;
+	readonly expanded: boolean;
+	onMenuItemClick(): void;
+}
+
+function CustomMainMenuComponent(props: PropsType): JSX.Element {
+	return <React.Fragment />;
+}
+
+function CustomMainMenuButtonComponent(props: ButtonProps): JSX.Element {
+	return <React.Fragment />;
+}
+
+const DefaultClientWidgetMap = useContext(ClientWidgetMapContext);
+
+const widgetMap = {
+	...DefaultClientWidgetMap,
+	Button: CustomMainMenuButtonComponent
+};
+
+<ClientWidgetMapContext.Provider value={widgetMap}>
+	<FrameViews.ApplicationFrameLayout
+		{...layoutProps}
+		mainMenuComponent={CustomMainMenuComponent}
+	/>
+</ClientWidgetMapContext.Provider>
+----
+
+[WARNING]
+====
+In order to insure correct behavior it is necessary to call `onMenuItemClick` on every menu entry click if a change should occur!
+====
+
+==== Mobile Navigation
+
+Mobile Navigation is a build-in feature of the `ApplicationFrameLayout` that is active by default. It enhances the user experience on mobile devices by using the available screen space in a more efficient way.
+
+More details are available in <<features-mobile-navigation>>.
+
+==== MainMenuContext
+On a mobile device the main menu is shown as a sliding menu. It can be toggled by the user via touching the "hamburger" button shown in the mobile header.
+
+The `ApplicationFrameLayout` wraps its content into the provider of the `MainMenuContext` in order to allow toggling the menu in a programmatic way. This React context provides props to get and set the current expansion state of the mobile main menu. This way a custom component can use the context anywhere within the application via its Consumer to toggle the mobile main menu.
+
+A use case is a button in the mobile application header which starts a new activity and at the same time closes the mobile menu to prevent that the view of the new activity is hidden from the user.
+
+=== SidebarContext
+The ApplicationFrame wraps a React context around the Sidebar region, with which the current state of the sidebar (collapsed or expanded, minimized or maximized) can be retrieved and set.
+Please refer to the link:assets/typedoc/index.html[API documentation] for more information about `FrameViews.SidebarContext`.
+
+=== Layout Settings
+The `ApplicationModel` contains the following `ApplicationFrame` settings which can be used to configure the `ApplicationFrame`:
+
+* disableCollapsingSub: Used to hide the button for triggering the collapsing and expanding of the sidebar
+* initialSubExpanded: Used to set the initial expansion state of the sidebar.
+* initialSubExpandedState: Used to set the initial size of the sidebar.
+
+Please refer to the link:assets/typedoc/index.html[API documentation] for more information about `ApplicationModel.ApplicationFrame.Settings`.
+
+== Stack
+
+Views are "stacked" on top of each other, i.e. only the latest view is visible. Useful for modals.
+
+== Null
+
+All views are rendered without any layout next to each other in the DOM. Use if you want to output all views without any additional markup.
+
+== Custom Layouts
+
+You can define your own layouts by returning them in a custom `LayoutProvider`. Then you can use them by referencing them in the Application Model.
+
+Use the same approach to define a custom logo, login image, or version. Example:
+
+[source,tsx]
+----
+include::assets/typescript/layouts/customLayout.tsx[indent=0,tags=content]
+----
+
+You could even implement a fully custom layout component, laying out the view components as you wish. See the following example:
+
+[source,tsx]
+----
+include::assets/typescript/layouts/customGridLayout.tsx[indent=0,tags=content]
+----
+
+== Progress Indication
+
+Every layout renders a progress indicating React component wrapping each view component. This component is provided by a _Progress Component Provider_.
+
+The default provider can be obtained by using `FrameFactories.createProgressComponentProvider()`. It delivers a `ProgressIndicator` widget showing a progress spinner if the flag "busy" of the default DataHolder of the related activity is true.
+
+If a different behavior is desired, it is always possible to provide your own custom progress component provider.
+
+=== Conditionally Hide Progress Indicator
+
+To conditionally show or hide the progress indicator from inside the view component, set `handleProgressIndicator` on the view component. If this flag is set to `true`, the progress component will be passed to your view component, where you can show or hide it based on your custom condition. Example:
+
+[source,tsx,title="For functional components"]
+----
+include::assets/typescript/layouts/viewComponentWithConditionalProgress.tsx[tags=customFunctional]
+----
+
+[source,tsx,title="For class components"]
+----
+include::assets/typescript/layouts/viewComponentWithConditionalProgress.tsx[tags=customClass]
+----
+
+Here, the view component provider will set `handleProgressIndicator` only for the `ConditionalProgress` components, while keeping the default behavior for all other components.
+
+[NOTE]
+====
+In order to achieve this behavior when using your own custom layout, you need check for this flag and either wrap your ViewComponent inside of the ProgressComponent (if `false` or not set) or pass it to the ViewComponent as the prop `ProgressComponent`
+====
+
+== Error Boundaries
+
+Every layout renders an error boundary component wrapping each view component. Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+
+The error boundary component is provided by an _Error Boundary Provider_.
+The default provider `FrameFactories.errorBoundaryProvider` delivers an `ErrorBoundary` with a default fallback component. This fallback shows a component with detailed information about the error and a button to cancel the current activity.
+
+The provider mechanism allows to replace the default error boundary component for specific views or regions, e.g.:
+
+====
+[source,tsx,title="Using a custom error boundary provider"]
+----
+include::assets/typescript/layouts/customErrorBoundary.tsx[tags=usage]
+----
+
+To prevent re-renderings of your view components, it is essential that your provider always returns a stable function reference like this:
+
+====
+[source,tsx,title="Using a custom error boundary"]
+----
+include::assets/typescript/layouts/customErrorBoundary.tsx[tags=specific]
+----
+
+Here, the custom error boundary rendering a fallback text is used only for a specific ViewComponent. In all other cases, the default error boundary is used.
+Because the error boundary is defined outside of the provider, its reference will not change during reacts lifecycle.
+
+== Resizing
+
+It is possible to enable resizing for the following built-in layouts via customization:
+
+* ApplicationFrameLayout: horizontal resizing of the sidebar
+* MasterDetailRegionLayout: horizontal resizing of the left view
+
+The customization is enabled via the widget map approach:
+
+The Client layout components allow optionally providing alternative layout widget components via a widget map.
+The provided custom widgets can be setup to be resizable using the resizing api of the respective layout widget. Please consult the Widgets documentation for more details.
+
+The following example shows how to achieve this in a Client based application. A custom layout name is defined in the Application Model. A custom layout provider returns a custom layout component for that name. In this component, the widgetMap property is defined and provides a respective custom, resize-enabled layout widget.
+
+[source,tsx]
+----
+include::assets/typescript/layouts/customLayoutWithResizing.tsx[indent=0,tags=content]
+----

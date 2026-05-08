@@ -1,0 +1,155 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/advanced/modelLoader]
+= Model Loader
+
+The _modelLoader_ extension provides the functionality to load different kinds of models from different locations.  
+
+We distinguish between loading models directly from the platform server (Platform Model Loading) or from other locations, e.g. a different server or your local file system (HTTP Model Loading). Model loading also varies for different kinds of models, e.g. for a Document Model it is also necessary to load the corresponding validation code.
+
+The extension provides a single generic loader, which can be used to load all kinds of models. For Document models, the loader will additionally perform post-processing by default (deserializing the model and adding the validation code).
+
+This model loader is internally customized with different fetching mechanisms to be used for both HTTP Model Loading and Platform Model Loading.
+
+[#/advanced/model-loading]
+== ModelLoader API
+
+Both extensions provide an API for parallel model loading.
+The implementation provides a single generic loader, which can be used to load all kinds of models. Both the fetching and the post-processing mechanism can be customized.
+
+=== HTTP Model Loading
+
+With the public factory function _createHttpModelLoader_ you can retrieve the model loader for HTTP Model Loading, which uses the fetch API for loading. The base path from which the models should be loaded and the post-processing of models can be configured by passing it to the factory function.
+If no base path is given, the root path "/" will be used.
+
+[source,tsx]
+----
+const modelLoader = createHttpModelLoader({ basePath: "/models/", modelProcessors: [] });
+----
+
+=== Platform Model Loading
+
+Platform Model Loading reuses the model loader from the _HTTP Connectors_ extension, but sets a different fetching mechanism, using RPC operations for batch-loading models.
+
+==== Providing a Custom Server Connector
+
+This loader respects the Services API and uses the `ConnectorLocator`. Therefore, it is possible to provide your implementation following the <<ConnectorLocator>> API. This can be used to modify the authentication filters as well as provide a custom server connector.
+
+[#ConnectorLocator]
+[source,tsx,title=Simple Example]
+----
+include::assets/typescript/server/config/dev.config.ts[tags=marker1]
+----
+
+==== Note about behavior
+
+The `ModelLoader` API performs *parallel* model loading. To achieve this, the Model Graph is used to find all referenced models before the actual loading is started, allowing the loader to load everything "at once".
+Therefore, when using the API make sure to initialize the Model Graph on application startup. This is required as the new API uses the Model Graph to resolve all references. See the <</features/modelgraph, Model Graph>> and the A12 Services documentation for more information.
+
+[#/advanced/model-processor]
+=== ModelProcessor API
+
+The `ModelLoader` API is designed to load all models in parallel. To be able to handle models differently depending on their type, the `ModelProcessor` API can be used.
+
+[source,tsx,title="Usage of ModelProcessor API"]
+----
+include::assets/typescript/features/model-processor.ts[tags="api",indent=0]
+----
+
+In case your processing logic needs access to the referenced models, they are included as the second parameter.
+See the customization section below for additional information.
+
+=== Implementing a Custom ModelLoader
+
+==== Fetching models
+
+The actual loading of models can be customized by passing your own implementation of a `ModelFetcher`. Note that by default, Client expects a valid ModelGraph to be able to find all referenced models.
+When the `ModelFetcher` is called, Client will pass all of the resolved model descriptors at once, allowing the fetcher to perform parallel loading.
+
+As a consequence, using the default `ModelLoader` implementation by Client requires a ModelGraph (without it, model loading will break even for a single ui model, since already the referenced Document Model would not be found).
+
+However, in case setting up a `ModelGraph` is not wanted or not possible, the API can still be used, requiring you to write a custom model fetcher instead. Since the fetcher will only get the models in scene without any resolved dependencies, the logic might look like this:
+
+1. Load all models that are given (in most cases, this will be a single model: the UI model of the current scene, for example a form)
+2. When loading is done, manually extract referenced models from the header
+3. For each found model, perform loading again (starting at 1.)
+
+While this approach would allow circumventing the need for a ModelGraph, please note that it also hinders performance. In case there are a lot of referenced models, loading them like this will trigger a waterfall of requests, potentially slowing down your application.
+
+==== Post-processing models
+
+In addition to customizing the model fetching, it is also possible to customize the post-processing of loaded models with the `ModelProcessor` API e.g. like this:
+
+[source,tsx,title="Usage of ModelProcessor API"]
+----
+include::assets/typescript/features/model-processor.ts[tags="example",indent=0]
+----
+
+Both the http and the platform loader factories allow passing a list of `ModelProcessor`s. Since Client already includes post-processing by default for Document Models, the following rules apply:
+
+* There is always only one `ModelProcessor` applied (if there are multiple passed for the same model type, the first one wins)
+* If there exists a custom `ModelProcessor` for Document Models, it will be applied *instead* of the default.
+* If no `ModelProcessor` is passed, Client will always fall back to the default processing logic for Document Models
+
+If you need to write your own `ModelLoader`, the default `ModelProcessor` from Client for Document Models is available as a convenience.
+
+==== Customizing the loader itself
+
+You can also implement a custom ModelLoader yourself. To achieve this you first need to implement the `ModelLoader` interface as shown in the example below and afterwards register your custom model loader in the appsetup of your application.
+
+[source,tsx,title="The ModelLoader interface"]
+----
+include::assets/typescript/features/model-loading.ts[tags="Interface",indent=0]
+----
+
+[source,tsx,title="Example of a simple ModelLoader implementation"]
+----
+include::assets/typescript/features/model-loading.ts[tags="CustomModelLoader",indent=0]
+----
+
+While the examples above can be used as a starting point, please note that this API is designed to only provide a single loader. Therefore, if you need to customize the processing of specific model types, you will still need to implement processing for all of them.
+
+== Custom Model Loading
+
+Independent of the default model loading of the Client it is possible to handle model loading yourself. In order to prevent interference with the default model loading only models should be handled that are not referenced by the Application Model and their transitive dependencies.
+
+Handling the model loading yourself has some implications, because without the model descriptors in the Application Model no automatic data loading will happen and Engine views are not able to resolve their models. Therefore, you have to provide your own DataProviders and views.
+
+In the following example you can see a simple custom model loading saga. For more details about setting models please have a look the `ModelActions.setModels` action documentation.
+
+[source,tsx,title="Example of a custom model loading saga"]
+----
+include::assets/typescript/features/custom-model-loading-saga.ts[tags="saga",indent=0]
+----
+
+

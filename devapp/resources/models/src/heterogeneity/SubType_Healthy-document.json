@@ -1,0 +1,218 @@
+{
+  "header": {
+    "id": "SubType_Healthy-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Healthy"
+      },
+      {
+        "locale": "de",
+        "text": "Gesund"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "subTypes",
+        "value": "SubType_Fruits-document,SubType_Vegetables-document"
+      },
+      {
+        "name": "abstract",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Supertype_Food-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Supertype_Food-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SubType_Healthy-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_05460b9c-800a-48f6-91d5-b4797054f2be",
+        "name": "ProteinPudding",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "key1",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Chocolate"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Schokolade"
+                  }
+                ]
+              },
+              {
+                "value": "key2",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Vanilla"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Vanille"
+                  }
+                ]
+              },
+              {
+                "value": "key3",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Strawberry"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Erdbeere"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_afaa3",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_d2c83",
+                "name": "Food",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "Supertype_Food-document"
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_c7007",
+                "name": "Benefits",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "1",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "High in vitamins and minerals"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Reich an Vitaminen und Mineralien"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "2",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Good source of fiber"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Gute Ballaststoffquelle"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "3",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Promotes overall health"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Fördert die Gesundheit im Allgemeinen"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Benefits of Consuming this Food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Vorteile des Konsums dieses Lebensmittels"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_cfcb1",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

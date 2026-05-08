@@ -1,0 +1,103 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#features-mobile-navigation]
+= Mobile Navigation
+
+== General Overview
+
+To be able to navigate backwards in a consistent way on a small device, the `ApplicationFrameLayout` of the Client provides a navigation mechanism to show a back button which either cancels the activities belonging to the currently visible views or expands the sidebar, if it exists. +
+The back button will be shown as soon as a nested view (e.g. the detail in a Master Detail Layout) is shown or a sidebar is collapsed.
+
+The position and rendering of the back button depends on the used layout.
+
+In the case of a layout which shows multiple views in mobile mode (e.g. DashboardLayout) the ApplicationFrameLayout will render a back button in the navigation bar above the current content. +
+
+For layouts only showing one view in mobile mode (e.g. Master Detail), a React context with a `onBackButtonClicked` callback will be created if a back navigation is possible. +
+Each view is responsible of showing a back button if this callback is given. +
+More details can be found in the <<project-setup, Mobile Navigation Project setup>>.
+
+In a multi view layout you also should provide a title for a better navigation experience. This title needs to be given to the `ApplicationFrameLayout` with the prop `navigationBarTitle`.
+
+Furthermore, this feature hides the header and footer of the `ApplicationFrameLayout` as soon as a back-button is shown.
+
+The next section will summarize what you need to do in your project to fully enable mobile navigation.
+
+[NOTE]
+====
+If you do not want this described behavior, you can disable it by setting the prop `disableMobileNavigation` of the `ApplicationFrameLayout` to `true`.
+Then no back-button will be displayed and the header as well as the footer will be shown the whole time.
+====
+
+== Mobile Navigation Project Setup
+=== Application
+First of all you need to enable responsive layout optimization for the whole application. See <<features-responsive-behavior>> for more details.
+
+[#project-setup]
+=== Views
+If you use an `ActionContentBox`, you need to set the content box prop `listenToNavigationContext` to true. +
+If you do not use an ActionContentBox for your view, you need to take care of rendering the button yourself when the `onBackButtonClicked` callback is set. +
+For this purpose the A12 Widgets library provides a `BackButton` component. +
+The following code shows how to create the back button which you can then put in the heading of your content box:
+
+[source,tsx]
+----
+include::assets/typescript/mobile-navigation/backButton.tsx[tags=content]
+----
+
+=== Title
+If you use a layout which shows more than one view in mobile mode (e.g. Dashboard or Null layout), you should provide a title for the navigation bar, which is shown above the visible content in the `ApplicationFrameLayout`. +
+You can set the title with the prop `navigationBarTitle` of the `ApplicationFrameLayout`.
+
+[NOTE]
+You do not need to do this, if you do not use the layout in a nested scenario. Meaning there is no sidebar or other parent activity before.
+
+=== Custom Layouts
+In your custom layouts you need to adapt the layout provider. The declaration of the layout depends on the number of visible views in mobile mode.
+
+==== One View in Mobile Mode
+For this case the layout provider needs to return a Layout object, which sets
+`visibleViews` to "single" and `getClearedAfterViewIndex` to "views.length - 2". +
+The getClearedAfterViewIndex tells the `ApplicationFrameLayout` after which view index there is a clear caused by the layout. +
+The following code shows an example for such a custom layout declaration
+
+[source,tsx]
+----
+include::assets/typescript/mobile-navigation/custom-layout.tsx[tags=content]
+----
+
+The usage of the properties `visibleViews` and `getClearedAfterViewIndex` is described in more detail in the link:assets/typedoc/index.html[API documentation] about `Layout`.
+
+==== Multiple Views in Mobile Mode
+For this case the layout provider needs to return a Layout object, which sets
+"visibleViews" to "multiple". Furthermore, if you do not show all available views with your layout, you need to set getClearedAfterViewIndex as well, to define the view index after which the layout causes a clear.
+

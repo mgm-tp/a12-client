@@ -1,0 +1,286 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= 2025.06-ext2
+
+== Deprecation of widgetMap props
+
+Customizing the rendered A12 Widgets for certain Client components via the `widgetMap` property is deprecated starting with Client 16.1.0. Instead, use the `ClientWidgetMapContext` to customize A12 Widgets rendered by Client.
+For example, when customizing the MasterDetail widget with the widgetMap property like so:
+
+[source,typescript]
+----
+const customWidgetMap: FrameViews.MasterDetailLayoutProps["widgetMap"] = {
+	masterDetail: CustomMasterDetail
+};
+
+export function CustomResizableMasterDetailLayout(
+	props: FrameViews.MasterDetailLayoutProps
+) {
+	return <FrameViews.MasterDetailRegionLayout {...props} widgetMap={customWidgetMap} />;
+}
+----
+
+You can instead wrap the outer component with the `ClientWidgetMapContext` and pass your custom widget there:
+
+[source,typescript]
+----
+import { useContext } from "react";
+import { ClientWidgetMapContext } from "@com.mgmtp.a12.client/client-core/lib/core/ClientWidgetMap.js";
+
+export function CustomResizableMasterDetailLayout(
+	props: FrameViews.MasterDetailLayoutProps
+) {
+	const DefaultClientWidgetMap = useContext(ClientWidgetMapContext);
+
+	const customWidgetMap = {
+		...DefaultClientWidgetMap,
+		MasterDetail: CustomMasterDetail
+	};
+
+	return (
+		<ClientWidgetMapContext.Provider value={customWidgetMap}>
+			<FrameViews.MasterDetailRegionLayout {...props} />
+		</ClientWidgetMapContext.Provider>
+	);
+}
+----
+
+== Deprecation of ProgressIndicatorComponent property
+
+The property `ProgressIndicatorComponent` used to customize the `ProgressIndicator` of the `ViewViews.ProgressIndicator` component is deprecated starting with Client 16.1.0. The migration path is the same as described above for the `widgetMap` property.
+You can use the `ClientWidgetMapContext` from Client and customize the `ProgressIndicator` widget instead.
+
+== Changes to Experimental features
+
+[#/experimentalChanges/payload]
+=== Extended ActivityActionWithModelsInScenePayload with Model References and Model Graph
+
+The experimental interface `ActivityActionWithModelsInScenePayload` (along with its async counterpart, their type guards and the `extractModelsInScenePayload` helper) was moved from the `ActivityActions` namespace of the `activity` module to the `model` module.
+
+[source,typescript]
+----
+// OLD
+import { type ActivityActions } from "@com.mgmtp.a12.client/client-core/lib/core/activity/index.js";
+type P = ActivityActions.ActivityActionWithModelsInScenePayload
+
+// NEW
+import { type ActivityActionWithModelsInScenePayload } from "@com.mgmtp.a12.client/client-core/lib/core/model/index.js";
+----
+
+Additionally, it was extended to contain *all* referenced models in the current scene (not only the *loaded* ones). Additionally, the Model Graph is now part of the payload as well to be able to work with model descriptors (for example, finding references from the header).
+
+[source,typescript]
+----
+export interface ActivityActionWithModelsInScenePayload extends ActivityActionPayload {
+
+	//readonly modelsInScene: ModelAPI[]; // <- OLD
+
+	readonly modelsInScene: ReferencedModel.Instance[]; // <- NEW
+	readonly modelGraph: ModelGraph; // <- NEW
+}
+----
+
+Note that the type of each referenced model depends on its loading state, meaning each element in `modelsInScene` is now either:
+
+* the already loaded model
+* a model error, when loading was already attempted and failed
+* a model descriptor, when the model was not loaded yet (in this case the Model Graph could be used, e.g. to find references)
+
+Additionally, the `direct` property of a referenced model can be used to distinguish between:
+
+* models that are part of a scene because they were explicitly specified in it (`direct: true`)
+* models that are part of a scene because they are transitively referenced via other models (`direct` property is not set)
+
+When you use `modelsInScene` to iterate over available references, you will now need to either:
+
+* filter out only the loaded references (if thats all you're interested in) or
+* handle the other types as well and
+* check for the `direct` property (if you want to treat `modelsInScene` as in "models directly set in the scene" and not as "all models that are part of the scene")
+
+Type Guards for the different reference types are provided as part of the `ReferencedModel` namespace.
+
+=== Removed canHandleAsync from DataProvider
+
+The experimental method `canHandleAsync` was removed from the `DataProvider` interface because it introduces stack overflow errors when using a large number of Data Providers and/or Data Holders.
+In order to still fulfill the original use case of `canHandleAsync` (being able to limit the scope of a Data Provider based on the presence of models in the scene), the `canHandle` method now receives the triggering action as well.
+
+To stay non-breaking, `action` is added as an optional property to the `DataProvider.CanHandleConfig` interface, which now looks like this:
+
+[source,typescript]
+----
+export interface CanHandleConfig {
+	readonly activityId: string;
+	readonly operation: Operation;
+	readonly dataHolder: Activity.DataHolder;
+
+	readonly activities: ActivityMap;
+
+	readonly action?: ActivityActions.DataReducerAction; // <- NEW
+}
+----
+
+The migration path depends on your logic implemented in `canHandleAsync`:
+
+==== No Saga Effects
+
+If you implemented `canHandleAsync` without using any kind of effect, you can simply put the logic in the normal `canHandle` (which has the same parameters, but is just a "normal" function).
+
+[NOTE]
+====
+When you only use the `select` effect, check whether the data you're selecting is available from the config parameter directly. In these cases, you can also just move the implementation to `canHandle` and replace the "selecting" logic. Consider this example:
+
+[source,typescript]
+----
+*canHandleAsync(config: DataProvider.CanHandleConfig): SagaGenerator<boolean> {
+	const instance = yield* select(
+			ActivitySelectors.activityPropById(
+				config.activityId,
+				activity => activity.descriptor.instance
+			)
+		);
+
+	return instance !== undefined;
+}
+----
+
+Here, we only want to handle a data holder when its activity has an instance set. However, since `activities` is a property of `CanHandleConfig`, this can be refactored to a normal `canHandle`:
+
+[source,typescript]
+----
+canHandle(config: DataProvider.CanHandleConfig): boolean {
+	const { activityId, activities } = config;
+
+	const activity = activities[activityId];
+
+	return activity?.descriptor.instance !== undefined;
+}
+----
+====
+
+==== Accessing Models In Scene
+
+[NOTE]
+====
+The import path for the `extractModelsInScenePayload` helper and its return value was changed slightly. See <</experimentalChanges/payload,here>>
+====
+
+When you used `canHandleAsync` to be able to select the models of the current scene, use the new action property in `canHandle` to access them. Consider this example:
+
+[source,typescript]
+----
+import { select, type SagaGenerator } from "typed-redux-saga";
+
+import { type DataProvider } from "@com.mgmtp.a12.client/client-core/lib/core/data/index.js";
+import { ModelSelectors } from "@com.mgmtp.a12.client/client-core/lib/core/model/index.js";
+
+const myProvider: DataProvider = {
+	name: "MyProvider",
+	canHandle(): boolean {
+		return false; // not used because we implemented canHandleAsync
+	},
+	*canHandleAsync(config: DataProvider.CanHandleConfig): SagaGenerator<boolean> {
+		const models = yield* select(ModelSelectors.modelDescriptorsByActivityId(config.activityId));
+
+		return models.some(({ modelType }) => modelType === "<some a12 model type>");
+	},
+	*provideData(): SagaGenerator<void> { /* impl */ }
+};
+----
+
+This Data Provider wants to handle data holders where the activity contains a specific A12 model in its scene. Since this was not possible before using just `canHandle`, `canHandleAsync` was implemented.
+
+However, this use case can now be solved with the normal `canHandle` method by accessing the payload of the triggering action:
+
+[source,typescript]
+----
+import { type SagaGenerator } from "typed-redux-saga";
+
+import { isModelInstance } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
+
+import { type DataProvider } from "@com.mgmtp.a12.client/client-core/lib/core/data/index.js";
+import { ActivityActions } from "@com.mgmtp.a12.client/client-core/lib/core/activity/index.js";
+
+export const myProvider: DataProvider = {
+	name: "MyProvider",
+	canHandle({ action }: DataProvider.CanHandleConfig): boolean {
+		const { modelsInScene } = ActivityActions.extractModelsInScenePayload(action) ?? {};
+
+		return modelsInScene?.some(
+			m => (isModelInstance(m) ? m.header.modelType : !Model.Error.isInstance(m) ? m.modelType : undefined) === "<some a12 model type>"
+		) ?? false;
+	},
+	*provideData(): SagaGenerator<void> { /* impl */ }
+};
+----
+
+Here, we can first use the convenience type guard from the `ActivityActions` namespace to extract the models in scene from the action payload before searching them for our specific type.
+Note that the type of each element in `modelsInScene` depends on the loading state (so in our example, we check the `modelType` property from the header if the model already exists, otherwise we access the `modelType` property of its descriptor).
+
+==== Accessing Other State / Using Other Effects
+
+If you used effects other than `select` or accessed any other state (that is not available via the config parameters) in your `canHandleAsync` implementation, you need to refactor your Data Provider and/or the action that triggers it.
+Note that the triggering action (e.g. `loadData`) gets passed to `canHandle`, which means you could use its payload to make additional data available there (like A12 Client does internally with the models in the scene).
+
+=== How to define the rootReducer
+
+Previously, if you provided a rootReducer to Client, you had to create the default rootReducer yourself. If your appsetup defined 'reducerMap' and 'dataReducers', they had to be integrated into the rootReducer yourself via the 'createRootReducer' function and the Client was ignoring these parameters.
+
+Now, the default rootReducer is created by Client again, passed to you and you have the option to customize or to ignore it. 'createRootReducer' is removed from the public API. Make sure to add 'reducerMap' and 'dataReducers' back to the appsetup, if you removed them.
+
+[source,typescript]
+----
+// OLD
+const defaultRootReducer = createRootReducer(otherConfig.reducerMap, otherConfig.dataReducers);
+
+const customRootReducer: Reducer<object> = (state, action) => {
+		switch (action.type) {
+			case "CUSTOM_ACTION": {
+				return { ...state, custom: true };
+			}
+			default:
+				return defaultRootReducer(state, action);
+		}
+	};
+
+// NEW
+const customRootReducer: (defaultReducer: Reducer<object>) => Reducer<object> =
+	defaultReducer => (state, action) => {
+		switch (action.type) {
+			case "CUSTOM_ACTION": {
+				return { ...state, custom: true };
+			}
+			default:
+				return defaultReducer(state, action);
+		}
+	};
+----

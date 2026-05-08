@@ -1,0 +1,48 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/getting-started/prerequisites]
+= Prerequisites
+
+In order to use the Client library no special software dependencies are necessary.
+
+== Useful Tools
+
+=== A12 Modeling Tools
+
+The A12 SME offers the opportunity to create document and UI models. It provides a way to upload models to the server. Be aware that the A12 modeling tools version has to fit to the version of the backend (i.e. Services and Engines).
+
+Please check the https://geta12.com/#/releases/releases-overview[A12 Releases,role=external,window=_blank] page to find out about compatible versions of different A12 components.
+
+=== React and Redux Developer Tools
+
+The React and Redux extensions are essential to inspect your application's UI and backend state.

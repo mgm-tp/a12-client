@@ -1,0 +1,57 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#features-responsive-behavior]
+= Responsive Application Layout Optimization
+
+There are certain layout optimizations for small window sizes (e.g. an application is opened on a phone device or the browser window is made smaller).
+
+These optimizations apply to the following components in the Client: 
+
+* *MasterDetailLayout*: In a large window the MasterDetailLayout shows two panels next to each other, if there is more than one view opened. In a small window the layout shows only one panel.  
+* *NotificationFrame*: If the application window is large the notifications are shown separately. Otherwise they are stacked.
+* *ApplicationFrameLayout*: If the application window is small the mobile navigation behavior (<<features-mobile-navigation>>) is enabled.
+
+Furthermore, A12 Engines and Widgets provide layout optimization for small window sizes for certain components as well.
+
+In order to enable these layout optimizations for the whole application (including Engines and Widgets) you need to wrap your application in a React context provider called `SizeContext`. This provider makes the current window size available to all underlying React components.
+
+The following code shows an example of how this should look like: 
+[source,tsx]
+----
+include::assets/typescript/responsive-behavior/sizeContext.tsx[tags=register-size-context, indent=0]
+----
+
+[WARNING]
+====
+If you do not wrap your application with the `SizeContext.Provider` there will not be any size detection and a large window will be assumed. There is no fallback to a device detector for Client components.
+====

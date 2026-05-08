@@ -1,0 +1,182 @@
+{
+  "header": {
+    "id": "SubType_Fruits-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Obst"
+      },
+      {
+        "locale": "en",
+        "text": "Fruit"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "SubType_Healthy-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "SubType_Healthy-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SubType_Fruits-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_6fc33",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_49c6a",
+                "name": "Food",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "SubType_Healthy-document"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_ac5ca",
+                "name": "CookingSuggestions",
+                "Group": {
+                  "repeatability": 999999,
+                  "usageType": "multi-select",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_977c5",
+                      "name": "value",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "key1",
+                                "label": [
+                                  {
+                                    "locale": "de",
+                                    "text": "Lecker in Salaten"
+                                  },
+                                  {
+                                    "locale": "en",
+                                    "text": "Delicious in salads"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "key2",
+                                "label": [
+                                  {
+                                    "locale": "de",
+                                    "text": "Ideal für Smoothies"
+                                  },
+                                  {
+                                    "locale": "en",
+                                    "text": "Great for smoothies"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "de",
+                            "text": "Zubereitungsempfehlungen"
+                          },
+                          {
+                            "locale": "en",
+                            "text": "Cooking Suggestions"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_aa646",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_1e9cb",
+                "name": "Sugar",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "zeroNotAllowed": true
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Zucker [g]"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Sugar [g]"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

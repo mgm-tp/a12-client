@@ -1,0 +1,12 @@
+{
+  "include": [
+    "src/core/**/*",
+    "src/extensions/**/*",
+    "lib/core/**/*",
+    "lib/extensions/**/*"
+  ],
+  "reporter": [
+    "text-summary"
+  ],
+  "report-dir": "./target/c8"
+}

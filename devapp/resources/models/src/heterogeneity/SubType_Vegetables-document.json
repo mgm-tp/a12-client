@@ -1,0 +1,119 @@
+{
+  "header": {
+    "id": "SubType_Vegetables-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Vegetable"
+      },
+      {
+        "locale": "de",
+        "text": "Gemüse"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "SubType_Healthy-document",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "SubType_Healthy-document"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SubType_Vegetables-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_8ffd7",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_7358b",
+                "name": "Food",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "SubType_Healthy-document"
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b9e61",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_1a52a",
+                "name": "WaterContent",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "zeroNotAllowed": true,
+                      "trait": "percent"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Water content [%]"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Wassergehalt [%]"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,200 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Asynchronous Flows With Redux Saga
+
+Client uses the JavaScript library Redux Saga for code that involves asynchronous execution and side effects. This code can be often seen as defining application flow of some type, like logging-in and -out of a user or retrieving documents from a server and storing them in the redux store. Redux Saga allows writing asynchronous code in a synchronous manner, by using generator functions, called in this context "sagas", that yield descriptions of what "effects" should occur at any given point in the flow. Those descriptions are then handled by the saga middleware to perform tasks, like dispatching actions, waiting for some action to come, calling an asynchronous function (a function that returns a promise). Effects can be blocking or non-blocking.
+
+Most sagas use the take-effect (or the helper effects takeLatest or takeEvery) to wait for an action that matches some pattern. It is important to remember, that the saga middleware executes after reducers - if some reducer changes the store in some way on receiving an action, and some saga listens for the same action, then by the time yield take returns, the store was already modified by the reducer. If this is not desired, then a new type of action should be created, that is ignored by reducers.
+
+For general information about Redux Saga, you may want to visit following links:
+
+* https://redux-saga.js.org/[Redux project page, role=external,window=_blank]
+* https://www.blog.duomly.com/implement-redux-saga-with-reactjs-and-redux/#redux-saga[Tutorial with background information, role=external,window=_blank]
+* http://blog.isquaredsoftware.com/2017/01/idiomatic-redux-thoughts-on-thunks-sagas-abstraction-and-reusability/[Comparison of Thunks and Sagas with background information and links to discussions, role=external,window=_blank]
+* https://medium.com/@totaldis/redux-saga-in-action-s-f7d11cffa35a[Description of an approach that strictly divides actions into signals (that trigger sagas) and deltas (that trigger reducers), role=external,window=_blank]
+
+== Implementation of Sagas in Client
+
+In the standard case, like the one described in the official tutorial (to be found under the first link above), a saga is a generator function that is directly connected to the saga middleware. It has all the freedoms allowed by Redux-Saga and behaves as if it was a separate thread. It is completely independent of any other sagas. Client allows to define sagas like this, but the built-in platform-sagas are implemented in a different way.
+
+=== Connecting Sagas Directly to Middleware
+
+Custom sagas can be passed in the customSagas-argument to the factory function `ApplicationFactories.createApplicationSetup`. Its platform implementation passes each saga to the run-function defined by the saga middleware. This function executes each saga right away, so if it contained some blocking code, it would freeze the application. That's why possibly long running code should always be run asynchronous and the sagas should always yield effects. Typical usage is that a saga waits for some action using the take-effect and then calls some asynchronous code using the call-effect.
+
+=== Connecting Sagas to the Dispatcher
+
+This method is used for built-in platform-sagas and it allows to overwrite them. Objects implementing the interface `ApplicationSaga.Descriptor` can be passed in the overridePlatformSagas-argument to the factory function `ApplicationFactories.createApplicationSetup`. A descriptor must define following two functions:
+
+* canHandle: takes an action as argument and returns true, if the saga should execute
+* handle: calls a generator function (can be seen as a saga), that handles the action matched by canHandle and returns its result, that is, a generator
+
+To use the Descriptor, you need following import:
+
+[source,tsx]
+----
+import { ApplicationSaga } from "@com.mgmtp.a12.client/client-core/lib/core/application";
+----
+
+Those descriptors are then used by the dispatcher, a saga that is directly connected to the middleware, just like in the standard case described before. The dispatcher receives all actions dispatched to the store and calls canHandle on every descriptor that it knows. For the first matching descriptor, the dispatcher yields the generator returned by its handle-function, that is then processed by the saga middleware. To recapitulate, the dispatcher dispatches actions to functions, that can handle them.
+
+This mechanism can be used to selectively overwrite built-in sagas - all descriptors in overridePlatformSagas are checked before built-in sagas, so if some of them can handle the same action as some built-in saga, then it will be executed instead.
+
+This mechanism has its restrictions - some concurrency patterns, that are possible when using sagas in a standard way, are currently not directly possible, like takeLatest or blocking take. The dispatcher uses takeEvery under the hood, so an action is always executed, if any of the registered descriptors can handle it.
+
+For an explanation of takeEvery and takeLatest you may want to visit the https://redux-saga.js.org/docs/basics/UsingSagaHelpers.html[documentation, role=external,window=_blank] on Redux Saga helpers.
+
+=== Providing Own Dispatcher
+
+Users of Client can pass the setup function their own implementation of the dispatcher. It is then executed by the saga middleware, just like provided dispatcher would be, and receives all registered descriptors as argument.
+
+== Error Handling in Sagas
+
+The circumstance that sagas are implemented as generator functions allows for easy error handling with the try…catch statement. Inside the catch-block, the ERROR-action should be created, that is then used by reducers to save the error and error status in the affected activity. Below are the steps, that comprise the error handling.
+
+. Inside the catch-block in a saga, the ERROR-action should be dispatched. Its payload contains the error and the property operationType, which can be set to "loading" or "saving" - it is used by reducer to set the value of either loadingState or savingState in the activity.
+. If the error is of type ApplicationError, then it is saved by reducer as is. Otherwise, the reducer wraps the error in an ApplicationError with the error code of INTERNAL_CLIENT_ERROR.
+. Based on value of operationType, the reducer sets either loadingState or savingState to "error".
+. Components can use this information for example to render some kind of indication, that an error occurred.
+. The error-property can be reset by dispatching the action CLEAR_ERROR.
+
+== Built-in Sagas Which Get Triggered by an Action
+
+Below are listed all actions that are consumed by Client built-in sagas. All actions that trigger them are in the namespace "Activity", so for example the action named "PUSH" below has the type "Activity/PUSH". If you want to have a different behavior, you can register your own implementation in the array `overridePlatformSagas` in the Client application setup.
+
+=== Models and Documents
+
+Handle loading of A12 documents and models.
+
+[cols="1,11"]
+|===
+|Triggering action |Description
+
+|`PUSH` |Executes after the reducer already created a new activity. Dispatches the `LOAD_MODELS`- and `LOAD_DATA`-action if model and/or data loading is required. It also initializes one DataHolder if it is not already existing. This DataHolder's descriptor is identical to the activity's descriptor, and we refer to it as the activity DataHolder. If there is an Overview Model specified in the scene for the current activity, this saga also initializes the list parameters like pagination, filter and sorting.
+|`LOAD_MODELS` |Loads all models into the Redux store which are specified in the scene matching the current activity. All referenced Document Models are automatically loaded, so there is no need to additionally specify the referenced Document Model. It only loads models which are not yet in the redux store.
+|`LOAD_DATA` |It performs the data loading for all DataHolders of the current activity whose loading state is `loading`. The loading itself is delegated to the DataHandlers. +
+If you are using a DataLoader, there is some default behavior implemented within the Client. After the loading, it dispatches a `SET_DATA` action which sets the data in the activity. When a new document is created and the `preComputeNewDocuments` parameter of the `ApplicationSaga.Configuration` object is set to true, computations will be executed before and the calculated document will be set as data of the activity. +
+If you are using the DataProvider, you have the full control about the data loading operation, e.g. you have to write the loaded data back into the activity's DataHolder.
+|`SAVE.STARTED` / `COMMIT.STARTED` |If performs the saving of data for the current activity. The saving itself is delegated to the DataHandlers. +
+If you are using a DataLoader, it dispatches the `SET_DATA`-action for the activity after saving with the data from the save result in the payload. If the activity contains a datasourceActivityId, the `SET_DATA`-action is also dispatched for this activity. It also dispatches a `RELOAD` action for related overview activity if it exists. +
+If you are using a DataProvider, there is no additional default behavior. The Client simply runs your implemented `provideData` method of the matching DataProvider. +
+For the `COMMIT.STARTED` action, the activity is cancelled after the saving operation.
+|`REMOVE_DATA` |Calls the delete function of a matching DataHandler for the current activity. If you are using a DataLoader, it also dispatches the `RELOAD`-action for the parent overview-activity and its dependents after the delete operation.
+|`RELOAD` |Locks the activity (by dispatching the `LOCK`-action), dispatches the `LOAD_DATA`-action and then unlocks the activity (by dispatching the `UNLOCK`-action).
+|===
+
+=== Cancellation of Activities
+
+[cols="1,11"]
+|===
+|Triggering action |Description
+
+|`CANCEL_REQUESTED` |Dispatches a `CANCEL`-action for all activities which are contained in the payload of the action. This saga can be overridden with for example the dirtyHandling-saga which is contained in the extensions of the Client.
+|===
+
+== ActivitySagas
+
+=== acquireActivityLock
+
+This saga can be used to acquire a lock for an activity. The saga tries to lock an activity until it has the lock or until the activity is not in the store anymore. If the activity is already locked by somebody else, the saga waits for the activity to be unlocked.
+
+The saga has the following signature:
+
+[source,tsx]
+----
+function acquireActivityLock(activityId: string, owner: string, details: object): SagaIterator<string | undefined> { /* ... */ }
+----
+
+The locks get a unique id which later has to be used to unlock them.
+
+If the saga acquired a lock it returns the lock id. If the activity gets deleted from the store in the process the saga returns "undefined". A caller has to check that the lock id is not undefined before proceeding.
+
+A caller also has to release the lock after it is not needed anymore.
+
+Example usage:
+
+[source,tsx]
+----
+const lockId = yield call(ActivitySagas.acquireActivityLock, activityId, owner, details);
+if (lockId === undefined){
+  // activity with activityId is not in the store anymore, so it makes sense to stop here..
+  return "failed";
+}
+
+// Statements while having the lock
+
+// When you are done, unlock the activity with the lockId
+yield put(ActivityActions.unlock({activityId: activityId, lockId: lockId}));
+
+----
+
+== StoreSagas
+
+=== waitForStateChange
+
+This saga can be used to wait for a specific state change by passing a selector.
+
+The saga has the following signature:
+
+[source,tsx]
+----
+waitForStateChange<T>: (selector: Selector<{stateChanged: boolean, returnValue: T}>) => SagaGenerator<T>;
+----
+
+The function expects as an argument a selector, which returns an object, which contains the following values:
+
+* stateChange: specifies that the state changed to the desired outcome
+* returnValue: a value which gets returned by the selector
+
+The waitForStateChange saga calls the selector on the first call and then after each action which gets dispatched, until the "stateChanged" value is true. In the end the saga returns the "returnValue" to the caller.
+
+Example usage in another saga:
+
+[source,tsx]
+----
+const returnValue = yield call(StoreSagas.waitForStateChange, mySelector(myArguments))
+----
+
+=== waitFor
+
+This saga is a simplified variant of <<waitForStateChange>>. Instead of requiring a selector that returns an object with `stateChanged` and `returnValue`, it accepts a selector that returns either a value or `undefined`.
+
+This makes `waitFor` more convenient when you simply need to wait until some value becomes available in the store, without needing the explicit `stateChanged` flag.
+
+The saga has the following signature:
+
+[source,tsx]
+----
+waitFor<T>: (selector: WaitForSelector<T>) => SagaGenerator<T>;
+
+type WaitForSelector<T> = Selector<T | undefined>;
+----

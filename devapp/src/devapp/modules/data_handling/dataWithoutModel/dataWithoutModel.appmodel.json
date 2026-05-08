@@ -1,0 +1,135 @@
+{
+  "header": {
+    "id": "dataWithoutModel.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "data_handling.without-model",
+        "menu": {
+          "name": "data_handling.without-model",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Data Loading without models"
+            },
+            {
+              "locale": "de",
+              "text": "Datenladen ohne Modelle"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "DataHandling",
+              "feature": "DataLoader"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "data_handling.without-model",
+            "scenes": [
+              {
+                "name": "DataLoader",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "DataHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "DataLoader"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DataLoaderFeature",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "DATAOverview",
+                "description": "View to demonstrate an overview data loader without A12 models",
+                "matchConditions": [
+                  {
+                    "key": "feature",
+                    "mustEqual": "DataLoaderWithoutModel"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewWithoutModel",
+                      "loadData": true
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "DATAForm",
+                "description": "View to demonstrate a document data loader without A12 models",
+                "matchConditions": [
+                  {
+                    "key": "feature",
+                    "mustEqual": "DataLoaderWithoutModel"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DocumentWithoutModel",
+                      "loadData": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

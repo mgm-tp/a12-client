@@ -1,0 +1,124 @@
+{
+  "header": {
+    "id": "activity-replacement.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "examples.activity-replacement",
+        "menu": {
+          "name": "examples.activity-replacement",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Activity Replacement"
+            },
+            {
+              "locale": "de",
+              "text": "Activity Ersetzung"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "Examples",
+              "feature": "ActivityReplacement",
+              "model": "ActivityReplacement-document"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "examples.activity-replacement.flow",
+            "scenes": [
+              {
+                "name": "ActivityReplacementOverview",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "Examples"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "ActivityReplacement"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ActivityReplacementOverview",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "ActivityReplacement-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Form",
+                "priorScene": "ActivityReplacementOverview",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ActivityReplacementForm",
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "ActivityReplacement-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

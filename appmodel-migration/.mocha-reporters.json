@@ -1,0 +1,6 @@
+{
+  "reporterEnabled": "./scripts/mocha/reporter.cjs,xunit",
+  "xunitReporterOptions": {
+    "output": "./target/TEST-com.mgmtp.a12.client-client-application-model-migration.xml"
+  }
+}

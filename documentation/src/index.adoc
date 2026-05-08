@@ -1,0 +1,129 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= A12 Client
+
+include::0100_introduction.adoc[leveloffset=1]
+
+include::0101_technologies.adoc[leveloffset=2]
+
+include::0102_principles.adoc[leveloffset=2]
+
+include::0103_packages.adoc[leveloffset=2]
+
+include::0200_getting-started.adoc[leveloffset=1]
+
+include::0201_prerequisites.adoc[leveloffset=2]
+
+include::0300_basics.adoc[leveloffset=1]
+
+include::0301_application_frame.adoc[leveloffset=2]
+
+include::0302_views.adoc[leveloffset=2]
+
+include::0303_activity.adoc[leveloffset=2]
+
+include::0304_activities-views-engines.adoc[leveloffset=2]
+
+include::0305_application_model.adoc[leveloffset=2]
+
+include::0306_data_loading.adoc[leveloffset=2]
+
+include::0307_data_reducers.adoc[leveloffset=2]
+
+include::0308_model_loading.adoc[leveloffset=2]
+
+include::0309_summary.adoc[leveloffset=2]
+
+include::0400_features.adoc[leveloffset=1]
+
+include::0401_appsetup.adoc[leveloffset=2]
+
+include::0402_root_reducer.adoc[leveloffset=2]
+
+include::0403_model_loading.adoc[leveloffset=2]
+
+include::0404_layouts.adoc[leveloffset=2]
+
+include::0405_widgets.adoc[leveloffset=2]
+
+include::0406_localization.adoc[leveloffset=2]
+
+include::0407_modularization.adoc[leveloffset=2]
+
+include::0408_dirty-handling.adoc[leveloffset=2]
+
+include::0409_notifications.adoc[leveloffset=2]
+
+include::0410_deep-linking.adoc[leveloffset=2]
+
+include::0411_modelgraph.adoc[leveloffset=2]
+
+include::0412_heterogeneity.adoc[leveloffset=2]
+
+include::0413_accessibility.adoc[leveloffset=2]
+
+include::0414_asynchronous-flows-with-redux-saga.adoc[leveloffset=2]
+
+include::0415_responsive-behavior.adoc[leveloffset=2]
+
+include::0416_mobile-navigation.adoc[leveloffset=2]
+
+include::0500_architecture.adoc[leveloffset=1]
+
+include::0501_walkthrough.adoc[leveloffset=2]
+
+include::0800_recipes.adoc[leveloffset=1]
+
+include::0801_write-tests.adoc[leveloffset=2]
+
+include::0900_faq.adoc[leveloffset=1]
+
+include::0901_general.adoc[leveloffset=2]
+
+include::0902_engines.adoc[leveloffset=2]
+
+include::0903_performance.adoc[leveloffset=2]
+
+include::0950_problems.adoc[leveloffset=1]
+
+include::1000_api-documentation.adoc[leveloffset=1]
+
+include::1050_breaking-change-management.adoc[leveloffset=1]
+
+include::1100_migration.adoc[leveloffset=1]
+
+include::1101_2025.06-ext4.adoc[leveloffset=2]
+
+include::1102_2025.06-ext2.adoc[leveloffset=2]
+
+include::1103_2025.06.adoc[leveloffset=2]

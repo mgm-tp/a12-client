@@ -1,0 +1,107 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/advanced/rootReducer]
+= Root Reducer
+
+In most cases, your own reducers will either work on custom top level slices of the state (using the `reducerMap` property of the `ApplicationSetup`) or on certain activities (using <</basics/data-reducers, Data Reducer>>).
+
+However, these APIs will not work when wanting to work on the default slices of Client itself.
+To achieve this, it is possible to customize the root reducer as a whole: this lets you intercept actions, add your own logic to default actions, while still being able to delegate to the default reducer if necessary.
+
+Consider the following example:
+
+[source,ts,title="Example of a custom root reducer"]
+----
+include::assets/typescript/features/rootReducer.ts[tags="root",indent=0]
+----
+
+Here we define a custom root reducer that handles a specific action (`"CUSTOM_ACTION"`) and falls back to the default root reducer for all other actions.
+Note that because our custom action wants to update the top level of the Client state, using something like a <</basics/data-reducers, Data Reducer>> would not be possible here (since these only work per Activity).
+This ensures that your custom logic is applied without affecting the default Client behavior. 
+
+[NOTE]
+====
+Instead of using a switch statement, you could also use the `.match()` method provided by action creators to distinguish actions.
+====
+
+== Lenses
+
+Lenses are a functional programming concept adapted here for state management. In the context of A12 Client, a lens is a plain object with a getter and a setter, allowing you to read and update a specific part of the redux state in a type-safe and composable way.
+This is especially useful when customizing the root reducer, when default Client behavior should be overridden / changed.
+
+Compared to selectors, which only read state, lenses provide both read and write access. 
+
+Lenses are available for all slices of the Client state, namely:
+
+[cols="1,1",options="header"]
+|===
+| Client state slice   | lens namespace
+| `activities`         | `ActivityLenses`
+| `application`        | `ApplicationLenses`
+| `locale`             | `LocaleLenses`
+| `models`             | `ModelLenses`
+| `notifications`      | `NotificationLenses`
+|===
+
+[NOTE]
+====
+There is no specific lens for the ApplicationModel inside the `models` slice. To programmatically change flows, regions and menus, implement the corresponding selectors with the `DynamicConfiguration` API instead.
+====
+
+=== Basic Example
+
+Consider this example showing how to use a lens to update the `locale` slice in your root reducer:
+
+[source,ts,title="Example of a custom root reducer using the LocaleLenses"]
+----
+include::assets/typescript/features/basicExample.ts[tags="localeLens",indent=0]
+----
+
+Here, we define a custom action to set a locale from a string. When dispatched, the reducer uses the `LocaleLenses.locale()` lens to update the default `locale` slice in the state.
+Other actions, including all the default ones from Client, will go through the default reducer, leaving their behavior unchanged.
+
+== Complete Example
+
+The following example demonstrates how you can use multiple lenses to handle both custom actions and default Client actions:
+
+[source,ts,title="Example of a custom root reducer using the different Lenses from Client"]
+----
+include::assets/typescript/features/fullExample.ts[tags="full",indent=0]
+----
+
+As seen in the example, you can choose to override the default behavior or delegate to the default reducer and then use lenses to further update the state. This flexibility makes the API very powerful for advanced use cases.
+
+[NOTE]
+====
+When handling default Client actions in your custom root reducer, be careful not to break the Client behavior. Always make sure to handle these actions properly, or fallback to the default reducer.
+====

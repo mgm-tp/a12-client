@@ -1,0 +1,170 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Modularization
+
+The ModuleRegistry is an API to enable modularization of Client projects. The API offers extension points to implement dynamic modules in the Client Redux context. This documentation shows what a modularized Client project can look like.
+
+== Motivation
+
+Modularization is a common requirement in web projects regarding different aspects:
+
+* Architecture
+** Clear dependency management
+** Clear relation between frontend and backend code
+** Loose coupling of BE modules
+** API for portal / cross-functionality
+* Infrastructure
+** Possibility to separately release a module (not by default)
+** Possibility to separately deploy a module (not by default)
+* Organization
+** Modules can be developed by another supplier
+** Modules can be easily switched off or de-activated
+
+Different but related aspects are:
+
+* Keep JS modules in the browser cache for offline usage
+* Partial loading of modules - modules which are not used are not loaded
+* Delta updates in production in order to limit bandwidth
+
+== ModuleRegistry
+
+To be able to build up a single page Client application by modules dynamically, the base or core application itself is not allowed to know the concrete modules. The modules have to register themselves to any part of the architecture they want to participate in.
+
+Therefore, the Client architecture provides a central `ModuleRegistry` to add, remove or retrieve modules. More information about the API can be found in the respective part of the link:assets/typedoc/index.html[API documentation].
+
+To implement a module the API offers different extension points like reducers, views, sagas, etc. The Client uses the OSGi whiteboard pattern to integrate the modules: The extension points use a provider to ask all the modules for specific functions. To enable dynamic implementations of these interfaces, access to the Redux state is needed.
+
+Modules have to return an unique id. Everything else is optional.
+
+[NOTE]
+====
+Module definitions should not interfere and interact with each other to prevent any execution order issue because the execution order is not ensured. This especially applies to fallback solutions for DataProviders, DataEditors and DataReducers because they prevent the executions of others that are later in the execution chain. Therefore, it is highly recommended that every fallback logic for preventing fatal error should be done in the global definition.
+====
+
+The `ModuleRegistry` can be accessed by the `ModuleRegistryProvider` namespace.
+
+[source,tsx]
+----
+include::assets/typescript/modularization/moduleRegistryProvider.ts[tags=moduleRegistryProvider1;moduleRegistryProvider2;moduleRegistryProvider3,indent=0]
+----
+
+The `ModuleRegistryProvider` also offers the `getViewProvider` function which can be used in a `RegionUi` to set the `viewProvider` as this an extension point outside the Client core.
+
+[#/advanced/module-api]
+== Using the API
+
+To register a module we first need to implement the `Module` interface
+
+[source,tsx]
+----
+include::assets/typescript/modularization/myModule.ts[tags=myModule,indent=0]
+----
+
+Then the module can be registered before or after bootstrapping the Client Application by `ApplicationSetup`.
+
+[source,tsx]
+----
+include::assets/typescript/modularization/registration.ts[tags=registration,indent=0]
+
+----
+
+As you can see we still need to define the Application Model, the modules model will be added at runtime. Special care must be taken when removing modules at runtime and it should be avoided, if possible. If there is an active View in a module, removing the module will lead to an Error.
+
+If you remove a module at runtime you are responsible for consistency. For example you may have to stop running sagas or middleware that are doing processing in the background, or you have to remove state from the store.
+
+[NOTE]
+====
+Modules are not allowed to set own reducers for the following slices because they are handled internally:
+
+* activities
+* locale
+* models
+* application
+* notifications
+====
+
+== Implementing Custom Extension Points
+
+The given extension points may not fit your needs completely, but with the API it is quite simple to implement new ones on top of it.
+
+In the example we see a `MyAbstractModule` which is the base class for every project module that offers the new extension `getModuleSpecificRenderer`.
+The `MyModuleExtensions.getRenderer()` function provides a renderer to render a central component that includes module specific parts:
+
+[source,tsx]
+----
+include::assets/typescript/modularization/extension.tsx[tags=extension,indent=0]
+----
+
+== Modules and the Main Menu
+
+The default main menu of the Client creates one menu item per (Application Model) menu, and the order of the menu items is the same as the appearance / order of registration in the Application Model.
+When using Modularization, this might not fit your needs. In this case, please integrate a custom menu component using the App Frame's mainMenuComponent API.
+
+[NOTE]
+====
+When using the adapter module with multiple Application Models (see below), the menu order is dependent on the order of the models in the <</features/modelgraph, Model Graph>>.
+====
+
+[#/features/adapter]
+== Adapter Module
+
+Client provides an Adapter Module to handle multiple Application Models. This module can be registered like any other Client module and will collect all Application Models in your model graph, load them and make them available. 
+When using the adapter module, specifying an Application Model in your application setup becomes obsolete (because Application Models from the Model Graph will be collected anyway). Since the typing still requires you to set the property, Client provides a placeholder that can be used in that case. Please see the snippet below for an example.
+
+[source,tsx]
+----
+include::assets/typescript/modularization/adapter.tsx[tags=setup,indent=0]
+----
+
+Note that while the adapter allows to provide multiple Application Models, in most use cases a single Application Model should be sufficient.
+In this case you can still specify it in the setup directly. Changing an existing setup by splitting the Application Model into multiple ones is not recommended and might lead to unwanted effects (see below).
+
+[NOTE]
+====
+Using this adapter module requires a Model Graph that contains all Application Models you want to load. See the <</features/modelgraph, Model Graph>> and the A12 Services documentation for more information about it.
+====
+
+=== Merging Application Models
+
+When matching scenes, Client will internally consider all Application Models that were loaded this way and merge them together into one.
+
+[NOTE]
+====
+When merging regions of Application Models, only the subregions are taken into account. If a Region (identified by name) exists both in source and target model, the
+subregions of source are added, while all other properties from the source are ignored.
+====
+
+=== Effects of Having Multiple Application Models
+
+* Having more than one Application Model with an initial activity is not supported and will lead to unexpected results. There should always only be a single initial activity.
+* When multiple Application Models contribute menu entries, their order is defined by the <</features/modelgraph, Model Graph>> (as this is used to find and load the models from the server).

@@ -1,0 +1,142 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Performance
+
+== Common Issues Impacting Performance 
+
+=== Dispatching Many Consecutive Actions
+
+This can be problematic when each action triggers a state change and another action, which in turn also changes the state. A typical case is a higher-level saga,
+that listens to actions and dispatches additional ones. When each action triggers state change, dispatching the first trigger action will cause a fast cascade of state changes, which
+might impact the render time of components that are subscribed on a specific piece of the state.
+
+To resolve these problems, try to reduce the number of state changes by putting as much logic as possible into reducers and use saga/middlewares only where reducers are not possible (for example, network requests or other side effects).
+The amount of "work" done in a reducer does not matter, since there will always be only one state change at the end of it.
+
+Apart from performance, this approach also has some other advantages:
+
+* reducers are simple functions and can easily be unit tested
+* reducers can easily be composed and therefore reused
+* stepping through the code while debugging is easy, because there are no additional "redux effect layers"
+* cognitive load is lower for developers reading the code
+
+=== Subscribing to Too Much State
+
+React components should always only subscribe to state changes they are actually interested in. This way, unrelated state changes will cause a re-render.
+Consider the following view component:
+
+[source,tsx,title="Using a too generic selector"]
+----
+include::assets/typescript/performance/view.tsx[tags="generic",indent=0]
+----
+
+Since the whole activity object is selected from the state, any change to it will trigger a re-render. However, only the `lock` property of the activity is actually used.
+Therefore, the component should subscribe to changes from this property only:
+
+[source,tsx,title="Using a specific selector"]
+----
+include::assets/typescript/performance/view.tsx[tags="specific",indent=0]
+----
+
+Now, the component will not re-render when the activity state changes, except for the `lock` property (which is exactly what we want here).
+
+=== Using Unstable References
+
+With React and Redux, its important that references to non primitives (like objects or arrays, but also functions) stay stable (equal by reference) whenever possible.
+Therefore reducers and selectors should only return a new value when something actually changed. With arrays and objects in particular, this can be difficult to spot:
+
+[source,tsx,title="Unstable selector"]
+----
+include::assets/typescript/performance/selector.ts[tags="unstable",indent=0]
+----
+
+Since the selector will be called after every state change (regardless of what it will select) and link:https://react-redux.js.org/api/hooks#equality-comparisons-and-updates[only checks for referential equality by default], a component using it re-renders on every state change.
+This happens because the selector returns a new object on every call.
+
+For these cases, either try to return stable values or use the second parameter of `useSelector` to pass a custom equality function.
+
+[source,tsx,title="Stable selector"]
+----
+include::assets/typescript/performance/selector.ts[tags="stable",indent=0]
+----
+
+While the example above is only for illustrative purposes, a more common real-word scenario is a selector that returns an empty array/object. Consider this code:
+[source,tsx,title="Real-world example"]
+----
+include::assets/typescript/performance/selector.ts[tags="real",indent=0]
+----
+
+=== Using Context
+
+Every time the value of a React context changes, the children of the context provider will re-render.
+Therefore the same principle as above applies here. The context value needs to be stable and only return a new value when something actually changed.
+
+Also note that `useContext` on its own does not provide a custom equality function.
+
+== How to Analyze
+
+Its recommended to install the link:https://react.dev/learn/react-developer-tools[React developer tools].
+
+=== Visualize Renderings
+
+The developer tools extension can be configured to visualizing any rendering by highlighting the affected component(s).
+You can find the setting under "General -> Highlight updates when components render"
+
+Note that this displays **any** rendering, including the valid ones. Therefore this should only be used in cases where you don't expect any renderings and
+want to check the impact of a state change.
+
+=== Use the Devtools Profiler
+
+The developer tools extension provides a Profiler panel that records all renders when running.
+
+[NOTE]
+====
+Make sure to activate "Record why each component rendered while profiling." in the settings of the Profiler.
+====
+
+While recording, perform the "problematic" state changes to trigger rendering. Afterwards, the extension will display
+each render cycle and the components that were affected. In case your profile contains lots of unrelated/unproblematic renders (very short ones),
+they can be excluded via the setting "Hide commits below".
+
+When clicking on a component, the cause of the rendering and its time should be displayed. When identifying "slow" renders, check whether the rendering is expected (for example, a Modal component rendering the first time after the user clicked a confirm button).
+If it is, check the render logic of the React component to identify any blocking code paths. If not, try optimizing the component based on the cause (for example with memoizing or by stabilizing any selectors)
+
+=== Setup Programmatic Profiling
+
+This can be done with the link:https://react.dev/reference/react/Profiler[React Profiler directly in the code] or by using external libraries like link:https://github.com/welldone-software/why-did-you-render[WhyDidYouRender]. These libraries hook into React internals to track any changes, including any unwanted re-renderings.
+This approach allows you to set up unit tests for common performance problems.
+
+[NOTE]
+====
+Note that tools like WhyDidYouRender rely on using internal code of React, which might break with a new React release. This needs to be taken into account when upgrading.
+====

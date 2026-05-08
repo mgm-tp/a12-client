@@ -1,0 +1,206 @@
+{
+  "header": {
+    "id": "Supertype_Food-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Supertype_Food Example"
+      },
+      {
+        "locale": "de",
+        "text": "Supertype_Food Beispiel"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "subTypes",
+        "value": "SubType_Healthy-document,SubType_Unhealthy-document"
+      },
+      {
+        "name": "abstract",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Supertype_Food-document"
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_1dab7",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_807d2",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name of food"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name des Lebensmittels"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_55d25",
+                "name": "NutritionInfo",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Nutritional Information per Serving"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Nährwertangaben pro Portion"
+                    }
+                  ],
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_1b8ed",
+                      "name": "Calories",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Calories [kCal]"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Kalorien [kCal]"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_f714d",
+                      "name": "Proteins",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Protein [g]"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Eiweiß [g]"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_74a9b",
+                      "name": "Carbohydrates",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Carbohydrates [g]"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Kohlenhydrate [g]"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_7d4ae",
+                      "name": "Fat",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Fat [g]"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Fett [g]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_7b0f5",
+                "name": "Consumption",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Recommended Consumption Frequency"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Empfohlene Verzehrmenge"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

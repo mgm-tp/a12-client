@@ -1,0 +1,119 @@
+{
+  "header": {
+    "id": "viewsConcept.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "SIDEBAR",
+          "layout": {
+            "name": "Null"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "ui_handling.views-concept",
+        "menu": {
+          "name": "ui_handling.views-concept",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Views Concept"
+            },
+            {
+              "locale": "de",
+              "text": "Views-Konzept"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "UIHandling",
+              "feature": "ViewsConcept"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "ui_handling.views-concept",
+            "scenes": [
+              {
+                "name": "ViewsConcept",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "UIHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "ViewsConcept"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "REGION_CLEAR",
+                      "region": [
+                        "SIDEBAR"
+                      ]
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ViewsConceptEmpty",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ViewsConcept",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "SampleSidebarContent",
+                      "region": [
+                        "SIDEBAR"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

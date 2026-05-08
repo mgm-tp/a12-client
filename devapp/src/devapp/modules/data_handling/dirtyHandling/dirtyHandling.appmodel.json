@@ -1,0 +1,90 @@
+{
+  "header": {
+    "id": "dirtyHandling.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "data_handling.dirty-handling",
+        "menu": {
+          "name": "data_handling.dirty-handling",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Dirty Handling"
+            },
+            {
+              "locale": "de",
+              "text": "Dirty Handling"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "DataHandling",
+              "feature": "DirtyHandling"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "data_handling.dirty-handling",
+            "scenes": [
+              {
+                "name": "DirtyHandling",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "DataHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "DirtyHandling"
+                  },
+                  {
+                    "key": "detail",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "DirtyHandling"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"name": "Client API Documentation",
+	"readme": "./resources/typedoc/README.md",
+	"out": "../documentation/src/assets/typedoc",
+	"entryPoints": [
+		"./src/core/ClientWidgetMap.tsx",
+		"./src/core/lenses.ts",
+		"./src/core/*/index.{ts,tsx}",
+		"./src/extensions/deep-linking",
+		"./src/extensions/dirtyHandling",
+		"./src/extensions/heterogeneity",
+		"./src/extensions/modelLoader",
+		"./src/extensions/appModelAdapter",
+		"./src/extensions/localization"
+	],
+	"exclude": ["./src/core/assertion.ts", "./src/core/utils.ts"],
+	"excludeExternals": true,
+	"excludePrivate": true,
+	"excludeProtected": false,
+	"plugin": ["typedoc-plugin-missing-exports"],
+	"placeInternalsInOwningModule": true
+}

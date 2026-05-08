@@ -1,0 +1,61 @@
+buildscript {
+    // Adds the dataservices BOM to buildscript classpath to resolve A12 dependency versions
+    apply from: project.file('../buildscript-platforms.gradle')
+
+    configurations.classpath {
+        // both dataservices and kernel provide groovy 3.x (org.codehaus.groovy) dependencies, while we want groovy 4.x (org.apache.groovy)
+        resolutionStrategy.capabilitiesResolution.withCapability('org.codehaus.groovy:groovy') {
+            selectHighestVersion()
+        }
+    }
+
+    dependencies {
+        classpath "com.mgmtp.a12.dataservices:dataservices-core-tooling"
+        classpath "com.mgmtp.a12.kernel:kernel-md-model"
+        classpath "com.mgmtp.a12.kernel:kernel-md-facade"
+        classpath "com.mgmtp.a12.kernel:kernel-tool-model-migration"
+    }
+}
+
+plugins {
+    alias(a12Libs.plugins.prepare.models)
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+tasks.register('_clean', Delete) {
+    delete layout.buildDirectory
+    delete prepareModels.outputDir
+}
+
+tasks.named('clean') {
+    dependsOn tasks.named('_clean')
+}
+
+tasks.register('generateModelGraph', JavaExec) {
+    dependsOn tasks.named('prepareModels')
+
+    final String dir = prepareModels.outputDir.asFile.get().toString()
+    final String modelGraphFilePath = "../../src/devapp/mocks/modelGraph/model_graph_mock.json"
+
+    classpath = buildscript.configurations.classpath
+    mainClass = 'com.mgmtp.a12.dataservices.tooling.modelgraph.ModelGraphGenerator'
+
+    inputs.dir(prepareModels.outputDir)
+    outputs.file(modelGraphFilePath)
+
+    args("--output=${modelGraphFilePath}")
+
+    // models are copied into one directory as the generator class can only handle a "single" input
+    args(dir)
+
+    description = 'Generates the modelgraph used for mock mode and tests. Re-run this after changes to resources/models.'
+    group = 'development'
+}
+
+
+tasks.named('assemble') {
+    dependsOn tasks.named('generateModelGraph')
+}

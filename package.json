@@ -1,0 +1,49 @@
+{
+  "name": "@com.mgmtp.a12.client/root",
+  "version": "16.3.0-SNAPSHOT",
+  "a12ReleaseLine": "2025.06",
+  "description": "Client Workspaces Root",
+  "author": "mgm technology partners",
+  "license": "(EUPL-1.2 OR LicenseRef-commercial)",
+  "engines": {
+    "node": "^24",
+    "pnpm": "^11"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "node ./scripts/validateA12Peers.ts",
+    "clean": "pnpm run -r --parallel clean",
+    "verify": "pnpm run \"/^(format|lint:onlyErrors|spellcheck)$/\"",
+    "verify:fix": "pnpm run \"/^(format:fix|lint:fix)$/\"",
+    "build": "pnpm run -r build",
+    "compile": "pnpm run -r compile",
+    "watch": "pnpm run -r --parallel watch",
+    "test": "pnpm run -r test",
+    "format": "prettier \"**/src/**/*.{ts,tsx}\" --check --cache --cache-strategy metadata",
+    "format:fix": "prettier \"**/src/**/*.{ts,tsx}\" --check -w",
+    "lint": "eslint . --cache",
+    "lint:onlyErrors": "node --run lint -- --quiet",
+    "lint:inspect": "pnpm dlx @eslint/config-inspector",
+    "lint:fix": "eslint . --fix",
+    "spellcheck": "pnpm run -r --parallel spellcheck"
+  },
+  "devDependencies": {
+    "@com.mgmtp.a12.devtools/eslint-config": "catalog:a12",
+    "@com.mgmtp.a12.devtools/prettier-config": "catalog:a12",
+    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
+    "@types/node": "catalog:",
+    "@types/semver": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-jsdoc": "catalog:",
+    "eslint-plugin-mocha": "catalog:",
+    "eslint-plugin-notice": "catalog:",
+    "eslint-plugin-use-effect-no-deps": "catalog:",
+    "eslint-plugin-workspaces": "catalog:",
+    "prettier": "catalog:",
+    "react": "catalog:",
+    "semver": "catalog:",
+    "yaml": "catalog:"
+  },
+  "packageManager": "pnpm@11.1.2"
+}

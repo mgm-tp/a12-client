@@ -1,0 +1,69 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Dirty Handling
+
+This extension consists of a Dirty Handling saga and a VetoDialog, which can be wrapped around the application.
+
+The saga can be used instead of the default cancelRequestedHandling saga, to handle the CANCEL_REQUESTED action.
+
+The CANCEL_REQUESTED action contains in its payload an array of activity ids and will cancel these activities if they are not dirty or locked.
+For evaluating the dirty state the saga takes all DataHolders of the activity into account. An activity is dirty if one of the DataHolders is dirty.
+
+If an activity is dirty or locked, a SET_CANCEL_CONFIRMATION_REQUIRED action with cancelConfirmationRequired=true is dispatched. The saga then waits until a RESPONSE_CANCEL_CONFIRMATION action is dispatched. This action contains in its payload the information about if there was a veto for the cancellation. If there was no veto the activity gets cancelled by the dirty handling saga. If there was a veto the activity does not get cancelled and the whole cancelling process gets aborted.
+
+If all activities got cancelled the Dirty Handling saga dispatches in the end the RESPONSE_CANCEL_REQUESTED action which contains the payload "cancelled=true". If not all activities got cancelled, because there was a veto, the saga dispatches the RESPONSE_CANCEL_REQUESTED action which contains the payload "cancelled=false". The caller can use the ActivitySaga `waitForResponseCancelRequested` to wait for the response of the cancelProcess.
+
+Example usage:
+
+[source,tsx]
+----
+const activityIdsWhichShouldBeCancelled = ["A", "B"];
+
+yield put(ActivityActions.cancelRequested({activityIds: activityIdsWhichShouldBeCancelled }));
+
+// wait for the process to finish and take the response
+const cancelled: boolean = yield call(ActivitySagas.waitForResponseCancelRequested);
+
+if(cancelled){
+	// all activities where cancelled
+} else {
+	// not all activities where cancelled
+}
+----
+
+If the VetoDialog is used, it will listen to any state change and show a dialog, if there is an activity with "cancelConfirmationRequired=true" . The dialog offers two options: "Discard changes" and "Abort".
+
+* The first option dispatches a RESPONSE_CANCEL_CONFIRMATION action with veto=false.
+* The second option dispatches a RESPONSE_CANCEL_CONFIRMATION action with veto=true.
+
+If you do not use the VetoDialog, you have to take care of dispatching a RESPONSE_CANCEL_CONFIRMATION action, if there are activities which need a cancelConfirmation, yourself.

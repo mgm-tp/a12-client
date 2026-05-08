@@ -1,0 +1,122 @@
+{
+  "header": {
+    "id": "OverviewDataLoaderTest-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin,systemAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "OverviewDataLoaderTest-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "G2",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "F1",
+                "name": "Field1",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Dummy Feld"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Dummy Field"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F2",
+                "name": "Field2",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Dummy Feld"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Dummy Field"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "F3",
+                "name": "Field3",
+                "annotations": [
+                  {
+                    "name": "enable_case_insensitive_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Dummy Feld"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Dummy Field"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

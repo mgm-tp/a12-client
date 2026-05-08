@@ -1,0 +1,76 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Writing Tests for the Client
+
+== React Components
+
+We write tests using https://testing-library.com/docs/react-testing-library/intro/[React Testing Library,role=external,window=_blank]. If you were using enzyme before, have a look at https://testing-library.com/docs/react-testing-library/migrate-from-enzyme/[this migration guide,role=external,window=_blank] as the approach to testing components is different.
+
+== ActionCreators / Reducers
+
+In Redux, _action creators_ are functions which return plain objects. When testing action creators, we want to test whether the correct action creator was called and also whether the right action was returned.
+
+A _reducer_ should return the new state after applying the action to the previous state.
+
+Because these functions are pure, they are easy to test without mocking.
+
+=== Example
+
+The following example shows one test case for an action creator.
+
+[source,tsx]
+----
+include::assets/typescript/test/features/multiple-data-holders/actions.spec.ts[tags=content]
+----
+
+[#/recipes/write-tests/dataeditor-dataloader-modelloader]
+== DataEditor / DataLoader / ModelLoader
+
+Whenever you have to deal with the retrieval and persistence of data or models in your application, it is likely that you get in touch with these components.
+
+The features documentation provides more information about the <</basics/data-loading,DataLoader and DataEditor>>. The ModelLoader works quite the same, but is concerned with the retrieval and persistence of models.
+
+When testing these classes, we recommend to use a mocking library.
+
+== Sagas
+
+Our preferred way of testing sagas is to run the whole saga and assert that the expected effects have occurred.
+
+This approach is also recommended by the official https://redux-saga.js.org/docs/advanced/Testing.html[redux-saga docs,role=external,window=_blank].
+
+=== Example
+
+[source,tsx]
+----
+include::assets/typescript/test/features/multiple-data-holders/sagas.spec.ts[tags=content]
+----

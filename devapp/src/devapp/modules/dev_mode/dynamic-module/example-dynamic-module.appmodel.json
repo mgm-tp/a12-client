@@ -1,0 +1,85 @@
+{
+  "header": {
+    "id": "example-dynamic-module.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "example_dynamic_module",
+        "menu": {
+          "name": "example_dynamic_module",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Example Dynamic Module"
+            },
+            {
+              "locale": "de",
+              "text": "Beispiel für Dynamisches Modul"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "feature": "ExampleDynamicModule"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "example_dynamic_module",
+            "scenes": [
+              {
+                "name": "example_dynamic_module",
+                "description": "example_dynamic_module",
+                "matchConditions": [
+                  {
+                    "key": "feature",
+                    "mustEqual": "ExampleDynamicModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ExampleDynamicModuleView"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "header": {
+    "id": "focushandling.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "examples.focus_handling",
+        "menu": {
+          "name": "examples.focus_handling",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Custom Focus Handling"
+            },
+            {
+              "locale": "de",
+              "text": "Custom Focus Handling"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "Examples",
+              "feature": "FocusHandling",
+              "model": "Person-document"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "examples.focus_handling",
+            "scenes": [
+              {
+                "name": "FocusHandlingOverview",
+                "description": "Overview with custom focus handling",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "Examples"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "FocusHandling"
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Person-document"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FocusHandlingDescription",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FocusHandlingOverview",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "Person-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "FocusHandlingForm",
+                "description": "Form with custom focus handling",
+                "priorScene": "FocusHandlingOverview",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FocusHandlingForm",
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "Person-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

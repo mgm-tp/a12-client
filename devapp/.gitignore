@@ -1,0 +1,12 @@
+/lib
+/dist
+/target
+/node_modules
+/platform-server.log*
+/services-server.log*
+/dataservices-server.log*
+*.tsbuildinfo
+LICENSE
+NOTICE
+THIRD_PARTY_NOTICES
+licenses/

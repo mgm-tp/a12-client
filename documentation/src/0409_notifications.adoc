@@ -1,0 +1,49 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Notifications
+
+The `core/notification` API can be used to notify the user about arbitrary events.
+
+In order to visualize notifications, it is mandatory to wrap the application's root component with a suitable React component to visualize notifications. The `core/notification` API provides a default frame component. Without such a component no notification is shown to the user.
+
+Notifications can be created by dispatching the notification action "add" and removed again by the corresponding "remove" action.
+
+Notifications can be bound to activities by providing the corresponding activity id to the notification. Activity bounded notifications will be removed automatically if the bounded activity is removed by either committing or canceling. If no activity id is provided then the notification is treated as a global notification and will not be removed on removing any activity.
+
+Currently, notifications by default are shown as toast messages following the function and design of the A12 Toast Widget. They can be customized in their message, position, duration, color, and other options via the properties of the notification object, that needs to be given to the "add" action as payload.
+
+It is also possible to create completely custom notifications by providing the notification frame with a notification renderer, that would return the custom notification view.
+
+== Mobile
+
+On mobile the position is not customizable due to the small available space. Therefore, only the newest notification is shown on the bottom of the screen.

@@ -1,0 +1,122 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#/features/deep-linking]
+= Deep Linking
+
+The deep linking extension helps to implement URL based (activity) state restoration, e.g. when a user wants to share a deep link into the application. Whenever a (relevant) state changes, the encoder is called to update the location part of the URL. When loading the application, the decoder is called to restore activity state based on the URL location.
+
+To register this extension you need to call `DeepLinkingFactories.createSagas` and pass the returned sagas to the `customSagas` property of the `ApplicationFactories.createApplicationSetup` function.
+
+== Default Codec
+
+The extension includes a default codec, that uses the descriptor of the latest activity. This means that other state of the activity or even other activities will not be recovered, so the scene might not look the same as at the time of encoding.
+
+== Setup
+
+=== URL Encoding
+
+Registering the sagas is already enough to activate the encoding of the last started activity into the URL with the default codec.
+
+=== Activity Restoration
+
+To restore the activity encoded in the URL when the app is loading, you need to setup an action which serves as a trigger for the restoration to be started.
+
+First, you have to dispatch this action after the initialization code of the app was executed. This could be e.g. before the first render of the app or after the user logged in successfully.
+
+Second, the action also needs to be added to the array of apply triggers in the deep linking sagas configuration. You can hand in the configuration object to the `DeepLinkingFactories.createSagas` factory function in your app setup.
+
+== Configuration
+
+To further customize this extension you can pass more options to the `DeepLinkingFactories.createSagas` function via the configuration object.
+This configuration contains:
+
+* *updateTriggers*: A list of actions for which the deep link should be updated
+* *applyTriggers*: A list of actions for which the deep link should be applied
++
+If no action is given in `applyTriggers` the deep link will never be applied. If the `Activity` encoded in the URL is not found, the default page will be loaded if configured (see <</features/deep-linking/welcome-page, Welcome Page>>).
+* *clearTriggers*: A list of action for which the deep link should be cleared
+* *loadingTimeout*: The time that is waited for the data of a data source activity to be loaded. When it expires and the data is not loaded, the to-be-restored activity will not be created.
+
+== Customization
+
+There are other properties in the configuration object which can be used to replace default implementations:
+
+* *deepLinkCoder*: Users can provide their own implementation of `DeepLinkCoder`, which decides, what information is encoded in the URL, and how this is done. The default implementation only uses information stored in the `ActivityDescriptor`.
+* *locationManager*: A custom location manager can be provided which allows customizing the handling of the location part of the url. The default implementation only manages setting the '#' character before the location part.
+
+== Limitations
+
+[NOTE]
+====
+This feature is not meant to provide full URL-based navigation through the application (Routing).
+====
+
+By default, only the latest Activity is restored, regardless of how many Activities were active
+when the link was created.
+
+Additionally, the URL changes are not saved in the browser history and therefore it is not possible to navigate to a previous or later Activity with the browser navigation buttons.
+
+If you want to encode more Activities or even implement a history-based navigation yourself, a good custom implementation can be found in
+https://discourse.geta12.com/t/implementing-a-router-for-bap-client/272/3[Discourse, role=external, window=_blank].
+
+It is not sufficient to just change the link in the address bar of a web browser. The link needs to be opened.
+
+Deep links currently do not work when used in combination with the priorScene property of Scenes (see <</basics/views/arranging-uis,Arrange UIs>>).
+
+[#/features/deep-linking/welcome-page]
+== Welcome Page
+
+To set a default starting page ("welcome page"), you need to set the property `initialActivity` in your Application Model. This contains the descriptor of the activity that will open as your starting/welcome activity. Additionally, you need to configure at least one action which indicates that this activity should be loaded.
+To do that, you have two possibilities:
+
+If you already configured the deep-linking extension as described above, the saga that listens to `applyTriggers` will load the activity described by the `initialActivity` property of your App Model, when one of these actions gets dispatched and when the current url does not contain a deep link.
+
+If the App Model does not contain an `initialActivity` property and the current url does not contain a deep link, the saga will do nothing.
+
+If you don't want to use the deep-linking functionality, you need to call `DeepLinkingFactories.loadWelcomePage` and pass its returned saga to the `customSagas` property of the `ApplicationFactories.createApplicationSetup` function. Then you need to configure it by adding your action/actions to the `applyTriggers` list, in the same way as described above.
+
+The saga from `DeepLinkingFactories.loadWelcomePage` will listen for your configured actions and create the activity described by the `initialActivity` property of your App Model.
+
+If no `initialActivity` is set in the App Model, the saga will do nothing.
+
+Finally, to actually show the view component of your welcome page, you need to define a scene in your Application Model matching the descriptor of the `initialActivity` with its match conditions and which has a VIEW_ADD directive with your welcome page view.
+
+[NOTE]
+====
+When using the default `ModelLoader` implementation of Client and your initial activity wants to load models, make sure to use a trigger action that is dispatched *after* the <</features/modelgraph, Model Graph>> was set.
+Since by default Client <</advanced/model-loading, uses the Model Graph to resolve model dependencies>>, triggering model loading before the graph exists will fail.
+====
+
+=== Modularization
+
+If no `initialActivity` is set in the root App Model and you add Application Models using the `ModelActions.addModulesApplicationModels` action then the initial activity is taken from the first App Model defining one which is merged into the root App Model.

@@ -1,0 +1,131 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Engines
+
+== How to Render a UI Engine?
+
+The following module from the Application Model contains one scene which renders the Overview Engine for the model `CRUD-overview` when this scene matches an activity with the specified match conditions.
+
+[source,json]
+----
+{
+	"name": "CRUD Module",
+	"menu": {
+		"name": "crud",
+		"label": { "en": "CRUD" },
+		"initialActivity": { "descriptor": { "model": "CRUD" } }
+	},
+	"flows": [
+		{
+			"name": "CRUD Flow",
+			"scenes": [
+				{
+					"name": "CRUD Overview Scene",
+					"matchConditions": [
+							{ "key": "model", "mustEqual": "CRUD" },
+							{ "key": "instance", "isSet": false }
+					],
+					"sceneChange": {
+						"onEnter": [
+							{ "type": "REGION_CLEAR" },
+							{
+								"type": "VIEW_ADD",
+								"name": "OverviewCRUD",
+								"models": [ { "modelType": "overview", "name": "CRUD-overview" } ]
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}
+----
+
+The Client first loads all models that are listed in all `VIEW_ADD` directives of that scene and puts them into the Redux store. It also loads the referenced models, if these have not already been loaded. In this example, it is the `CRUD-overview` Overview Model as well as the referenced `DomainCRUD` Document Model.
+
+As soon as the relevant models for the specified view `OverviewCRUD` are available, the UI component itself selects the appropriate models from the store and uses them to initialize and render the Overview Engine.
+
+Please keep in mind that each scene working with A12 models requires a key `model`. The value for this `model` key must match the model you specify in the models list of the `VIEW_ADD` directives. Of course, you may add additional Document Models which will be loaded into the store and can be used for project specific operations.
+
+*Remark:* From the `model` key, the Client derives the specific model names (for document and UI models), i.e.
+
+* *Document Model:* `Domain` and the value of the key `model`, e.g. `DomainCRUD`
+* *Form Model:* just the value of the key `model`, e.g. `CRUD`
+* *Overview Model:* the value of the key `model` and `-overview`, e.g. `CRUD-overview`
+
+== How to Render 2 UI Engines for Distinct Document Models?
+
+You need to add another scene into your module to render more than one UI engine in the same content area.
+
+You can find an example in the DevApp under `UI Handling > Layouts > Dashboard Layout > Multiple Activities`. The example dashboard contains multiple tiles that rely on different models.
+
+=== DO NOT Add Another `VIEW_ADD` Directive for a Different UI Engine
+
+Please be aware that it is not possible to use just one scene for rendering two UI Engines. You could think that we take the module from above and simply add another `VIEW_ADD` directive, e.g.
+
+[source,json]
+----
+{
+	"name": "CRUD Overview Scene",
+	"matchConditions": [
+		{ "key": "model", "mustEqual": "CRUD" },
+		{ "key": "instance", "isSet": false }
+	],
+	"sceneChange": {
+		"onEnter": [
+			{ "type": "REGION_CLEAR" },
+			{
+				"type": "VIEW_ADD",
+				"name": "OverviewCRUD",
+				"models": [ { "modelType": "overview", "name": "CRUD-overview" } ]
+			},
+			{
+				"type": "VIEW_ADD",
+				"name": "OverviewCRUD",
+				"models": [ { "modelType": "overview", "name": "Offer-overview" } ]
+			}
+		]
+	}
+}
+----
+
+The second `VIEW_ADD` directive wants to initialize the Overview Engine for the `Offer-overview` model which references the `DomainOffer` model.
+
+Note that the match conditions for this overall scene only have one `model` key. Its value is `CRUD`. The Client is not able to successfully render this second Overview Engine, because it expects `CRUD` models and documents.
+
+== How to Compute Values / Modify Document With Form Engine?
+
+In Client, you should never change the document inside the Form Engine state. It will create an inconsistency between engine and store. Instead, you should change the document in `activity.data` - which in turn should update the engine document. The Form Engine's internal document should only be used in non-standard based scenarios.
+
+We provide the `FormEngineStateAdapter` exactly for this reason. It allows you to pass a document from the store to the Form Engine. Please refer to the link:/docs/FORM_ENGINE/formengine-documentation-bundle/index.html#_api_documentation[Form Engine API documentation] for more details about the `FormEngineStateAdapter`.

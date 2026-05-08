@@ -1,0 +1,112 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License – EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+= Accessibility Support
+
+The Client allows creating applications with accessibility support.
+
+To make the application accessible for a user who uses accessibility tools like a screen reader, the application requires a clear hierarchical structure which also is reflected in the application's HTML.
+
+The user interface of a Client application is structured using regions which are configured with layouts to display views and other UI components like menus and headers.
+
+The hierarchical structure within the UI and the underlying HTML is established by using unambiguous HTML tags like nav for navigation components and by providing ARIA levels and the role "heading" to the headings and specific roles to other building blocks of those UI components.
+
+== ARIA in Built-in Layouts
+
+=== ApplicationFrameLayout
+
+The ApplicationFrameLayout is typically used in the application's root region to give the application its base structure. It provides an application header and a main menu and it allows to orchestrate the content for a main content region, a sidebar region, and a modal region.
+
+The following aria configuration is applied:
+
+* the application header has the role "banner"
+* the main menu is build with a nav-tag as root HTML element, marking it as a navigation for a screen reader
+* the main content view has the role "main", marking it as the application's main content
+* the side bar usually contains project specific custom content, making it a project responsibility to define an appropriate aria structure using nav-tags for a navigation, aria-levels for headings and suitable aria roles.
++
+When the case feature of the Client is used and a navigation to the different cases is displayed in the side bar, a nav-tag is used.
+* The modal region content again requires project specific configuration.
+
+=== DashboardLayout
+
+The DashboardLayout renders its views as tiles in a grid.
+
+The aria structure is established by
+
+* rendering a hidden title with aria-level 1 and role "heading" above the tiles
+* handing aria-level 2 to the views in the tiles, so that the views can use this level for their headings.
+
+=== MasterDetailLayout
+
+The MasterDetailLayout allows rendering a list of views, with each view depending on the previous one which creates a hierarchy of views.
+
+Therefore it hands aria-levels in ascending order starting with 1 to its visible views, so that the headings of these views can reflect that hierarchy.
+
+=== StackRegionLayout
+
+The StackRegionLayout can manage a list of views but will always only render the last added one. This view will receive aria-level 1 for its heading.
+
+== ARIA in Built-in Components
+
+=== Engines
+
+The Engines provide views which render a ContentBox Widget with a title. The title should be set for good accessibility. It can be defined in the respective UI model. The title will receive the aria-level determined for the view by the layout.
+
+Further details about accessibility support of the Engines can be found in the respective engine documentation.
+
+=== ErrorBoundary
+
+When an error is thrown during rendering of a view, the built-in layouts render the fallback component of the provided ErrorBoundary. It receives the same aria-level as the view, so that it can be set to the fallback component's title.
+
+== ARIA in Custom Layouts and Views
+
+When you are creating custom layouts and views and have to fulfill the requirement of good accessibility, we have the following recommendations:
+
+=== Custom Layouts
+
+* The layout should hand aria-levels to its visible views which resemble the hierarchy in which these views stand to each other. Views having the same level in the application hierarchy should get the same aria-level. A view depending on a parent view should get a higher aria-level than that of the parent.
+* If the layout wraps its views in ErrorBoundary components, those should get the same aria-level as the wrapped view.
+
+=== Custom Views
+
+* The HTML tag of the view's heading component should have the aria-level which was handed to the view, and the role "heading". This way the heading will integrate into the application's aria heading hierarchy.
+* For a good accessibility structure make sure your custom view has a heading. If you want to make the heading invisible but still accessible for screen readers, you can use the plasma style helper class "-u-unseenButRead" or style your header accordingly.
+* Please do not use aria-level for sub headings inside the view. Only the view's top heading, e.g. the content box title, should have an aria-level.
+* To structure the content of your view use roles on the HTML containers, e.g. "form" for content with input fields, "document" for text, "heading" for sub headings. Nesting such containers with roles makes the structure transparent for screen readers.
+* Please do not use h-tags for sub headings, since this interferes with the hierarchy created by the aria-levels. Instead use styled div tags with the role "heading".
+* Use a nav-tag as root tag for navigation components or use the role "navigation".
+
+== Focus Handling Between Views
+
+In some situations you might want to change the focus from one view to another. For example, this could happen when adding or removing views in a layout.
+How to achieve this focus behavior depends on the concrete requirement and the specific project setup.
+The Client DevApp provides an example in the "Examples" section demonstrating a custom focus handling between an overview and a form.

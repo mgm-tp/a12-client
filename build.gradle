@@ -1,0 +1,127 @@
+buildscript {
+    dependencies {
+        classpath 'org.apache.groovy:groovy-yaml:4.0.28'
+        classpath a12Libs.build.utilities
+    }
+}
+
+plugins {
+    alias(gradlePluginLibs.plugins.spotless)
+}
+
+import com.mgmtp.a12.devtools.gradle.plugins.buildutils.Helper
+import com.mgmtp.a12.devtools.gradle.plugins.buildutils.tasks.LeadingBuildTask
+import com.mgmtp.a12.devtools.gradle.plugins.buildutils.tasks.PackageJsonModifierTask
+import groovy.json.JsonSlurper
+import groovy.yaml.YamlSlurper
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
+/** Define a proper version in build */
+String globalVersion = Helper.getVersion(
+    file('package.json'),
+    project.findProperty('version') as String,
+    project.findProperty('use') as String
+)
+
+allprojects {
+    apply plugin: 'base'
+
+    version = globalVersion
+
+    tasks.register("deploy") {}
+}
+
+if (file('publish/build.gradle').exists()) {
+    apply from: 'publish/build.gradle'
+}
+
+spotless {
+    format 'asciidoc', {
+        target '**/*.adoc'
+        targetExclude("**/node_modules/**", "**/lib/**", "**/build/**")
+        licenseHeaderFile(rootProject.file('license_header.txt'), '^[=\\[]')
+        // transform C-style header to asciidoc block comments
+        replaceRegex 'Convert C-style block start to asciidoc block comment start', '^/\\*', '////'
+        replaceRegex 'Convert C-style block end to asciidoc block comment end', '^ \\*/', '////\n'
+        replaceRegex 'Remove asterisk prefixes', '^ \\* ?', ''
+    }
+}
+
+tasks.register('configurePnpm', LeadingBuildTask) {
+    doLast {
+        if (System.getenv('CI')) {
+            println "Installing $pnpmVersion"
+
+            Path installDir = Paths.get("${rootDir}/.npm")
+            Files.createDirectories(installDir)
+
+            execCommandLine 'npm', 'install', '-g', '--prefix', installDir.toString(), pnpmVersion
+        } else {
+            def os = System.getProperty('os.name').toLowerCase()
+            def pnpmCommand = os.contains('win') ? 'where pnpm' : 'which pnpm'
+            def result = pnpmCommand.execute().text.trim()
+
+            if (result) {
+                println "pnpm is available at: $result"
+            } else {
+                throw new GradleException("pnpm is not installed on your system. Please install with 'npm install -g $pnpmVersion'")
+            }
+        }
+    }
+}
+
+String getPnpmVersion() {
+    return (new JsonSlurper().parse(file("package.json"))["packageManager"] as String).split("\\+")[0]
+}
+
+tasks.register('installDependencies', LeadingBuildTask) {
+    dependsOn tasks.named('configurePnpm')
+    mustRunAfter tasks.named('setVersion')
+    doLast { execCommandLine 'pnpm', 'install' }
+}
+
+tasks.register('verify', LeadingBuildTask) {
+    dependsOn tasks.named('installDependencies')
+    doLast { execCommandLine 'node', '--run', 'verify' }
+}
+
+tasks.register('_clean', LeadingBuildTask) {
+    dependsOn tasks.named('installDependencies')
+    doLast { execCommandLine 'node', '--run', 'clean' }
+}
+
+tasks.named('clean') {
+    dependsOn tasks.named('_clean')
+}
+
+tasks.register('_assemble', LeadingBuildTask) {
+    dependsOn tasks.named('verify'),
+        project(':coreTestModels').tasks.named('assemble'),
+        project(':devappModels').tasks.named('assemble')
+    doLast { execCommandLine 'node', '--run', 'build' }
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('_assemble')
+}
+
+tasks.register('_check', LeadingBuildTask) {
+    doLast {
+        execCommandLine(['node', '--run', 'test']) {
+            environment "NODE_ENV", "test"
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('_check')
+}
+
+tasks.register('setVersion', PackageJsonModifierTask) {
+    packageDirs = new YamlSlurper().parse(file('./pnpm-workspace.yaml')).packages
+        .collect({ file(it) }) + file('.')
+    change = Helper.createSetVersion(version as String)
+}

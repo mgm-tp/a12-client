@@ -1,0 +1,9 @@
+/lib
+/build
+/target
+/node_modules
+cyclonedx.json
+LICENSE
+NOTICE
+THIRD_PARTY_NOTICES
+licenses/

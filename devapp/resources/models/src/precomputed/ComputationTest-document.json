@@ -1,0 +1,159 @@
+{
+  "header": {
+    "id": "ComputationTest-document",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin,systemAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "ComputationTest-document",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_0f758bba-319c-4059-9fc2-cc40a568dce1",
+        "name": "Field6",
+        "fieldType": {
+          "type": "DateTimeType",
+          "DateTimeType": {
+            "format": "yyyy-MM-dd'T'HH:mm:ss"
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "G2",
+          "name": "root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "G31",
+                "name": "computation",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "F32",
+                      "name": "number1",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "de",
+                            "text": "Erster Summand"
+                          },
+                          {
+                            "locale": "en",
+                            "text": "Number 1"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "F33",
+                      "name": "number2",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "de",
+                            "text": "Zweiter Summand"
+                          },
+                          {
+                            "locale": "en",
+                            "text": "Number 2"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "F34",
+                      "name": "result",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "maxValue": 20
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "de",
+                            "text": "Summe"
+                          },
+                          {
+                            "locale": "en",
+                            "text": "Result"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "C36",
+                      "name": "Computation_1",
+                      "Computation": {
+                        "computedFieldRelPath": "../result",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[number1] + [number2]",
+                            "precondition": "(FieldFilled(number1) \n    And FieldFilled(number2))"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of Computation_1"
+                          },
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of Computation_1"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

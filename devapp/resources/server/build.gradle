@@ -1,0 +1,68 @@
+buildscript {
+    // Adds the dataservices BOM to buildscript classpath to resolve Spring Boot plugin version
+    // Provides dataServicesVersion for use in the dependencies block
+    apply from: project.file('../buildscript-platforms.gradle')
+
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin'
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+// Apply the spring boot plugin with the version resolved in the buildscript dependencies
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    implementation platform("com.mgmtp.a12.dataservices:dataservices-parent:$dataServicesVersion")
+    implementation "com.mgmtp.a12.dataservices:dataservices-server-app"
+}
+
+layout.buildDirectory = layout.projectDirectory.dir('../../target/server')
+
+tasks.register("_clean", Delete) {
+    delete layout.buildDirectory
+}
+
+tasks.named("clean") {
+    dependsOn tasks.named("_clean")
+}
+
+springBoot {
+    mainClass = 'com.mgmtp.a12.dataservices.server.app.ServerApplication'
+}
+
+bootJar {
+    archiveBaseName = 'devapp'
+
+    from('../models/src') {
+        include '**/*.json'
+        into '/BOOT-INF/classes/com/mgmtp/a12/platform/business-models'
+    }
+
+    from('../rpcRequests') {
+        include '*.json'
+        into '/BOOT-INF/classes/com/mgmtp/a12/services/import/requests'
+    }
+
+    includeEmptyDirs = false
+
+    from('../../dist') {
+        include '**'
+        into '/BOOT-INF/classes/META-INF/resources/app'
+    }
+}
+
+tasks.register("runJar", JavaExec) {
+    dependsOn tasks.named('bootJar')
+
+    workingDir = new File("${projectDir.path}/../../")
+
+    systemProperty 'server.port', '9090'
+    systemProperty 'server.data.location', './target/server/data'
+
+    mainClass = '-jar'
+    args bootJar.archiveFile.get().toString()
+}

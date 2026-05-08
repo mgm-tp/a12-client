@@ -1,0 +1,92 @@
+{
+  "header": {
+    "id": "no-model-instance.appmodel",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "data_handling.no-model-instance",
+        "menu": {
+          "name": "data_handling.no-model-instance",
+          "label": [
+            {
+              "locale": "en",
+              "text": "No model/instance descriptor"
+            },
+            {
+              "locale": "de",
+              "text": "Kein model/instance descriptor"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "DataHandling",
+              "feature": "NoModelInstanceDescriptor"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "data_handling.no-model-instance",
+            "scenes": [
+              {
+                "name": "NoModelInstanceDescriptor",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "DataHandling"
+                  },
+                  {
+                    "key": "feature",
+                    "mustEqual": "NoModelInstanceDescriptor"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "NoModelInstanceView",
+                      "models": [
+                        {
+                          "modelType": "document",
+                          "name": "CRUD-document"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

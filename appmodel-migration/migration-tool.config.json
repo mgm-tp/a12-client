@@ -1,0 +1,7 @@
+{
+	"$schema": "./node_modules/@com.mgmtp.a12.migrationtool/migrationtool-utils/config.schema.json",
+	"stepsDirPath": "./src/main/steps",
+	"stepModelFileName": "ApplicationModel.ts",
+	"modelInterfaceName": "ApplicationModel",
+	"referenceModelPath": "../core/src/core/model/internal/ApplicationModel.ts"
+}

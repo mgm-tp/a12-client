@@ -1,0 +1,143 @@
+{
+	"header": {
+		"modelType": "application",
+		"id": "appmodel",
+		"modelVersion": "5.0.0",
+		"locales": [
+			{
+				"code": "en"
+			}
+		],
+		"annotations": [
+			{
+				"name": "roles",
+				"value": "admin"
+			},
+			{
+				"name": "do-not-migrate"
+			}
+		]
+	},
+	"content": {
+		"region": {
+			"name": "CONTENT",
+			"layout": {
+				"name": "CONTENT"
+			}
+		},
+		"modules": [
+			{
+				"name": "Mod1",
+				"flows": [
+					{
+						"name": "Flow1",
+						"scenes": [
+							{
+								"sceneChange": {
+									"onEnter": [
+										{
+											"type": "VIEW_ADD",
+											"region": [],
+											"models": [
+												{
+													"modelType": "tree",
+													"name": "m1",
+													"documentModel": "d1",
+													"other": "value1"
+												},
+												{
+													"modelType": "form",
+													"name": "m2",
+													"documentModel": "d2",
+													"other": "value2"
+												}
+											],
+											"name": "Add1"
+										}
+									],
+									"onExit": [
+										{
+											"type": "VIEW_ADD",
+											"region": [],
+											"name": "Add2",
+											"models": [
+												{
+													"modelType": "form",
+													"name": "m3",
+													"documentModel": "d3",
+													"other": "value3"
+												},
+												{
+													"modelType": "tree",
+													"name": "m4",
+													"documentModel": "d4",
+													"other": "value4"
+												}
+											]
+										}
+									]
+								},
+								"name": "Scene1",
+								"matchConditions": [
+									{
+										"key": "k1",
+										"mustEqual": "test"
+									}
+								],
+								"cases": [
+									{
+										"name": "case1"
+									},
+									{
+										"name": "case2",
+										"sceneChange": {
+											"onEnter": [
+												{
+													"type": "VIEW_ADD",
+													"region": [],
+													"name": "CAdd1"
+												}
+											]
+										}
+									},
+									{
+										"name": "case3",
+										"sceneChange": {
+											"onExit": [
+												{
+													"type": "VIEW_ADD",
+													"region": [],
+													"name": "CAdd2"
+												}
+											]
+										}
+									},
+									{
+										"name": "case4",
+										"sceneChange": {
+											"onEnter": [
+												{
+													"type": "VIEW_ADD",
+													"region": [],
+													"name": "CAdd3"
+												}
+											],
+											"onExit": [
+												{
+													"type": "VIEW_ADD",
+													"region": [],
+													"name": "CAdd4"
+												}
+											]
+										}
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		],
+		"defaultRegion": []
+	}
+}
