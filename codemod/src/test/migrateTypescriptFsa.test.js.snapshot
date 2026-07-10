@@ -1,0 +1,6 @@
+exports[`codemod.recipes.migrateTypescriptFsa > Rewrites typescript-fsa imports correctly > should migrate imports.ts correctly 1`] = `
+import { type AnyAction, actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+const actionCreator = actionCreatorFactory("forms");
+const test: AnyAction = actionFactory<void>("TEST");
+
+`;

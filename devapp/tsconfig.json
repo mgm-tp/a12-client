@@ -1,10 +1,11 @@
 {
 	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./src", "./package.json", "src/*.json", "src/**/*.json"],
+	"include": ["./src", "./package.json", "src/*.json", "src/**/*.json", "./@types"],
 	"compilerOptions": {
 		"outDir": "./lib",
 		"rootDir": "./src",
 		"types": ["node", "mocha"],
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"erasableSyntaxOnly": true
 	}
 }

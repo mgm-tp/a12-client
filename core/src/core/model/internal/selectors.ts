@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,17 +23,16 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Header } from "@com.mgmtp.a12.base/base-model-api/lib/main/header/index.js";
-import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
-import { isModelInstance } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
-import type { ModelGraph } from "@com.mgmtp.a12.dataservices/dataservices-access/lib/Relationship/ModelGraph.js";
+import type { Header, Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api";
+import { isModelInstance } from "@com.mgmtp.a12.base/base-model-api";
+import type { ModelGraph } from "@com.mgmtp.a12.dataservices/dataservices-access";
 
 import type { Activity } from "../../activity/internal/activity.js";
 import { ActivitySelectors } from "../../activity/internal/selectors.js";
@@ -63,28 +62,26 @@ export const sliceSelector = createSliceSelector("models", isModelsSlice);
 /**
  * These selectors provide access to the `ModelState` in the store.
  */
-export namespace ModelSelectors {
+export const ModelSelectors = {
 	/**
 	 * Selects the application model from the state
 	 */
-	export function applicationModel(): Selector<ApplicationModel> {
+	applicationModel(): Selector<ApplicationModel> {
 		return state => sliceSelector(state).applicationModel;
-	}
+	},
 
 	/**
 	 * Selects the model graph from the state.
 	 */
-	export function modelGraph(): Selector<ModelGraph> {
+	modelGraph(): Selector<ModelGraph> {
 		return state => sliceSelector(state).modelGraph;
-	}
+	},
 
-	export function models(): Selector<ModelMap> {
+	models(): Selector<ModelMap> {
 		return state => sliceSelector(state).models;
-	}
+	},
 
-	export function modelsLoaded(
-		descriptors: readonly Model.Descriptor[]
-	): Selector<ModelResult.ModelsLoaded> {
+	modelsLoaded(descriptors: readonly Model.Descriptor[]): Selector<ModelResult.ModelsLoaded> {
 		return state => {
 			const result: ModelAPI[] = [];
 
@@ -103,7 +100,7 @@ export namespace ModelSelectors {
 
 			return { stateChanged: true, returnValue: result };
 		};
-	}
+	},
 
 	/**
 	 * Selects the model with the given identifier from the state.
@@ -112,7 +109,7 @@ export namespace ModelSelectors {
 	 * "selected" value in `returnValue`, it should only be used in conjunction
 	 * with `StoreSagas.waitForStateChange`.
 	 */
-	export function modelLoaded<T extends ModelAPI>(
+	modelLoaded<T extends ModelAPI>(
 		identifier: string,
 		typeGuard: ModelTypeGuard<T> = defaultModelTypeGuard
 	): Selector<ModelResult.ModelLoaded<T>> {
@@ -138,7 +135,7 @@ export namespace ModelSelectors {
 				returnValue: { model }
 			};
 		};
-	}
+	},
 
 	/**
 	 * Selects the model for the given `modelName`.
@@ -152,7 +149,7 @@ export namespace ModelSelectors {
 	 * Due to convenience reasons models of type "document" contains the json
 	 * as well as the js representation of a document model.
 	 */
-	export function modelByName<T extends ModelAPI = ModelAPI>(
+	modelByName<T extends ModelAPI = ModelAPI>(
 		modelName: string,
 		typeGuard: ModelTypeGuard<T> = defaultModelTypeGuard
 	): Selector<T | undefined> {
@@ -168,12 +165,12 @@ export namespace ModelSelectors {
 
 			return modelEntry;
 		};
-	}
+	},
 
 	/**
 	 * Selects the model loading error for the given `modelName`.
 	 */
-	export function modelErrorByName(modelName: string): Selector<Model.Error | undefined> {
+	modelErrorByName(modelName: string): Selector<Model.Error | undefined> {
 		return state => {
 			const modelEntry = sliceSelector(state).models[modelName];
 			if (modelEntry === undefined || isModelInstance(modelEntry)) {
@@ -182,18 +179,19 @@ export namespace ModelSelectors {
 
 			return modelEntry;
 		};
-	}
+	},
 
 	/**
 	 * Selects the first matching model in a scene for the provided criteria.
 	 *
 	 * Provide a `typeGuard` function for stronger typings.
 	 */
-	export function modelInScene<T extends ModelAPI>(
+	modelInScene<T extends ModelAPI>(
 		{ activityId, modelType, documentModel }: ModelSearchDescriptor,
 		typeGuard: ModelTypeGuard<T> = defaultModelTypeGuard
 	): Selector<T | undefined> {
-		const modelDescriptorsByActivityIdSelector = modelDescriptorsByActivityId(activityId);
+		const modelDescriptorsByActivityIdSelector =
+			ModelSelectors.modelDescriptorsByActivityId(activityId);
 
 		return state => {
 			const modelDescriptors = modelDescriptorsByActivityIdSelector(state);
@@ -210,13 +208,13 @@ export namespace ModelSelectors {
 
 			return ModelSelectors.modelByName(modelDescriptor.name, typeGuard)(state);
 		};
-	}
+	},
 
 	/**
 	 * Selects all *loaded* models in the scene for the given activity.
 	 */
-	export function allModelsInScene(activityId: string): Selector<ModelAPI[]> {
-		const selectModelDescriptors = modelDescriptorsByActivityId(activityId);
+	allModelsInScene(activityId: string): Selector<ModelAPI[]> {
+		const selectModelDescriptors = ModelSelectors.modelDescriptorsByActivityId(activityId);
 		const selectModelGraph = ModelSelectors.modelGraph();
 
 		return state => {
@@ -224,7 +222,7 @@ export namespace ModelSelectors {
 				.map(({ name }) => ModelSelectors.modelByName(name)(state))
 				.filter((m): m is ModelAPI => m !== undefined);
 		};
-	}
+	},
 
 	/**
 	 * For all models in the scene for the given activity, returns either the model itself
@@ -234,10 +232,8 @@ export namespace ModelSelectors {
 	 *
 	 * Can be used in conjunction with `StoreSagas.waitFor`.
 	 */
-	export function allLoadedModelsInScene(
-		activityId: string
-	): Selector<(ModelAPI | Model.Error)[] | undefined> {
-		const selectModelDescriptors = modelDescriptorsByActivityId(activityId);
+	allLoadedModelsInScene(activityId: string): Selector<(ModelAPI | Model.Error)[] | undefined> {
+		const selectModelDescriptors = ModelSelectors.modelDescriptorsByActivityId(activityId);
 		const selectModelGraph = ModelSelectors.modelGraph();
 
 		return state => {
@@ -255,17 +251,18 @@ export namespace ModelSelectors {
 				? loadResults
 				: undefined;
 		};
-	}
+	},
 
 	/**
 	 * Selects the error for the first matching model in a scene for the provided criteria.
 	 */
-	export function modelErrorInScene({
+	modelErrorInScene({
 		activityId,
 		modelType,
 		documentModel
 	}: ModelSearchDescriptor): Selector<Model.Error | undefined> {
-		const modelDescriptorsByActivityIdSelector = modelDescriptorsByActivityId(activityId);
+		const modelDescriptorsByActivityIdSelector =
+			ModelSelectors.modelDescriptorsByActivityId(activityId);
 
 		return state => {
 			const modelDescriptors = modelDescriptorsByActivityIdSelector(state);
@@ -282,13 +279,13 @@ export namespace ModelSelectors {
 
 			return ModelSelectors.modelErrorByName(modelDescriptor.name)(state);
 		};
-	}
+	},
 
 	/**
 	 * Selects all models errors in the scene for the given activity.
 	 */
-	export function allModelErrorsInScene(activityId: string): Selector<Model.Error[]> {
-		const selectModelDescriptors = modelDescriptorsByActivityId(activityId);
+	allModelErrorsInScene(activityId: string): Selector<Model.Error[]> {
+		const selectModelDescriptors = ModelSelectors.modelDescriptorsByActivityId(activityId);
 		const selectModelGraph = ModelSelectors.modelGraph();
 
 		return state => {
@@ -296,18 +293,19 @@ export namespace ModelSelectors {
 				.map(({ name }) => ModelSelectors.modelErrorByName(name)(state))
 				.filter((err): err is Model.Error => err !== undefined);
 		};
-	}
+	},
 
 	/**
 	 * Selects the first region which matches the given region {@link ApplicationModel.Region.Reference}.
 	 *
 	 * @param regionReference reference to region
 	 */
-	export function region(
+	region(
 		regionReference: ApplicationModel.Region.Reference
 	): Selector<ApplicationModel.Region | undefined> {
 		return (state: object) => {
-			let current: ApplicationModel.Region | undefined = applicationModel()(state).content.region;
+			let current: ApplicationModel.Region | undefined =
+				ModelSelectors.applicationModel()(state).content.region;
 			for (const name of regionReference) {
 				const search: ApplicationModel.Region[] = current.subRegions || [];
 				current = search.find(sr => sr.name === name);
@@ -317,17 +315,17 @@ export namespace ModelSelectors {
 			}
 			return current;
 		};
-	}
+	},
 
 	/**
 	 * Selects all sub region references which matches the given region {@link ApplicationModel.Region.Reference}.
 	 *
 	 * @param regionReference region reference
 	 */
-	export function subRegionRefs(
+	subRegionRefs(
 		regionReference: ApplicationModel.Region.Reference
 	): Selector<ApplicationModel.Region.Reference[]> {
-		const regionSelector = region(regionReference);
+		const regionSelector = ModelSelectors.region(regionReference);
 		return state => {
 			const currentRegion = regionSelector(state);
 			if (currentRegion === undefined) {
@@ -337,9 +335,9 @@ export namespace ModelSelectors {
 				? currentRegion.subRegions.map(sr => [...regionReference, sr.name])
 				: [];
 		};
-	}
+	},
 
-	export function modelDescriptorsByActivityId(activityId: string): Selector<Model.Descriptor[]> {
+	modelDescriptorsByActivityId(activityId: string): Selector<Model.Descriptor[]> {
 		const activityByIdSelector = ActivitySelectors.activityById(activityId);
 		return state => {
 			const activity = activityByIdSelector(state);
@@ -349,16 +347,14 @@ export namespace ModelSelectors {
 
 			return InternalModelSelectors.modelDescriptorsByActivity(activity)(state);
 		};
-	}
+	},
 
 	/**
 	 * Returns all models in the scene (including transitive models) for the given activity
 	 * as {@link ReferencedModel.Instance} objects.
 	 */
-	export function referencedModelsInScene(
-		activityId: string
-	): Selector<ReferencedModel.Instance[]> {
-		const selectModelDescriptors = modelDescriptorsByActivityId(activityId);
+	referencedModelsInScene(activityId: string): Selector<ReferencedModel.Instance[]> {
+		const selectModelDescriptors = ModelSelectors.modelDescriptorsByActivityId(activityId);
 		const selectModelGraph = ModelSelectors.modelGraph();
 
 		return state => {
@@ -372,31 +368,31 @@ export namespace ModelSelectors {
 			);
 		};
 	}
+};
 
-	function addTransitive(directRefs: string[], name: string): Modifier<ReferencedModel.Instance> {
-		return r => (directRefs.includes(name) ? { ...r, direct: true } : r);
-	}
+function addTransitive(directRefs: string[], name: string): Modifier<ReferencedModel.Instance> {
+	return r => (directRefs.includes(name) ? { ...r, direct: true } : r);
+}
 
-	function referencedModelByDescriptor(d: Model.Descriptor): Selector<ReferencedModel.Instance> {
-		return state => {
-			const model = ModelSelectors.modelByName(d.name)(state);
-			const error = ModelSelectors.modelErrorByName(d.name)(state);
-			return model
+function referencedModelByDescriptor(d: Model.Descriptor): Selector<ReferencedModel.Instance> {
+	return state => {
+		const model = ModelSelectors.modelByName(d.name)(state);
+		const error = ModelSelectors.modelErrorByName(d.name)(state);
+		return model
+			? {
+					loadingState: "loaded",
+					model
+				}
+			: error
 				? {
-						loadingState: "loaded",
-						model
+						loadingState: "error",
+						model: error
 					}
-				: error
-					? {
-							loadingState: "error",
-							model: error
-						}
-					: {
-							loadingState: "notLoaded",
-							model: d
-						};
-		};
-	}
+				: {
+						loadingState: "notLoaded",
+						model: d
+					};
+	};
 }
 
 export interface ModelSearchDescriptor {

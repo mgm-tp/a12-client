@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -37,16 +37,15 @@ import { act } from "react";
 import type { Store } from "redux";
 
 import { query } from "@com.mgmtp.a12.devtools/react";
-import { MasterDetail } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/master-detail/main/master-detail.view.js";
 import {
+	MasterDetail,
 	SizeContext,
 	type SizeContextProps
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ActivityActions } from "../../../../../core/activity/index.js";
-import MasterDetailRegionLayout, {
-	type MasterDetailLayoutProps
-} from "../../../../../core/frame/internal/layout/MasterDetailRegionLayout.js";
+import type { LayoutProps } from "../../../../../core/frame/internal/layout/LayoutProps.js";
+import MasterDetailRegionLayout from "../../../../../core/frame/internal/layout/MasterDetailRegionLayout.js";
 import { ApplicationModel } from "../../../../../core/model/index.js";
 import type { View } from "../../../../../core/view/index.js";
 import LayoutProviderMock from "../../../../mocks/frame/LayoutProviderMock.js";
@@ -332,7 +331,7 @@ function MasterDetailTestWrapper(props: MasterDetailTestComponentProps) {
 function renderConfig(smallDevice?: true) {
 	const rootRegionRef: string[] = [];
 	const sizeContext: SizeContextProps = { currentSize: smallDevice ? "sm" : undefined };
-	const Layout: Mock<React.ComponentType<MasterDetailLayoutProps>> = mock.fn(
+	const Layout: Mock<React.ComponentType<LayoutProps>> = mock.fn(
 		MasterDetailRegionLayout.component
 	);
 	const viewProvider = ViewProviderWithNodeMocks();

@@ -1,3 +1,0 @@
-# This file intentionally overrides .gitignore for pnpm pack.
-# pnpm applies .gitignore as a filter when it is listed in the "files" field of package.json,
-# which would exclude NOTICE, THIRD_PARTY_NOTICES, and licenses/ from the published package.

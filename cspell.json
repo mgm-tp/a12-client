@@ -30,23 +30,31 @@
 		"**/.gitignore",
 		"**/.dockerignore",
 		"documentation/scripts/convert.ts",
-		"documentation/scripts/asciidoctor.d.ts"
+		"documentation/scripts/asciidoctor.d.ts",
+		"gradle/*.versions.toml"
 	],
 	"words": [
-		"mgmtp",
-		"osgi",
-		"localizable",
-		"localizables",
 		"actioncontentbox",
-		"navigationcontentboxcontext",
+		"Appmodel",
+		"appsetup",
 		"codemod",
 		"codemods",
 		"devapp",
 		"enablements",
-		"appsetup",
+		"jambit",
+		"localizable",
+		"localizables",
+		"mgmtp",
+		"navigationcontentboxcontext",
+		"osgi",
+		"rsbuild",
+		"Rsdoctor",
+		"rspack",
 		"unmarshall",
 		"unmarshalling"
 	],
 	"useGitignore": true,
-	"flagWords": ["wether->whether"]
+	"flagWords": [
+		"wether->whether"
+	]
 }

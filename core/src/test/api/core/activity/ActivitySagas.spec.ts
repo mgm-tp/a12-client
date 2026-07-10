@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,10 +32,11 @@
 
 import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert/strict";
 
+import type { Action } from "redux";
 import { expectSaga } from "redux-saga-test-plan";
 import { put } from "redux-saga/effects";
-import type { AnyAction } from "typescript-fsa";
-import { actionCreatorFactory } from "typescript-fsa";
+
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import type { Activity, ActivityMap } from "../../../../core/activity/index.js";
 import {
@@ -232,7 +233,7 @@ describe("core.activity.sagas", () => {
  */
 function reducerWaitForStateChange(
 	state: object | { activities: ActivityMap } = {},
-	action: AnyAction
+	action: Action
 ) {
 	if (ActivityActions.setData.match(action)) {
 		const activity = ActivitySelectors.activityById(action.payload.activityId)(state);
@@ -255,7 +256,7 @@ function reducerWaitForStateChange(
  * Reducer locks an activity, if the action ActivityAction.lock is dispatched
  * Reducer unlocks an activity, if the action ActivityAction.releaseLockAction is dispatched
  */
-function reducerForLockAndUnlock(state: object = {}, action: AnyAction) {
+function reducerForLockAndUnlock(state: object = {}, action: Action) {
 	const activities = ActivitySelectors.activities()(state);
 
 	if (ActivityActions.lock.match(action)) {
@@ -298,7 +299,7 @@ function reducerForLockAndUnlock(state: object = {}, action: AnyAction) {
  * Reducer which locks an activity after 3 tries
  */
 let TRY_COUNTER = 1;
-function reducerForMultipleTries(state: object = {}, action: AnyAction) {
+function reducerForMultipleTries(state: object = {}, action: Action) {
 	const activities = ActivitySelectors.activities()(state);
 	if (ActivityActions.lock.match(action) && TRY_COUNTER++ >= 3) {
 		const activity = activities[action.payload.activityId];

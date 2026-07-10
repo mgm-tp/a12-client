@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,11 +33,17 @@ LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 [#/basics/application-model]
 = Application Model
 
-So far we have focused on the runtime and understand how starting activities creates views in regions that show the UI elements. One piece of the puzzle is missing so far: how exactly do you specify which and how many views are associated with an activity? This section will explain that this association is in the Application Model, specifically in the "scene" descriptions.
+So far we have focused on the runtime and understand how starting activities creates views in regions that show the UI elements. One piece of the puzzle is missing so far: how exactly do you specify which and how many views are associated with an activity? This section will explain that this association is in the Application Model (also often referred to as just "App Model"), specifically in the "scene" descriptions.
+
+[NOTE]
+====
+For a code-first alternative to Application Models, see <<features-dynamic-configuration,Dynamic Configuration>>, which allows defining regions, flows, and menus directly in TypeScript with optional state-dependent selectors.
+When building new applications using A12 Client, we recommend using Dynamic Configuration over Application Models.
+====
 
 == Overview
 
-The Application Model is all about the structure of the UI in terms of regions and layout, and behavior – when and how UI components should be placed in the UI. The building blocks of the model are summarized in this diagram:
+The Application Model is all about the structure of the UI in terms of regions and layout, and behavior - when and how UI components should be placed in the UI. The building blocks of the model are summarized in this diagram:
 
 image::assets/images/model/model-hierarchy.svg[model-hierarchy]
 
@@ -298,7 +304,7 @@ The directives of a scene change are either in the `onEnter` or in the `onExit` 
 
 * `onEnter` directives are executed when a scene is selected.
 
-* `onExit` directives are executed when a scene is followed by a next one, i.e., when a new activity is created and this causes a new match condition. This group is for preparing a follow-up situation. Note that the scene with the `onExit` does not end – there is just another scene (change) now on top of it (or you might think of a new nested scene).
+* `onExit` directives are executed when a scene is followed by a next one, i.e., when a new activity is created and this causes a new match condition. This group is for preparing a follow-up situation. Note that the scene with the `onExit` does not end - there is just another scene (change) now on top of it (or you might think of a new nested scene).
 
 [NOTE]
 ====

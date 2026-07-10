@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -38,8 +38,11 @@ import {
 } from "node:assert/strict";
 
 import type { Activity, Model } from "@com.mgmtp.a12.client/client-core";
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js";
-import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/facade.js";
+import {
+	DocumentServiceFactory,
+	type GeneratedCodeRtConfig
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { initializeDataComponent } from "../../../core/api/initializeDataComponent.js";
 import { DocumentPath } from "../../../core/api/path/documentPath.js";
@@ -288,6 +291,71 @@ describe("redux.api.reducers", () => {
 			strictEqual(updatedDh.data?.validation["foo/1"]?.messages.length, 1);
 		});
 
+		describe("kernel options", () => {
+			function setupKernelOptionsTest(customOptions?: GeneratedCodeRtConfig) {
+				const TEST_DOC: DgDocument = {
+					docRef: "foo/1",
+					document: {},
+					documentModel: emptyDmTestInstance(),
+					loadingState: "loaded"
+				};
+
+				DocumentRuntimeServiceFactory.set(KernelFixtures.RtService.runtimeFactory({}));
+				DocServiceFactory.set(KernelFixtures.DocService.instance({}));
+
+				const testDh = setupDataHolderWithDocuments([TEST_DOC]);
+
+				// reset calls from initializeDataComponent
+				KernelFixtures.RtService.resetHistory();
+
+				handleParsingFailed(customOptions)(
+					testDh,
+					DataActions.parsingFailed({
+						activityId: "test-activity",
+						dataReference: "test-data-ref",
+						parseError: {
+							message: message({
+								type: "parseError",
+								entityInstance: []
+							}),
+							value: "this-is-blatantly-wrong!"
+						}
+					})
+				);
+
+				return KernelFixtures.RtService.getCallArgs();
+			}
+
+			it("extends the default options with the given custom options", () => {
+				const customKernelOptions: GeneratedCodeRtConfig = {
+					customConditionFactory: { createCustomCondition: () => null }
+				};
+
+				const callArgs = setupKernelOptionsTest(customKernelOptions);
+
+				// two calls for: computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 2);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, {
+						ignoreUnknownFields: true,
+						...customKernelOptions
+					});
+				});
+			});
+
+			it("uses default options if no custom options are given", () => {
+				const callArgs = setupKernelOptionsTest();
+
+				// two calls for: computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 2);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, { ignoreUnknownFields: true });
+				});
+			});
+		});
+
 		it("does not remove unknown data slices from the dataholder", () => {
 			const TEST_ACTIVITY_ID = "test-activity";
 			const TEST_DATA_REF = "/base[1]/aGroup[1]/aField[1]";
@@ -377,7 +445,7 @@ function setupDataHolderWithDocuments(
 		dirty: false,
 		slices: {},
 		data: {
-			...initializeDataComponent(documents, [], entryPoint),
+			...initializeDataComponent({ documents, entryPoint }),
 			validation: validation ?? {}
 		}
 	};

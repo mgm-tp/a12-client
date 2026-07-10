@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,20 +32,24 @@
 
 import type { JSX } from "react";
 import { useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
 import type {
 	Activity,
 	DataLoader,
-	ApplicationModel,
-	View
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
 } from "@com.mgmtp.a12.client/client-core";
-import { ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import { ActionContentbox, ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
-
-import appmodel from "./no-model-instance.appmodel.json" with { type: "json" };
+import { withProgressIndicator } from "../../../utils/withProgressIndicator.js";
 
 class NoModelInstanceDataLoader implements DataLoader<{}> {
 	name = "NoModelInstanceDataLoader";
@@ -71,16 +75,74 @@ class NoModelInstanceDataLoader implements DataLoader<{}> {
 	}
 }
 
-const NoModelInstanceModule: SampleAppModule = {
-	dataLoaders: [new NoModelInstanceDataLoader()],
+const INITIAL_DESCRIPTOR = { section: "DataHandling", feature: "NoModelInstanceDescriptor" };
+
+function matchesNoModelInstance(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "DataHandling" && descriptor.feature === "NoModelInstanceDescriptor"
+	);
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "data_handling.no-model-instance",
+		scenes: [
+			{
+				name: "NoModelInstanceDescriptor",
+				matches: matchesNoModelInstance,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: withProgressIndicator(NoModelInstanceView),
+							region: "/CONTENT",
+							models: [{ modelType: "document", name: "CRUD-document" }]
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "missing"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "data_handling.no-model-instance",
+			label: {
+				key: "data_handling.no-model-instance",
+				defaults: {
+					en: "No model/instance descriptor",
+					de: "Kein model/instance descriptor"
+				}
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const NoModelInstanceModule: SampleAppModule = {
 	id: "data_handling.no-model-instance",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
+	dataLoaders: [new NoModelInstanceDataLoader()],
+	flows: dynamicFlows,
+	menus: selectMenus
 };
 
-export default NoModelInstanceModule;
-
-function NoModelInstanceView(props: View): JSX.Element | null {
+function NoModelInstanceView(props: ViewNGProps): JSX.Element | null {
 	const data = useSelector(ActivitySelectors.data(props.activityId));
 
 	const loaded = useSelector(ActivitySelectors.loadingStateById(props.activityId)) === "loaded";
@@ -104,11 +166,3 @@ function NoModelInstanceView(props: View): JSX.Element | null {
 		</ActionContentbox>
 	);
 }
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-const Views: { [name: string]: View.ViewComponent | undefined } = {
-	NoModelInstanceView
-};

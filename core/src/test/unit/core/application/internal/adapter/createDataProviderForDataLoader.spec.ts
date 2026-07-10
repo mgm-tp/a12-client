@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,12 +34,13 @@ import { deepStrictEqual, fail, notStrictEqual, strictEqual } from "node:assert/
 import type { Mock } from "node:test";
 import { mock } from "node:test";
 
+import type { Action as ReduxAction } from "redux";
 import { expectSaga } from "redux-saga-test-plan";
 import type { CallEffect, PutEffect } from "redux-saga/effects";
-import type { Action, AnyAction } from "typescript-fsa";
 
-import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
-import type { DocumentModel } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/index.js";
+import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import type { DocumentModel } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import type { Activity, ActivityMap } from "../../../../../../core/activity/index.js";
 import { ActivityActions, ActivitySelectors } from "../../../../../../core/activity/index.js";
@@ -735,7 +736,7 @@ describe("core.application", () => {
 
 				function createDeleteConfig(
 					activityId?: string,
-					dataHolders?: Activity.DataHolder<{}>[]
+					dataHolders?: Activity.DataHolder[]
 				): DataProvider.DeleteConfig {
 					return {
 						activityId: activityId || "activityId",
@@ -750,7 +751,7 @@ describe("core.application", () => {
 				function createSaveConfig(
 					activityId?: string,
 					updateActivityData?: boolean,
-					dataHolders?: Activity.DataHolder<{}>[]
+					dataHolders?: Activity.DataHolder[]
 				): DataProvider.SaveConfig {
 					return {
 						activityId: activityId || "activityId",
@@ -774,7 +775,7 @@ describe("core.application", () => {
 
 				function createLoadConfig(
 					activityId?: string,
-					dataHolders?: Activity.DataHolder<{}>[]
+					dataHolders?: Activity.DataHolder[]
 				): DataProvider.LoadConfig {
 					return {
 						activityId: activityId || "activityId",
@@ -868,7 +869,7 @@ describe("core.application", () => {
 				}
 
 				function isSetDataAction(
-					action: AnyAction
+					action: ReduxAction
 				): action is Action<ActivityActions.SetDataPayload> {
 					return action.type === ActivityActions.setData.type;
 				}

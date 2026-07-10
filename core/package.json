@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-core",
-  "version": "16.3.0-SNAPSHOT",
+  "version": "17.0.0",
   "description": "Client Core Library",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -21,22 +21,25 @@
     "mocha:dev": "mocha --forbid-only=false --reporter=spec",
     "detect:cycles": "devtools detect-cycles \"./src/**/*.@(ts|tsx)\" --ignore-type-imports",
     "disabled:detect:components-cycles": "devtools detect-cycles \"./src/@(core|extensions)/**/*.@(ts|tsx)\" \"src\\/([^\\/]*\\/[^\\/]+)\\/.*\"",
-    "analyze-component-dependencies": "devtools analyze-dependencies \"./src/@(core|extensions)/**/*.@(ts|tsx)\" \"src\\/([^\\/]*\\/[^\\/]+)\\/.*\""
+    "analyze-component-dependencies": "devtools analyze-dependencies \"./src/@(core|extensions)/**/*.@(ts|tsx)\" \"src\\/([^\\/]*\\/[^\\/]+)\\/.*\"",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
+    "lint:fix": "node --run lint -- --fix",
+    "lint:onlyErrors": "node --run lint -- --quiet"
   },
   "type": "module",
   "sideEffects": false,
   "dependencies": {
+    "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat": "catalog:a12",
     "fast-deep-equal": "catalog:",
     "fp-ts": "catalog:",
     "monocle-ts": "catalog:",
-    "semver": "catalog:",
-    "typescript-fsa": "catalog:"
+    "semver": "catalog:"
   },
   "devDependencies": {
     "@com.mgmtp.a12.base/base-model-api": "catalog:a12",
     "@com.mgmtp.a12.dataservices/dataservices-access": "catalog:a12",
-    "@com.mgmtp.a12.devtools/build-tools": "catalog:a12",
     "@com.mgmtp.a12.devtools/tsconfig": "catalog:a12",
+    "@com.mgmtp.a12.devtools/build-tools": "catalog:a12",
     "@com.mgmtp.a12.devtools/react": "catalog:a12",
     "@com.mgmtp.a12.devtools/why-did-you-render": "catalog:a12",
     "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "catalog:a12",
@@ -46,6 +49,7 @@
     "@com.mgmtp.a12.utils/utils-localization-react": "catalog:a12",
     "@com.mgmtp.a12.utils/utils-logging": "catalog:a12",
     "@com.mgmtp.a12.widgets/widgets-core": "catalog:a12",
+    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
     "@microsoft/api-extractor": "catalog:",
     "@testing-library/dom": "catalog:",
     "@testing-library/react": "catalog:",
@@ -54,10 +58,11 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@types/react-redux": "catalog:",
     "@types/semver": "catalog:",
     "@types/source-map-support": "catalog:",
     "c8": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-mocha": "catalog:",
     "global-jsdom": "catalog:",
     "jsdom": "catalog:",
     "mocha": "catalog:",
@@ -104,8 +109,6 @@
   ],
   "modelType": "application",
   "modelVersion": "6.0",
-  "main": "./lib/core/index.js",
-  "types": "./lib/core/index.d.ts",
   "exports": {
     ".": "./lib/core/index.js",
     "./appModelAdapter": "./lib/extensions/appModelAdapter/index.js",
@@ -116,14 +119,6 @@
     "./localization": "./lib/extensions/localization/index.js",
     "./modelLoader": "./lib/extensions/modelLoader/index.js",
     "./notification": "./lib/extensions/notification/index.js",
-    "./lib/*.js": "./lib/*.js",
-    "./lib/*/index": "./lib/*/index.js",
-    "./lib/core/lenses": "./lib/core/lenses.js",
-    "./lib/core/ClientWidgetMap": "./lib/core/ClientWidgetMap.js",
-    "./lib/core/*.js": "./lib/core/*.js",
-    "./lib/core/*": "./lib/core/*/index.js",
-    "./lib/extensions/*.js": "./lib/extensions/*.js",
-    "./lib/extensions/*": "./lib/extensions/*/index.js",
-    "./package.json": "./package.json"
+    "./a12internal": "./lib/core/activity/a12-internal/index.js"
   }
 }

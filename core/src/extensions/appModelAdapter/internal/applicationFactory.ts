@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,11 +31,6 @@
  */
 
 import { AppModelAdapterModule } from "../../../core/application/internal/adapter/appModelAdapterModule.js";
-import type {
-	A12ApplicationConfig,
-	ApplicationWithConfiguredModel,
-	RequireFeatures
-} from "../../../core/application/internal/factories/applicationConfig.js";
 import {
 	addInitialAction,
 	combineFeatures,
@@ -43,13 +38,18 @@ import {
 	withModel
 } from "../../../core/application/internal/factories/applicationFactory.js";
 import { ModuleRegistryProvider } from "../../../core/application/internal/factories/moduleRegistryProvider.js";
+import type {
+	A12ApplicationConfig,
+	ApplicationWithConfiguredModel,
+	RequireFeatures
+} from "../../../core/index.js";
 import { APPLICATION_MODEL_PLACEHOLDER } from "../../../core/model/internal/appModelPlaceholder.js";
 import { addSupportedModelVersion } from "../../modelLoader/internal/applicationFactory.js";
 
 const MODEL_TYPE = "application";
 const SUPPORTED_MODEL_VERSIONS = "6.0";
 
-declare module "../../../core/application/internal/factories/applicationConfig.js" {
+declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		appModelAdapter?: unknown;
 	}

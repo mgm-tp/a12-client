@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,6 +31,7 @@
  */
 
 import type { ActivityReducers } from "@com.mgmtp.a12.client/client-core";
+import type { GeneratedCodeRtConfig } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import {
 	handleValidateFull,
@@ -44,75 +45,58 @@ import { assertCondition } from "../../typeguards.js";
 import { DataActions } from "./actions.js";
 import { isDgClAndValidationDataHolderShape } from "./types.js";
 
-export const dataComponentReducersFactory = (): ActivityReducers.DataReducer[] => [
-	{
-		// change field value
-		reduce(dataHolders, action, defaultDataHolder) {
-			return DataActions.changeValue.match(action)
-				? dataHolders?.map(dh => {
-						if (dh === defaultDataHolder) {
-							assertCondition(isDgClAndValidationDataHolderShape(dh));
-							return handleChangeValue()(dh, action);
-						}
-						return dh;
-					})
-				: dataHolders;
-		}
-	},
-	{
-		// parsing failed
-		reduce(dataHolders, action, defaultDataHolder) {
-			return DataActions.parsingFailed.match(action)
-				? dataHolders?.map(dh => {
-						if (dh === defaultDataHolder) {
-							assertCondition(isDgClAndValidationDataHolderShape(dh));
-							return handleParsingFailed()(dh, action);
-						}
-						return dh;
-					})
-				: dataHolders;
-		}
-	},
-	{
-		// row added
-		reduce(dataHolders, action, defaultDataHolder) {
-			return DataActions.rowAdded.match(action)
-				? dataHolders?.map(dh => {
-						if (dh === defaultDataHolder) {
-							assertCondition(isDgClAndValidationDataHolderShape(dh));
-							return handleRowAdded()(dh, action);
-						}
-						return dh;
-					})
-				: dataHolders;
-		}
-	},
-	{
-		// validate full
-		reduce(dataHolders, action, defaultDataHolder) {
-			return DataActions.validateFull.match(action)
-				? dataHolders?.map(dh => {
-						if (dh === defaultDataHolder) {
-							assertCondition(isDgClAndValidationDataHolderShape(dh));
-							return handleValidateFull()(dh, action);
-						}
-						return dh;
-					})
-				: dataHolders;
-		}
-	},
-	{
-		// validate part
-		reduce(dataHolders, action, defaultDataHolder) {
-			return DataActions.validatePart.match(action)
-				? dataHolders?.map(dh => {
-						if (dh === defaultDataHolder) {
-							assertCondition(isDgClAndValidationDataHolderShape(dh));
-							return handleValidatePart()(dh, action);
-						}
-						return dh;
-					})
-				: dataHolders;
+export const dataComponentReducerFactory = (
+	kernelOptions?: GeneratedCodeRtConfig
+): ActivityReducers.DataReducer => ({
+	reduce(dataHolders, action, defaultDataHolder) {
+		switch (true) {
+			case DataActions.changeValue.match(action): {
+				return dataHolders?.map(dh => {
+					if (dh === defaultDataHolder) {
+						assertCondition(isDgClAndValidationDataHolderShape(dh));
+						return handleChangeValue(kernelOptions)(dh, action);
+					}
+					return dh;
+				});
+			}
+			case DataActions.parsingFailed.match(action): {
+				return dataHolders?.map(dh => {
+					if (dh === defaultDataHolder) {
+						assertCondition(isDgClAndValidationDataHolderShape(dh));
+						return handleParsingFailed(kernelOptions)(dh, action);
+					}
+					return dh;
+				});
+			}
+			case DataActions.rowAdded.match(action): {
+				return dataHolders?.map(dh => {
+					if (dh === defaultDataHolder) {
+						assertCondition(isDgClAndValidationDataHolderShape(dh));
+						return handleRowAdded(kernelOptions)(dh, action);
+					}
+					return dh;
+				});
+			}
+			case DataActions.validateFull.match(action): {
+				return dataHolders?.map(dh => {
+					if (dh === defaultDataHolder) {
+						assertCondition(isDgClAndValidationDataHolderShape(dh));
+						return handleValidateFull(kernelOptions)(dh, action);
+					}
+					return dh;
+				});
+			}
+			case DataActions.validatePart.match(action): {
+				return dataHolders?.map(dh => {
+					if (dh === defaultDataHolder) {
+						assertCondition(isDgClAndValidationDataHolderShape(dh));
+						return handleValidatePart(kernelOptions)(dh, action);
+					}
+					return dh;
+				});
+			}
+			default:
+				return dataHolders;
 		}
 	}
-];
+});

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -44,23 +44,22 @@ export abstract class MyAbstractModule implements Module {
 	// ...
 
 	moduleSpecificRenderer(): (props: ModuleSpecificProps) => JSX.Element | undefined {
-		return props => undefined;
+		return () => undefined;
 	}
 }
 
-export namespace MyModuleExtensions {
-	export function getRenderer(): (props: ModuleSpecificProps) => JSX.Element {
-		return props => {
-			for (const module of ModuleRegistryProvider.getInstance().getAllModules()) {
-				if (module instanceof MyAbstractModule) {
-					const result = module.moduleSpecificRenderer()(props);
-					if (result) {
-						return result;
-					}
+export function getMyModuleExtensionsRenderer(): (props: ModuleSpecificProps) => JSX.Element {
+	return props => {
+		for (const module of ModuleRegistryProvider.getInstance().getAllModules()) {
+			if (module instanceof MyAbstractModule) {
+				const result = module.moduleSpecificRenderer()(props);
+				if (result) {
+					return result;
 				}
 			}
-			return <div>{/* ... default View */}</div>;
-		};
-	}
+		}
+		return <div>{/* ... default View */}</div>;
+	};
 }
+
 // end::extension[]

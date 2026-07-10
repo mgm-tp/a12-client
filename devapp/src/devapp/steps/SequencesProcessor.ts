@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,13 +32,13 @@
 
 import type { Store } from "redux";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { sleep } from "../utils/sleep.js";
 
 import { ActionProcessor } from "./ActionProcessor.js";
 import type { ActionSequence } from "./ActionSequence.js";
-import type { StateHistory } from "./factories.js";
+import type { StateHistory, StateHistoryEntry } from "./factories.js";
 
 const logger = LoggerFactory.getLogger("extensions/steps");
 
@@ -47,14 +47,24 @@ const logger = LoggerFactory.getLogger("extensions/steps");
  */
 export class SequencesProcessor {
 	private actionProcessor: ActionProcessor;
+	public readonly actionSequences: ReadonlyArray<ActionSequence>;
+	private readonly store: Store<object>;
+	private readonly stateHistory: StateHistory;
+	public readonly onDescriptionChange: (currentStepDescription: string) => void;
+	public readonly onSequenceChange: (currentSequenceDescription: string) => void;
 
 	constructor(
-		public readonly actionSequences: ReadonlyArray<ActionSequence>,
-		private readonly store: Store<object>,
-		private readonly stateHistory: StateHistory,
-		public readonly onDescriptionChange: (currentStepDescription: string) => void,
-		public readonly onSequenceChange: (currentSequenceDescription: string) => void
+		actionSequences: ReadonlyArray<ActionSequence>,
+		store: Store<object>,
+		stateHistory: StateHistory,
+		onDescriptionChange: (currentStepDescription: string) => void,
+		onSequenceChange: (currentSequenceDescription: string) => void
 	) {
+		this.actionSequences = actionSequences;
+		this.store = store;
+		this.stateHistory = stateHistory;
+		this.onDescriptionChange = onDescriptionChange;
+		this.onSequenceChange = onSequenceChange;
 		this.actionProcessor = new ActionProcessor(store);
 	}
 
@@ -120,5 +130,5 @@ export class SequencesProcessor {
 
 interface NextStepResult {
 	readonly state: object;
-	readonly stateDiff: StateHistory.Entry[];
+	readonly stateDiff: StateHistoryEntry[];
 }

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,25 +23,24 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ComponentType, JSX } from "react";
+import type { JSX } from "react";
 import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Locale.js";
-import { localizableFromLocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/LocalizableFactory.js";
 import {
 	initializeKeys,
+	Locale,
+	localizableFromLocalizationTreeMap,
 	type LocalizationTreeMap
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/LocalizationTree.js";
-import type { SelectProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/input/select/main/select.api.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 
 import { ClientWidgetMapContext } from "../../../ClientWidgetMap.js";
 import { LocaleActions, LocaleSelectors } from "../../../locale/index.js";
@@ -49,19 +48,6 @@ import { LocaleActions, LocaleSelectors } from "../../../locale/index.js";
 export interface LocaleSelectProps {
 	readonly hideLabel?: boolean;
 	readonly locales: Locale[];
-	/**
-	 * @deprecated since Client 16.1.0. This property will be removed in the next major release.
-	 * Use the {@link ClientWidgetMapContext} instead.
-	 *
-	 * A map of components, that will be used instead of the corresponding
-	 * default components, if they are provided.
-	 */
-	readonly widgetMap?: {
-		/**
-		 * Used instead the default select widget, if provided.
-		 */
-		readonly Select?: ComponentType<SelectProps>;
-	};
 }
 
 /**
@@ -98,12 +84,8 @@ export function LocaleSelect(props: LocaleSelectProps): JSX.Element {
 		dispatch(LocaleActions.set(locale));
 	};
 
-	// TODO: Remove with A12-17777
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
-	const SelectComponent = props.widgetMap?.Select ?? Select;
-
 	return (
-		<SelectComponent
+		<Select
 			label={label}
 			hideLabel={props.hideLabel}
 			value={Locale.toString(currentLocale)}

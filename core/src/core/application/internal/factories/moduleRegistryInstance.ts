@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,16 +32,16 @@
 
 import type { Store } from "redux";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { ActivityMap } from "../../../activity/internal/activityMap.js";
 import { ActivitySelectors } from "../../../activity/internal/selectors.js";
 import { convertMatchConditionsInScene } from "../../../configurationNG/internal/convertMatchConditions.js";
-import { selectPossibleObject } from "../../../store/internal/selectors.js";
 import type { DynamicMatchCondition } from "../../../configurationNG/internal/typings.js";
+import { selectPossibleObject } from "../../../store/internal/selectors.js";
 
-import { ModuleRegistryImpl } from "./moduleRegistry.js";
 import type { ModuleRegistryEventInterceptor } from "./moduleRegistry.js";
+import { ModuleRegistryImpl } from "./moduleRegistry.js";
 
 const logger = LoggerFactory.getLogger("core/application");
 
@@ -115,7 +115,7 @@ function findActivityIds(
 /**
  * Contains functions only useful for testing modules or the module registry
  */
-export namespace ModuleTestExtensions {
+export const ModuleTestExtensions = {
 	/**
 	 * @experimental
 	 * Only for automated tests!
@@ -123,7 +123,7 @@ export namespace ModuleTestExtensions {
 	 * Use this function to discard any existing ModuleRegistry along with all
 	 * modules inside it, e.g. if you recreate the store in a running VM.
 	 */
-	export function reset(): void {
+	reset(): void {
 		moduleRegistry = undefined;
 	}
-}
+};

@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -65,7 +65,7 @@ export interface Activity {
 }
 
 export interface ActivityDescriptor {
-  readonly instance?: string; // e.g. „P2“
+  readonly instance?: string; // e.g. „P2"
   readonly [key: string]: string | undefined;
 }
 
@@ -78,11 +78,11 @@ The Activity Descriptor is a key/value-map that specifies what the activity is d
 
 The idea is to separate the intention, i.e., _"What should be done"_ from the interpretation and implementation of _"How should it be done"_. The _"what"_ is the Activity Descriptor and it is the responsibility of the activity creator to specify it. The _"how"_ is specified by "use case matches" in the <</basics/application-model,Application Model>>.
 
-==== Pre-defined Key
+==== Pre-defined Keys
 
-There is one key with a pre-defined meaning: The instance key specifies the ID of the business object, or in A12 context, the A12 data document ID. For creating a new document the constant `NEW_INSTANCE_IDENTIFIER` (```"&#95;&#95;NEW&#95;&#95;"```) from `core/application` should be used.
+There are some keys which are part of activity descriptors emitted by A12 components, see link:/docs/crud/crud-dev-docs/index.html#_activity_descriptors[Activity Descriptors]. These keys are used to drive predefined behavior in A12 components.
 
-It is pre-defined in the sense that the provides I/O (loading/saving) and UI components that interpret this key in the following way: if a Form Model has been specified in the matching scene and the instance is set in the descriptor, e.g., `{ "instance": "P222" }`, this is interpreted as the use case "Editing data in a form": load the document for the specified business object and bring up a form. This uses the Document Model which is referenced in the specified Form Model.
+An example of such pre-defined behavior is in the form engine: if a Form Model has been specified in the matching scene and the instance is set in the descriptor, e.g., `{ "instance": "P222" }`, this is interpreted as the use case "Editing data in a form": load the document for the specified business object and bring up a form. This uses the Document Model which is referenced in the specified Form Model. If the constant `NEW_INSTANCE_IDENTIFIER` (```"&#95;&#95;NEW&#95;&#95;"```) from `core/application` is used as the instance, it is interpreted as the use case "Opening a new form": create a new document for the specified business object and bring up a form.
 
 [#/basics/activity/properties]
 === Properties
@@ -236,7 +236,7 @@ Of course, activities can also contain the actual data of the business object. D
 In addition to the actual data, there are several properties providing additional information about the activity's data:
 
 * *loading and saving state:* tells whether the activity DataHolder contains data at all and if yes, if the data is missing, loaded or the loading failed. These are usually controlled and used by DataHandlers and related functionality.
-* *lock:* can be used by business logic to prevent any changes to the DataHolder - a locked DataHolder is also considered as "dirty" - see the dirty handling feature (see below)
+* *lock:* can be used by business logic to prevent any changes to the DataHolder. Does not have any effect on its own.
 * *dirty information:* can be used by business logic to prevent an accidental cancellation of the activity.
 +
 WARNING: The feature only works if the "cancel requested" event action is used instead of the "cancel" command action.

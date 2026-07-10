@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -36,16 +36,14 @@ import type { MainMenuProps as InternalMainMenuProps } from "./components/MainMe
 import type {
 	ApplicationFrameLayoutProps as InternalFrameLayoutProps,
 	HeaderItemProps as InternalHeaderItemProps,
-	NavigationBarTitleProps as InternalNavigationBarTitleProps,
-	SidebarContextProps as SidebarContextPropsInternal
-} from "./layout/ApplicationFrameLayout.js";
-import ApplicationFrameLayoutInternal, {
-	SidebarContext as SidebarContextInternal
-} from "./layout/ApplicationFrameLayout.js";
+	NavigationBarTitleProps as InternalNavigationBarTitleProps
+} from "./layout/applicationFrameLayout/applicationFrameLayout.js";
+import ApplicationFrameLayoutInternal from "./layout/applicationFrameLayout/applicationFrameLayout.js";
+import type { SidebarContextProps as SidebarContextPropsInternal } from "./layout/applicationFrameLayout/sidebarContext.js";
+import { SidebarContext as SidebarContextInternal } from "./layout/applicationFrameLayout/sidebarContext.js";
 import type * as InternalLayoutProps from "./layout/LayoutProps.js";
 import type { MainMenuContextProps as MainMenuContextPropsInternal } from "./layout/MainMenuContext.js";
 import { MainMenuContext as MainMenuContextInternal } from "./layout/MainMenuContext.js";
-import type { MasterDetailLayoutProps as InternalMasterDetailLayoutProps } from "./layout/MasterDetailRegionLayout.js";
 import MasterDetailRegionLayoutComponent from "./layout/MasterDetailRegionLayout.js";
 
 export namespace FrameViews {
@@ -97,11 +95,9 @@ export namespace FrameViews {
 
 	export type MainMenuProps = InternalMainMenuProps;
 
-	export type MasterDetailLayoutProps = InternalMasterDetailLayoutProps;
-
 	/**
 	 * React component to render views of a region in a master detail layout.
 	 */
-	export const MasterDetailRegionLayout: ComponentType<MasterDetailLayoutProps> =
+	export const MasterDetailRegionLayout: ComponentType<LayoutProps> =
 		MasterDetailRegionLayoutComponent.component;
 }

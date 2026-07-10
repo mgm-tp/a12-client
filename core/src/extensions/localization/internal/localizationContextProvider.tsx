@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,17 +33,20 @@
 import { useMemo, type JSX, type PropsWithChildren } from "react";
 import { useSelector } from "react-redux";
 
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
 import {
 	defaultDataFormats,
 	defaultLocalizerFactory,
 	defaultValueConversion
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
+import {
+	LocalizerContext,
+	type LocalizerContextProps
+} from "@com.mgmtp.a12.utils/utils-localization-react";
 import {
 	A11YLanguageContext,
-	getA11yResource
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/a11y-localization/language-context.js";
-import { DateTimeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/date-time/date-time-context.js";
+	getA11yResource,
+	DateTimeContext
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { A12ApplicationConfig } from "../../../core/application/index.js";
 import { LocaleSelectors } from "../../../core/locale/internal/selectors.js";
@@ -54,7 +57,7 @@ import { LocaleSelectors } from "../../../core/locale/internal/selectors.js";
 export function makeLocalizationContextProvider(cfg: A12ApplicationConfig) {
 	return function LocalizationContextProvider(props: PropsWithChildren): JSX.Element {
 		const locale = useSelector(LocaleSelectors.locale());
-		const localizerContextValue = useMemo<LocalizerContext.Type>(() => {
+		const localizerContextValue = useMemo<LocalizerContextProps>(() => {
 			const dataFormats = defaultDataFormats(locale);
 			const conversion = defaultValueConversion(dataFormats);
 			const localizer = defaultLocalizerFactory({

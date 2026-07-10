@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,8 +32,11 @@
 
 type AnyObject = Record<string, unknown>;
 
-export function getByPath(val: AnyObject, [first, ...rest]: string[]): unknown {
-	return first && val ? getByPath(val[first] as AnyObject, rest) : val;
+export function getByPath<V>(
+	val: AnyObject | undefined,
+	[first, ...rest]: string[]
+): V | undefined {
+	return (first && val ? getByPath(val[first] as AnyObject, rest) : val) as V | undefined;
 }
 
 // obj will be mutated

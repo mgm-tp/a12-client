@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,26 +23,117 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ApplicationModel } from "@com.mgmtp.a12.client/client-core";
+import type { Dispatch } from "redux";
 
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
-import appmodel from "./errorHandling.appmodel.json" with { type: "json" };
-import viewProvider from "./errorHandlingComponent.js";
-import errorHandlingSagaEventsSaga from "./errorHandlingSaga.js";
+import { withProgressIndicator } from "../../../utils/withProgressIndicator.js";
 
-const GeneralErrorHandlingModule: SampleAppModule = {
+import { BrokenForm } from "./BrokenForm.js";
+import { GeneralErrorHandling } from "./errorHandlingComponent.js";
+import { errorHandlingSagaEventsSaga } from "./errorHandlingSaga.js";
+
+const INITIAL_DESCRIPTOR = { section: "ErrorHandling", feature: "GeneralErrorHandling" };
+
+function matchesGeneral(d: Activity.Descriptor): boolean {
+	return d.section === "ErrorHandling" && d.feature === "GeneralErrorHandling" && !d.instance;
+}
+
+function matchesDetail(d: Activity.Descriptor): boolean {
+	return (
+		d.section === "ErrorHandling" &&
+		d.feature === "GeneralErrorHandling" &&
+		d.model === "Person-document"
+	);
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "error_handling.general",
+		scenes: [
+			{
+				name: "error_handling.general",
+				matches: matchesGeneral,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: withProgressIndicator(GeneralErrorHandling),
+							region: "/CONTENT"
+						}
+					]
+				}
+			},
+			{
+				name: "error_handling.general.detail",
+				priorScene: "error_handling.general",
+				matches: matchesDetail,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: withProgressIndicator(BrokenForm),
+							region: "/CONTENT",
+							models: [
+								{ modelType: "document", name: "Person-document" },
+								{ modelType: "form", name: "Person-form" }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "error_handling.general",
+			label: {
+				key: "error_handling.general",
+				defaults: { en: "General Error Handling", de: "Allgemeines Error Handling" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const GeneralErrorHandlingModule: DynamicConfiguration = {
 	id: "error_handling.general",
-	model: () => appmodel as ApplicationModel,
-	sagas: () => [errorHandlingSagaEventsSaga],
-	views: () => viewProvider
+	flows: dynamicFlows,
+	menus: selectMenus,
+	sagas: () => [errorHandlingSagaEventsSaga]
 };
-
-export default GeneralErrorHandlingModule;

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -39,24 +39,29 @@ import type { ComponentType, JSX } from "react";
 import { act, useContext } from "react";
 
 import { query } from "@com.mgmtp.a12.devtools/react";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { DataRoles } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/data-roles.js";
-import { NavigationContentboxContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { ApplicationFrame } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/application-frame/main/application-frame.view.js";
-import { SizeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
+import {
+	Button,
+	DataRoles,
+	NavigationContentboxContext,
+	ContentBoxElements,
+	ApplicationFrame,
+	SizeContext
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { ClientWidgetMap } from "../../../../../../core/ClientWidgetMap.js";
 import { FrameFactories } from "../../../../../../core/frame/index.js";
 import type {
 	ApplicationFrameLayoutProps,
 	NavigationBarTitleProps
-} from "../../../../../../core/frame/internal/layout/ApplicationFrameLayout.js";
-import ApplicationFrameLayout from "../../../../../../core/frame/internal/layout/ApplicationFrameLayout.js";
+} from "../../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
+import ApplicationFrameLayout from "../../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
 import type { LayoutProvider } from "../../../../../../core/frame/internal/layout/LayoutProps.js";
 import { MobileNavigationAction } from "../../../../../../core/frame/internal/layout/mobile-navigation.js";
 import { ApplicationModel } from "../../../../../../core/model/index.js";
-import { ViewSelectors } from "../../../../../../core/view/index.js";
+import {
+	InternalViewSelectors,
+	type AddDirective
+} from "../../../../../../core/view/internal/selectors.js";
 import { modelWithSubRegions } from "../../../../../mocks/frame/storeMocks.js";
 import { createActivity } from "../../../../../utils/activity.js";
 import {
@@ -75,11 +80,11 @@ import { createStoreForTest } from "../../utils.js";
 
 describe("core.frame.internal.layout.ApplicationFrameLayout", () => {
 	describe("Mobile Navigation", () => {
-		let allViewsStub: Mock<typeof ViewSelectors.allRegions>;
+		let allViewsStub: Mock<typeof InternalViewSelectors.allRegions>;
 		let mobileNavigationStub: Mock<typeof MobileNavigationAction.calculate>;
 
 		beforeEach(() => {
-			allViewsStub = mock.method(ViewSelectors, "allRegions");
+			allViewsStub = mock.method(InternalViewSelectors, "allRegions");
 			mobileNavigationStub = mock.method(MobileNavigationAction, "calculate");
 		});
 
@@ -461,13 +466,13 @@ describe("core.frame.internal.layout.ApplicationFrameLayout", () => {
 			};
 
 			const view1 = { name: "View1", activityId: "A" };
-			const view1Info: ViewSelectors.AddDirective = {
+			const view1Info: AddDirective = {
 				...viewInformationContent,
 				...view1
 			};
 
 			const view2 = { name: "View-Sidebar", activityId: "B" };
-			const view2Info: ViewSelectors.AddDirective = {
+			const view2Info: AddDirective = {
 				...viewInformationSidebar,
 				...view2
 			};
@@ -500,7 +505,7 @@ describe("core.frame.internal.layout.ApplicationFrameLayout", () => {
 			};
 		}
 
-		function setupViewSelectorStub(options: { allViews: ViewSelectors.AddDirective[] }): void {
+		function setupViewSelectorStub(options: { allViews: AddDirective[] }): void {
 			const customSelector = () => {
 				return options.allViews;
 			};

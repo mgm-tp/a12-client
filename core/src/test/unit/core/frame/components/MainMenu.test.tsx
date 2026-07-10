@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -39,16 +39,18 @@ import type { RefObject } from "react";
 import { useEffect } from "react";
 import type { Store } from "redux";
 
-import type { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import type { Localizer } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import type { Localizer } from "@com.mgmtp.a12.utils/utils-localization";
 import {
 	defaultDataFormats,
 	defaultValueConversion,
 	localizableFromModel
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import type { FlyoutMenuProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/menu/main/flyout-menu.api.js";
-import type { MenuItemType } from "@com.mgmtp.a12.widgets/widgets-core/lib/menu/main/menu.api.js";
-import { isMenuItemList } from "@com.mgmtp.a12.widgets/widgets-core/lib/menu/main/menu.utils.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
+import type { LocalizerContextProps } from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	type FlyoutMenuProps,
+	type MenuItemType,
+	isMenuItemList
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { type ClientWidgetMap } from "../../../../../core/ClientWidgetMap.js";
 import type { MainMenuProps } from "../../../../../core/frame/internal/components/MainMenu.js";
@@ -68,7 +70,7 @@ describe("core.frame.internal.components.MainMenu", () => {
 	configure({ testIdAttribute: "data-role" });
 
 	describe("Localization", () => {
-		let localizerContextValue: LocalizerContext.Type & { localizer: Mock<Localizer> };
+		let localizerContextValue: LocalizerContextProps & { localizer: Mock<Localizer> };
 
 		beforeEach(() => {
 			const locale = DE_LOCALE;
@@ -981,7 +983,7 @@ describe("core.frame.internal.components.MainMenu", () => {
 function renderComponent(options?: {
 	mainMenuProps?: Partial<MainMenuProps>;
 	store?: Store<object>;
-	localizerContextValue?: LocalizerContext.Type;
+	localizerContextValue?: LocalizerContextProps;
 	useRealWidgets?: boolean;
 }) {
 	const { mainMenuProps, store, localizerContextValue, useRealWidgets } = options ?? {};

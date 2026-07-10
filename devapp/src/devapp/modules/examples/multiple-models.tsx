@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,28 +23,40 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Module, ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import type { Dispatch } from "redux";
 
-import appmodel from "./multipleModels.appmodel.json" with { type: "json" };
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import { ActionContentbox, ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core";
 
-const MultipleModelsModule: Module = {
-	id: "examples.multiple-models",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
+const INITIAL_DESCRIPTOR = {
+	section: "Examples",
+	example: "MultipleModels",
+	model: "Book-document"
 };
 
-export default MultipleModelsModule;
+function matchesScene(d: Activity.Descriptor): boolean {
+	return d.section === "Examples" && d.example === "MultipleModels";
+}
 
-function MultipleModelsFeature(props: View) {
+function MultipleModelsFeature(props: ViewNGProps) {
 	return (
 		<ActionContentbox
 			headingElements={
@@ -57,7 +69,7 @@ function MultipleModelsFeature(props: View) {
 			<h3>Scene with four document models</h3>
 			<p>
 				This example demonstrates how to load additional document models into the Redux store by
-				declaring them in the application model.
+				declaring them in the dynamic config.
 			</p>
 			<pre>{MODELS}</pre>
 			<p>
@@ -77,19 +89,73 @@ function MultipleModelsFeature(props: View) {
 }
 
 const MODELS = `sceneChange: {
-  onEnter: [
-    {
-      type: "VIEW_ADD",
-      name: "MyComponent",
-      models: [
-        { modelType: "document", name: "Book-document" },
-        { modelType: "document", name: "BookAuthor-document" }
-  ]`;
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MultipleModelsFeature,
+							region: "/CONTENT",
+							models: [
+								{ modelType: "document", name: "Book-document" },
+								{ modelType: "document", name: "BookAuthor-document" }
+							]
+						}
+					]
+				}`;
 
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "examples.multiple-models.flow",
+		scenes: [
+			{
+				name: "MultipleModelsScene",
+				matches: matchesScene,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MultipleModelsFeature,
+							region: "/CONTENT",
+							models: [
+								{ modelType: "document", name: "Book-document" },
+								{ modelType: "document", name: "BookAuthor-document" }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
 }
 
-const Views: { [name: string]: View.ViewComponent } = {
-	MultipleModelsFeature
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "examples.multiple-models",
+			label: {
+				key: "examples.multiple-models",
+				defaults: { en: "Multiple Models", de: "Zusätzliche Modelle" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const MultipleModelsModule: DynamicConfiguration = {
+	id: "examples.multiple-models",
+	flows: dynamicFlows,
+	menus: selectMenus
 };

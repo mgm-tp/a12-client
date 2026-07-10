@@ -1,8 +1,0 @@
-exports[`codemod.recipes.preferTopLevel > Rewrites import paths correctly > should migrate imports.ts correctly 1`] = `
-import { getModelElement } from "@com.mgmtp.a12.client/client-data";
-import { ApplicationFactories, APPLICATION_MODEL_PLACEHOLDER } from "@com.mgmtp.a12.client/client-core";
-import { DeepLinkingFactories } from "@com.mgmtp.a12.client/client-core/deepLinking";
-import { DirtyHandlingFactories } from "@com.mgmtp.a12.client/client-core/dirtyHandling";
-import { createHttpModelLoader } from "@com.mgmtp.a12.client/client-core/modelLoader";
-
-`;

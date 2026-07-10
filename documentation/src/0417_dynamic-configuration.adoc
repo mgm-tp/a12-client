@@ -1,0 +1,360 @@
+////
+SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+
+Copyright (c) 2012-2026 mgm technology partners GmbH
+
+Dual License
+------------
+This source file is part of the mgm A12 Platform and available under
+a choice of two different licenses:
+
+1. Open-Source License - EUPL v1.2
+   You may redistribute and/or modify this file under the terms of the
+   European Union Public License, version 1.2 - see https://eupl.eu/.
+
+2. Commercial License
+   Alternatively, you may obtain a commercial license from
+   mgm technology partners GmbH, that permits use of this software
+   under different terms (including support and maintenance services).
+
+   Please contact a12-license@mgm-tp.com for more information.
+
+You must select and comply with exactly one of the above license options.
+
+Warranty Disclaimer (applies to either option)
+----------------------------------------------
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
+WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
+LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
+////
+
+[#features-dynamic-configuration]
+= Dynamic Configuration
+
+Dynamic Configuration is a code-first, selector-based alternative to <</basics/application-model,Application Models>> for configuring A12 Client applications.
+Instead of defining regions, flows, scenes, and menus in static JSON files, you write them directly in TypeScript — enabling runtime-derived, state-dependent UI configuration.
+
+[NOTE]
+====
+The Dynamic Configuration API is currently marked as `@experimental`. While it is functional and used in production applications, its API surface may still change in future releases.
+====
+
+== Setup
+
+To enable Dynamic Configuration in your composable appsetup:
+
+1. Use `withDynamicConfig()` in your feature composition.
+2. Use `APPLICATION_MODEL_PLACEHOLDER` as the model (the traditional Application Model is not used, but the setup API still requires one).
+3. Register your `DynamicConfiguration` modules with the <<module-registry,ModuleRegistry>>.
+
+The root component of your application should use `DynamicRegionUi` (instead of the traditional layout/view providers) to render the region tree.
+
+[source,typescript,title="Appsetup with Dynamic Configuration"]
+----
+include::assets/typescript/features/dynamicConfiguration/appsetup.ts[tags="setup",indent=0]
+----
+
+== Defining a DynamicConfiguration
+
+A `DynamicConfiguration` module extends `Module` but replaces the JSON-based `model` and `views` properties with three new contributions:
+
+* `regions` — the region/layout tree
+* `flows` — flows containing scenes with match conditions and directives
+* `menus` — menu entries with actions and i18n labels
+
+[TIP]
+====
+The structure of these objects roughly follows the structure of the Application Model. This can be helpful when migrating an existing App Model to a Dynamic Configuration.
+The main differences are described in the <<migrate-from-appmodels,migration guide>>.
+====
+
+Each of these can be either a plain object (static) or a Redux selector function `(state) => T` (dynamic). See <<features-dynamic-configuration-selectors>> for details.
+
+[source,typescript,title="A simple static module"]
+----
+include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="module",indent=0]
+----
+
+== Defining Regions
+
+Regions define the layout tree of your application. Each `DynamicRegion` has a `name`, a `layout` (a React component wrapped in a `LayoutNG` object), and optional `subRegions`.
+
+* The root region by convention uses an empty string (`""`) as its name.
+* Sub-regions are referenced by absolute paths (e.g. `"/CONTENT"`).
+* Multiple modules can contribute regions — regions with the same name are merged automatically.
+
+[source,typescript,title="Region definition"]
+----
+include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="regions",indent=0]
+----
+
+Built-in layout components include `ApplicationFrameLayoutNG`, `MasterDetailRegionLayoutNG`, `NullRegionLayoutNG`, `StackRegionLayoutNG`, and `DashboardLayoutComponentNG` (same ones as for the Application Model-based layouts).
+Custom layout components receive `LayoutPropsNG` which provides `views`, `regionRef`, and `subRegionRefs`.
+
+To render a region in a view component, use `DynamicRegionUi`:
+
+[source,typescript,title="Region rendering"]
+----
+include::assets/typescript/features/dynamicConfiguration/rendering.tsx[tags="rendering",indent=0]
+----
+
+== Defining Flows and Scenes
+
+Flows group related scenes. Each `DynamicScene` defines:
+
+* `name` — a unique scene identifier
+* `matches` — a `DynamicMatchCondition`: a function `(descriptor: Activity.Descriptor) => boolean` that determines when this scene is active
+* `sceneChange` — contains `onEnter` and/or `onExit` arrays of directives
+* `priorScene` (optional) — links to a preceding scene, establishing scene order within a flow
+* `defaultCase` / `cases` (optional) — for sub-case handling within a scene
+
+[source,typescript,title="Flow and scene definition"]
+----
+include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="flows",indent=0]
+----
+
+=== Directives
+
+Scene changes use directives to modify the UI:
+
+`DYNAMIC_ADD_VIEW`:: Adds a view component to a region. The component is referenced directly (not by string name). Optionally includes `models` (model descriptors) and `constraints`.
+`DYNAMIC_CLEAR_REGION`:: Clears all views from a region. Optionally accepts a new `layout` to apply after clearing.
+
+Unlike the traditional Application Model where views and layouts are referenced by name through a provider, Dynamic Configuration references React components directly — eliminating the need for a mapping of string constants to components (e.g., "viewProvider").
+
+== Defining Menus
+
+Each `DynamicMenu` has:
+
+* `id` — unique menu identifier
+* `label` — a `Localizable` object (typically an i18n resource key like `{ key: "application.menu.person" }`)
+* `selected` (optional) — whether the menu item is currently active
+* `action` (optional) — a callback `(dispatch: Dispatch) => void` that is invoked when the menu is clicked
+* `children` (optional) — nested sub-menus
+
+[source,typescript,title="Menu definition"]
+----
+include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="menus",indent=0]
+----
+
+Menus typically derive their `selected` state from `ActivitySelectors.activitiesByDescriptor()` and dispatch `ApplicationActions.startMainActivityRequested` in their `action`.
+
+[#features-dynamic-configuration-selectors]
+== Static vs Dynamic Configuration (Selectors)
+
+The `regions`, `flows`, and `menus` properties on `DynamicConfiguration` accept the type `SelectorOrObject<T>`:
+
+[source,typescript]
+----
+type SelectorOrObject<T> = T | ((state: object) => T);
+----
+
+**Static (plain object):** Use when the configuration is known at build time and does not depend on application state. This is the simpler option and has no performance concerns.
+
+**Dynamic (selector function):** Use when the configuration depends on Redux state — for example, showing different regions based on active activities, or computing menu `selected` state from current activities.
+
+[source,typescript,title="Dynamic module with selectors"]
+----
+include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="selectors",indent=0]
+----
+
+== Performance and Memoization
+
+When using selector functions, it is critical to ensure **referential stability**. The framework uses reference equality (`===`) to detect changes — if a selector returns a new object or function reference on every call, it triggers unnecessary re-renders even when the underlying data hasn't changed.
+
+=== The Problem
+
+Selector functions run on every Redux state change. Creating new objects, arrays, functions, or React components inside a selector produces fresh references each time:
+
+[source,typescript,title="Memoization pattern"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="bad",indent=0]
+----
+
+=== The Solution
+
+Use memoization to return the same reference when the relevant inputs haven't changed:
+
+[source,typescript,title="Memoization pattern"]
+----
+include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="memoization",indent=0]
+----
+
+**General strategies:**
+
+* Move non-dynamic parts out of the selector — use plain objects for anything that doesn't depend on state.
+* Use a memoization utility keyed on the values that actually change.
+* Ensure stable references for: match condition functions, React components, layout objects, and menu arrays.
+
+== Caveats and Limitations
+
+=== No `initialActivity`
+
+Dynamic Configuration has no equivalent of `ApplicationModel.initialActivity`. If your application needs to start with a specific activity, you have two options:
+
+* **Setup Actions** Dispatch the initial activity by putting in the setup actions of the application setup.
+* **Deep linking configuration:** Combine with the deep-linking feature to derive the initial activity from the URL.
+
+=== No Default Wrapping of View Components with Progress Indicators / Error Boundaries
+
+Previously, views added via `VIEW_ADD` directives were automatically wrapped with a progress indicator and error boundary by the default A12 Client Layouts (like the `MasterDetailLayout`). These could be customized via the corresponding provider.
+
+With Dynamic Configuration, you are responsible for the rendering of the layout / view components directly, which means that A12 Client by default will not do any wrapping in the default layouts. To restore this functionality, simply wrap your view components with Progress Indicator / Error Boundary components as needed (or move the logic in the view components themselves).
+
+=== Deep Linking Interaction
+
+The deep-linking system traditionally relies on `ApplicationModel.initialActivity` to determine the starting point. When using Dynamic Configuration, ensure you handle the initial navigation explicitly (see above).
+
+=== Memoization is Required for Dynamic Selectors
+
+Unlike Application Models (which are structurally compared), Dynamic Configuration uses reference equality. Forgetting to memoize selector return values can cause excessive re-renders. See <<Performance and Memoization>> for details.
+
+=== No Direct `permission` Property on Menus
+
+The `ApplicationModel.Menu.permission` property is not directly available on `DynamicMenu`. However, you can implement permission-based filtering in your selector logic by conditionally including or excluding menu entries based on the current user's permissions from the state.
+
+=== Module Registration Order
+
+When multiple modules contribute regions, the module that defines the root region structure (the application frame) should be registered first. Other modules contribute into the region tree established by the root module.
+In the same way, contributed menus will be shown in order of their registration when using the default Menu component. If this is not wanted, provide a custom Menu component (see the A12 Client Devapp for an example).
+
+== Comparison: Application Model vs Dynamic Configuration
+
+The following table maps concepts from the traditional JSON-based Application Model to their Dynamic Configuration equivalents:
+
+[cols="1,1",options="header"]
+|===
+| Application Model (JSON) | Dynamic Configuration (TypeScript)
+
+| JSON `ApplicationModel` file
+| `DynamicConfiguration` module (TypeScript object)
+
+| `Module.model` (JSON selector)
+| Removed (`never`) — configuration is code
+
+| `Module.views` (string → component map)
+| Components referenced directly in `DynamicAddView.component`
+
+| `ApplicationModel.Region` + `Layout` (by name)
+| `DynamicRegion` + `LayoutNG` (React component)
+
+| `Flow` / `Scene` / `MatchCondition` (JSON)
+| `DynamicFlow` / `DynamicScene` / `DynamicMatchCondition` (function)
+
+| `Menu` with `initialActivity` + `label[]`
+| `DynamicMenu` with `action` callback + `Localizable` label
+
+| `Directive.Add` (`VIEW_ADD` by name)
+| `DynamicAddView` (`DYNAMIC_ADD_VIEW`, direct component)
+
+| `Directive.Clear` (`REGION_CLEAR`)
+| `DynamicClearRegion` (`DYNAMIC_CLEAR_REGION`)
+
+| `ApplicationModel.initialActivity`
+| No direct equivalent — dispatch actions instead.
+
+| View provider (`createViewProviderSelector`)
+| Not needed — components are imported directly
+
+| Layout provider (by string name)
+| `LayoutNG` object with `component` property
+|===
+
+== Backward Compatibility
+
+The `AppmodelToDynamicConfigurationAdapter` bridges traditional JSON Application Models into the Dynamic Configuration system. This allows existing modules using JSON models to coexist with new `DynamicConfiguration` modules in the same application.
+
+The adapter is automatically registered when using `withAppModelAdapter` in your composable appsetup. It converts the loaded Application Model's regions, flows, and menus into their dynamic equivalents at runtime.
+
+NOTE: This adapter is not meant to be used in production! It only serves as way to test DynamicConfiguration in an existing A12 Client application (using Application Models).
+
+[#migrate-from-appmodels]
+== Migrating from Application Model
+
+This section provides a step-by-step guide for converting an existing JSON Application Model to Dynamic Configuration.
+
+=== Step 1: Enable Dynamic Configuration
+
+In your composable appsetup, add `withDynamicConfig()` and replace any direct model import with `APPLICATION_MODEL_PLACEHOLDER`:
+
+[source,typescript,title="Enable Dynamic Configuration"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="step1",indent=0]
+----
+
+Remove `withApplicationFrameLayout` if present — the application frame is now defined as a `DynamicRegion` with a layout component.
+
+=== Step 2: Convert Regions
+
+Translate the JSON region tree into `DynamicRegion[]`. Replace layout names with layout components:
+
+[cols="1,1",options="header"]
+|===
+| JSON Layout Name | LayoutNG Component
+
+| `"ApplicationFrame"` | `ApplicationFrameLayoutNG`
+| `"MasterDetail"` | `MasterDetailRegionLayoutNG`
+| `"Null"` | `NullRegionLayoutNG`
+| `"Stack"` | `StackRegionLayoutNG`
+| `"Dashboard"` | `DashboardLayoutComponentNG`
+| Custom name | Custom component implementing `LayoutPropsNG`
+|===
+
+=== Step 3: Convert Flows and Scenes
+
+For each JSON flow, create a `DynamicFlow`. For each scene:
+
+* Replace JSON `matchConditions` with a predicate function:
+* Replace `VIEW_ADD` directives with `DYNAMIC_ADD_VIEW`, referencing the component directly instead of by name:
++
+[source,typescript,title="Convert scenes"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="step3a,step3b",indent=0]
+----
+
+* Note that the `region` property is now explicit on each directive. With Application Models, a missing `region` property would fallback to the default region.
+
+Use the `state` parameter to make the generation of scenes / flows fully dynamic.
+
+=== Step 4: Convert Menus
+
+Replace inline locale arrays with i18n resource keys, and replace `initialActivity` with an `action` callback:
+
+[source,typescript,title="Convert menus"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="step4",indent=0]
+----
+
+Same as above, `state` can be used to dynamically return menu items (e.g., hiding menus based on user information).
+
+Move the localized label texts to your i18n resource files.
+
+=== Step 5: Handle Initial Activity
+
+Since Dynamic Configuration has no `initialActivity` equivalent, add an initialization middleware that sets the starting activity.
+This example assumes that deep linking is used and `ModelActions.setModelGraph` is used as the trigger action.
+
+[source,typescript,title="Handle Initial Activity"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="step5",indent=0]
+----
+
+In case deep linking is not used, the initial activity can also be dispatched via `setupAction` in the application setup.
+
+=== Step 6: Register and Clean Up
+
+Register your new `DynamicConfiguration` module with the `ModuleRegistry`:
+
+[source,typescript,title="Registering the module"]
+----
+include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="step6",indent=0]
+----
+
+Then remove:
+
+* The JSON Application Model file
+* Any `createViewProviderSelector` calls
+* The old `Module.views` and `Module.model` properties
+* Layout/view provider configuration from the appsetup

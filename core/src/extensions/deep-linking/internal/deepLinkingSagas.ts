@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,9 +32,9 @@
 
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, delay, put, race, select, take, takeEvery } from "typed-redux-saga";
-import type { Action, ActionCreator } from "typescript-fsa";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import type { Action, ActionCreator } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { Activity, ActivityActions, ActivitySelectors } from "../../../core/activity/index.js";
 import { ActivityUtils } from "../../../core/application/internal/sagas/utils.js";
@@ -84,7 +84,8 @@ export interface Configuration {
 	 * * {@link ActivityActions.commit}.done
 	 * * {@link ActivityActions.setData}
 	 */
-	readonly updateTriggers?: ActionCreator<{ activityId: string }>[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	readonly updateTriggers?: ActionCreator<any>[];
 
 	/**
 	 * If any of these given type of actions are dispatched,
@@ -118,12 +119,24 @@ export interface CurrentActivityLocationManager {
 /** @internal */
 export const browserLocationManager: CurrentActivityLocationManager = {
 	getLocation(): string {
+		if (typeof location === "undefined") {
+			return "";
+		}
+
 		return location.toString();
 	},
 	getDeepLink(): string {
+		if (typeof location === "undefined") {
+			return "";
+		}
+
 		return location.hash.replace(/^#/, "");
 	},
 	setDeepLink(deepLink: string): void {
+		if (typeof history === "undefined") {
+			return;
+		}
+
 		let nextHash = deepLink;
 		if (!deepLink.startsWith("#")) {
 			nextHash = "#" + nextHash;

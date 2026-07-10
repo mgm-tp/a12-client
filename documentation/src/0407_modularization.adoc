@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,13 +23,14 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
 LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 ////
 
+[#module-registry]
 = Modularization
 
 The ModuleRegistry is an API to enable modularization of Client projects. The API offers extension points to implement dynamic modules in the Client Redux context. This documentation shows what a modularized Client project can look like.
@@ -71,13 +72,7 @@ Modules have to return an unique id. Everything else is optional.
 Module definitions should not interfere and interact with each other to prevent any execution order issue because the execution order is not ensured. This especially applies to fallback solutions for DataProviders, DataEditors and DataReducers because they prevent the executions of others that are later in the execution chain. Therefore, it is highly recommended that every fallback logic for preventing fatal error should be done in the global definition.
 ====
 
-The `ModuleRegistry` can be accessed by the `ModuleRegistryProvider` namespace.
-
-[source,tsx]
-----
-include::assets/typescript/modularization/moduleRegistryProvider.ts[tags=moduleRegistryProvider1;moduleRegistryProvider2;moduleRegistryProvider3,indent=0]
-----
-
+The `ModuleRegistry` can be accessed by the `ModuleRegistryProvider` object.
 The `ModuleRegistryProvider` also offers the `getViewProvider` function which can be used in a `RegionUi` to set the `viewProvider` as this an extension point outside the Client core.
 
 [#/advanced/module-api]
@@ -118,7 +113,7 @@ Modules are not allowed to set own reducers for the following slices because the
 The given extension points may not fit your needs completely, but with the API it is quite simple to implement new ones on top of it.
 
 In the example we see a `MyAbstractModule` which is the base class for every project module that offers the new extension `getModuleSpecificRenderer`.
-The `MyModuleExtensions.getRenderer()` function provides a renderer to render a central component that includes module specific parts:
+The `getMyModuleExtensionsRenderer` function provides a renderer to render a central component that includes module specific parts:
 
 [source,tsx]
 ----

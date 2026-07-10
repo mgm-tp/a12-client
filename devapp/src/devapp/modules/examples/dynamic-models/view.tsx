@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,7 +32,7 @@
 
 import type { JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AnyAction } from "redux";
+import type { Action } from "redux";
 
 import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import {
@@ -40,12 +40,14 @@ import {
 	ActivitySelectors,
 	NEW_INSTANCE_IDENTIFIER
 } from "@com.mgmtp.a12.client/client-core";
-import { ButtonGroup } from "@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { addPrefix } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Typography } from "@com.mgmtp.a12.widgets/widgets-core/lib/typography/main/typography.view.js";
+import {
+	ButtonGroup,
+	Button,
+	addPrefix,
+	ActionContentbox,
+	ContentBoxElements,
+	Typography
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 export function DynamicModelsSelect({ activityId, ariaLevel }: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
@@ -94,7 +96,7 @@ export function DynamicModelsSelect({ activityId, ariaLevel }: ViewNGProps): JSX
 
 function useCreateOrReplaceChildActivityActionCreator(
 	initiatingActivityId: string
-): (taskType: string) => AnyAction {
+): (taskType: string) => Action {
 	const descriptor = useSelector(
 		ActivitySelectors.activityPropById(initiatingActivityId, activity => activity.descriptor)
 	);

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,14 +34,16 @@ import type { JSX } from "react";
 import { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { addPrefix } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { TextLineStateless } from "@com.mgmtp.a12.widgets/widgets-core/lib/input/text-line/main/template/text-line.tpl.view.js";
-import { LayoutGrid } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.view.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	addPrefix,
+	Button,
+	Icon,
+	LayoutGrid,
+	TextField
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-import { SimpleOverviewActions } from "../../../../mocks/SimpleOverview/actions.js";
+import { SimpleOverviewActions } from "../../../../mocks/SimpleOverview/index.js";
 
 export function SearchPanel(props: { activityId: string }): JSX.Element {
 	const dispatch = useDispatch();
@@ -61,7 +63,7 @@ export function SearchPanel(props: { activityId: string }): JSX.Element {
 		<LayoutGrid.Grid className={addPrefix("-u-padding-sm")}>
 			<LayoutGrid.Row layoutConfig={{ layout: { sm: [12], md: [12], lg: [12] } }}>
 				<LayoutGrid.Column>
-					<TextLineStateless
+					<TextField
 						label={localizer({ key: "examples.ui-handling.tabPanel.searchPanel.inputLabel" })}
 						onChange={e => {
 							setValue(e.target.value);

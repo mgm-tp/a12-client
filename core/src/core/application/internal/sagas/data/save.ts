@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,8 +31,13 @@
  */
 
 import deepEqual from "fast-deep-equal";
+import type { Action as ReduxAction } from "redux";
 import { all, call, put, select, type SagaGenerator } from "typed-redux-saga";
-import type { Action, AnyAction, AsyncActionCreators } from "typescript-fsa";
+
+import type {
+	Action,
+	AsyncActionCreators
+} from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { ActivityActions } from "../../../../activity/internal/actions.js";
 import type { Activity } from "../../../../activity/internal/activity.js";
@@ -49,7 +54,7 @@ export function commitStartActivitySaga(
 	config: ApplicationSaga.Configuration
 ): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (_: Activity.Descriptor, action: AnyAction) =>
+		canHandle: (_: Activity.Descriptor, action: ReduxAction) =>
 			ActivityActions.commit.started.match(action),
 		handle: (action: Action<ActivityActions.ActivityActionPayload>) =>
 			handleSaveActivity(config, action, ActivityActions.commit, false)
@@ -61,7 +66,7 @@ export function saveActivitySaga(
 	config: ApplicationSaga.Configuration
 ): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (_: Activity.Descriptor, action: AnyAction) =>
+		canHandle: (_: Activity.Descriptor, action: ReduxAction) =>
 			ActivityActions.save.started.match(action),
 		handle: (action: Action<ActivityActions.SaveDataPayload>) =>
 			handleSaveActivity(config, action, ActivityActions.save, true)
@@ -73,13 +78,11 @@ function* handleSaveActivity(
 	action: Action<ActivityActions.SaveDataPayload | ActivityActions.CommitPayload>,
 	asyncActionCreator: AsyncActionCreators<
 		ActivityActions.SaveDataPayload | ActivityActions.CommitPayload,
-		{},
 		{}
 	>,
 	updateActivityData: boolean
 ): SagaGenerator<void> {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const { activityId: _, dataHolderDescriptors = [], ...payloadRest } = action.payload;
+	const { activityId, dataHolderDescriptors = [], ...payloadRest } = action.payload;
 
 	const activities = yield* select(ActivitySelectors.activities());
 	const moduleDps = yield* select(ModuleExtensions.getDataProviders);

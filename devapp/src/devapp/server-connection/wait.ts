@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,30 +23,30 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Dispatch } from "redux";
+import type { Store } from "redux";
 
-import { NotificationActions } from "@com.mgmtp.a12.client/client-core";
+import { NotificationActions, NotificationSelectors } from "@com.mgmtp.a12.client/client-core";
 
 import { sleep } from "../utils/sleep.js";
 
 const CHECK_INTERVAL = 5000;
 
 /**
- * The bundler proxies this to "<server>/actuator/health/initializationFinished", which is the recommended endpoint
+ * The bundler proxies this to "<server>/actuator/health/(dataservices|contentstore)InitializationFinished", which is the recommended endpoint
  * by services to query for "readiness"
  */
-const STATUS_ENDPOINT = "/status";
+const STATUS_ENDPOINTS = ["/statusDataservices", "/statusContentstore"];
 
-export async function waitForServer(dispatch: Dispatch) {
+export async function waitForServer(store: Store) {
 	if (!(await isReady())) {
-		dispatch(
+		store.dispatch(
 			NotificationActions.add({
 				severity: "info",
 				title: { key: "server.connection.waiting.title" },
@@ -60,15 +60,24 @@ export async function waitForServer(dispatch: Dispatch) {
 			await sleep(CHECK_INTERVAL);
 		} while (!(await isReady()));
 	}
+
+	store.dispatch(
+		NotificationActions.remove(
+			NotificationSelectors.notifications()(store.getState()).map(n => n.id)
+		)
+	);
 }
 
 async function isReady(): Promise<boolean> {
 	try {
-		const response = await fetch(STATUS_ENDPOINT);
+		const responses = STATUS_ENDPOINTS.map(async endpoint => {
+			const response = await fetch(endpoint);
 
-		const data = await response.json();
+			const data = await response.json();
 
-		return typeof data === "object" && data !== null && "status" in data && data.status === "UP";
+			return typeof data === "object" && data !== null && "status" in data && data.status === "UP";
+		});
+		return (await Promise.all(responses)).every(response => response);
 	} catch {
 		return false;
 	}

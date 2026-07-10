@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -39,8 +39,8 @@ import {
 	ActivityActions,
 	ActivityMap,
 	ActivitySelectors,
-	NEW_INSTANCE_IDENTIFIER,
-	ViewSelectors
+	DynamicModelSelectors,
+	NEW_INSTANCE_IDENTIFIER
 } from "@com.mgmtp.a12.client/client-core";
 
 import type { DocumentListData } from "../mocks/SimpleOverview/data.js";
@@ -51,8 +51,11 @@ import { getIdOfDocument } from "./handleStore.js";
 
 export class ActionProcessor {
 	private activityId = 0;
+	private store: Store<object>;
 
-	constructor(private store: Store<object>) {}
+	constructor(store: Store<object>) {
+		this.store = store;
+	}
 
 	executeStep(action: Action): Promise<unknown> {
 		const waitForStepFinishedPromise = action.actionFinished
@@ -193,9 +196,9 @@ export class ActionProcessor {
 	/** Deletes a document */
 	private deleteDocument(modelName: string, instance: number): Promise<void> {
 		const topLevelActivities = ActivitySelectors.topLevelActivities()(this.store.getState());
-		const activity = ActivityMap.toList(topLevelActivities).sort(
-			(a, b) => b.activationTimestamp - a.activationTimestamp
-		)[0];
+		const activity = ActivityMap.toList(topLevelActivities)
+			.sort((a, b) => b.activationTimestamp - a.activationTimestamp)
+			.at(0);
 
 		if (activity === undefined) {
 			throw new Error(`Activity ${this.activityId} not found.`);
@@ -234,9 +237,9 @@ export class ActionProcessor {
 	/** Opens an existing document */
 	private async openDocument(documentModelName: string, documentIndex: number): Promise<{}> {
 		const topLevelActivities = ActivitySelectors.topLevelActivities()(this.store.getState());
-		const activity = ActivityMap.toList(topLevelActivities).sort(
-			(a, b) => b.activationTimestamp - a.activationTimestamp
-		)[0];
+		const activity = ActivityMap.toList(topLevelActivities)
+			.sort((a, b) => b.activationTimestamp - a.activationTimestamp)
+			.at(0);
 		if (activity === undefined) {
 			throw new Error("No current activity");
 		}
@@ -405,19 +408,16 @@ async function waitFor(store: Store<object>, p: Predicate, timeoutInMs = 8_000):
 	return Promise.race([promiseTimeout, promiseUpdateState]);
 }
 
-namespace StateChangePredicates {
-	export function activityExists(activityId: string): Predicate {
+export const StateChangePredicates = {
+	activityExists(activityId: string): Predicate {
 		const result: Predicate = state => {
-			if (activityId === undefined) {
-				return false;
-			}
 			return ActivitySelectors.activityById(activityId)(state) !== undefined;
 		};
 		result.description = "activity " + activityId + " exists";
 		return result;
-	}
+	},
 
-	export function cancelConfirmationRequiredChanged(
+	cancelConfirmationRequiredChanged(
 		activityId: string,
 		cancelConfirmationRequired?: boolean
 	): Predicate {
@@ -428,9 +428,9 @@ namespace StateChangePredicates {
 			}
 			return activity.cancelConfirmationRequired === cancelConfirmationRequired;
 		};
-	}
+	},
 
-	export function activityWithPageDescriptor(descriptorName: string): Predicate {
+	activityWithPageDescriptor(descriptorName: string): Predicate {
 		return state => {
 			const lastActivity = ActivitySelectors.latestActivity()(state);
 			if (lastActivity === undefined) {
@@ -439,9 +439,9 @@ namespace StateChangePredicates {
 			const descriptor: { [key: string]: string } = lastActivity.descriptor as {};
 			return descriptor["page"] === descriptorName;
 		};
-	}
+	},
 
-	export function activityWithRegion(
+	activityWithRegion(
 		expected: ApplicationModel.Region.Reference,
 		shouldBeEmpty: boolean
 	): Predicate {
@@ -450,18 +450,21 @@ namespace StateChangePredicates {
 			if (lastActivity === undefined) {
 				return false;
 			}
-			const regionViews = ViewSelectors.region(expected)(state).views;
+			const dynamicRegionRef = "/" + expected.join("/");
+			const dynamicViews = DynamicModelSelectors.dynamicRegionInfo(dynamicRegionRef)(state).views;
 
 			if (!shouldBeEmpty) {
-				const lastActivityViewFound = regionViews.some(view => view.activityId === lastActivity.id);
+				const lastActivityViewFound = dynamicViews.some(
+					view => view.props.activityId === lastActivity.id
+				);
 				return lastActivityViewFound === true;
 			} else {
-				return regionViews.length === 0;
+				return dynamicViews.length === 0;
 			}
 		};
-	}
+	},
 
-	export function activityWithSavingState(expectedSavingState: Activity.SavingState): Predicate {
+	activityWithSavingState(expectedSavingState: Activity.SavingState): Predicate {
 		return state => {
 			const lastActivity = ActivitySelectors.latestActivity()(state);
 			if (lastActivity === undefined) {
@@ -469,16 +472,16 @@ namespace StateChangePredicates {
 			}
 			return ActivitySelectors.savingState(lastActivity).state === expectedSavingState;
 		};
-	}
+	},
 
-	export function activityWithDirtyState(expected: boolean): Predicate {
+	activityWithDirtyState(expected: boolean): Predicate {
 		return state => {
 			const lastActivity = ActivitySelectors.latestActivity()(state);
 			return lastActivity?.dataHolders.some(x => x.dirty) === expected;
 		};
-	}
+	},
 
-	export function activityWithCancelConfirmationRequired(expected?: boolean): Predicate {
+	activityWithCancelConfirmationRequired(expected?: boolean): Predicate {
 		return state => {
 			const lastActivity = ActivitySelectors.latestActivity()(state);
 
@@ -487,9 +490,9 @@ namespace StateChangePredicates {
 			}
 			return lastActivity.cancelConfirmationRequired === expected;
 		};
-	}
+	},
 
-	export function activityWithInstanceName(expected?: string): Predicate {
+	activityWithInstanceName(expected?: string): Predicate {
 		return state => {
 			const lastActivity = ActivitySelectors.latestActivity()(state);
 			if (lastActivity === undefined) {
@@ -497,16 +500,16 @@ namespace StateChangePredicates {
 			}
 			return lastActivity.descriptor.instance === expected;
 		};
-	}
+	},
 
-	export function numberOfActivitiesActivityMap(count: number): Predicate {
+	numberOfActivitiesActivityMap(count: number): Predicate {
 		return state => {
 			const actual = ActivitySelectors.activities()(state);
 			return Object.keys(actual).length === count;
 		};
-	}
+	},
 
-	export function stateObjectChanged(
+	stateObjectChanged(
 		originalState: object,
 		selector: (state: object) => object | undefined,
 		name?: string
@@ -519,9 +522,9 @@ namespace StateChangePredicates {
 		};
 		func.description = name ?? selector.toString();
 		return func;
-	}
+	},
 
-	export function fromLoadingToLoaded(
+	fromLoadingToLoaded(
 		activityId: string,
 		stateHistory: StateHistory,
 		oldLength: number
@@ -529,34 +532,24 @@ namespace StateChangePredicates {
 		const result: Predicate = () => {
 			const entries = stateHistory.entries.slice(oldLength);
 			for (const entry of entries) {
-				const activitiesBefore: ActivityMap | undefined = ActivitySelectors.activities()(
-					entry.stateBefore
-				);
-				const activitiesAfter: ActivityMap | undefined = ActivitySelectors.activities()(
-					entry.stateAfter
-				);
-
-				if (activitiesAfter && activitiesBefore) {
-					const activityBefore = activitiesBefore[activityId];
-					const activityAfter = activitiesAfter[activityId];
-
-					if (activityBefore && activityAfter) {
-						if (
-							ActivitySelectors.loadingState(activityBefore).state === "loading" &&
-							ActivitySelectors.loadingState(activityAfter).state === "loaded"
-						) {
-							return true;
-						}
-					}
+				const activityBefore = ActivitySelectors.activityById(activityId)(entry.stateBefore);
+				const activityAfter = ActivitySelectors.activityById(activityId)(entry.stateAfter);
+				if (
+					activityBefore &&
+					activityAfter &&
+					ActivitySelectors.loadingState(activityBefore).state === "loading" &&
+					ActivitySelectors.loadingState(activityAfter).state === "loaded"
+				) {
+					return true;
 				}
 			}
 			return false;
 		};
 		result.description = "from loading to loaded of " + activityId;
 		return result;
-	}
+	},
 
-	export function loading(activityId: string): Predicate {
+	loading(activityId: string): Predicate {
 		const pendingStates = ["missing", "loading"];
 
 		const result: Predicate = state => {
@@ -572,13 +565,13 @@ namespace StateChangePredicates {
 
 		result.description = activityId + " loading ";
 		return result;
-	}
+	},
 
-	export function saving(activityId: string): Predicate {
+	saving(activityId: string): Predicate {
 		const pendingStates = ["not_saved", "saving"];
 
 		const result: Predicate = state => {
-			if (activityExists(activityId)) {
+			if (StateChangePredicates.activityExists(activityId)(state)) {
 				const activity = ActivitySelectors.activityById(activityId)(state);
 				if (activity === undefined) {
 					throw new Error(`Activity ${activityId} not found.`);
@@ -596,11 +589,11 @@ namespace StateChangePredicates {
 		};
 		result.description = activityId + " saving";
 		return result;
-	}
+	},
 
-	export function not(p: Predicate): Predicate {
+	not(p: Predicate): Predicate {
 		const result: Predicate = state => !p(state);
 		result.description = "not " + p.description;
 		return result;
 	}
-}
+};

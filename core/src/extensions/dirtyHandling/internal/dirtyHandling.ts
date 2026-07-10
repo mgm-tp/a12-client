@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,8 +32,9 @@
 
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, put, select } from "typed-redux-saga";
-import type { Action } from "typescript-fsa";
-import { isType } from "typescript-fsa";
+
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { isType } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import type { Activity } from "../../../core/activity/index.js";
 import {
@@ -47,7 +48,7 @@ import type { ApplicationSaga } from "../../../core/application/index.js";
 /** @internal */
 export function dirtyHandlingSaga(): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (ad: Activity.Descriptor, action: Action<{}>) => {
+		canHandle: (_ad: Activity.Descriptor, action: Action<{}>) => {
 			return isType(action, ActivityActions.cancelRequested);
 		},
 		handle: (action: Action<ActivityActions.CancelRequestedPayload>) => {
@@ -92,7 +93,7 @@ export function* handleDirtyState({
 			continue;
 		}
 
-		const dirtySubTree = yield* select(ActivitySelectors.allDirtyOrLockedActivities(activity));
+		const dirtySubTree = yield* select(ActivitySelectors.allDirtyActivities(activity));
 
 		const cancelPayload =
 			replacementActivity !== undefined

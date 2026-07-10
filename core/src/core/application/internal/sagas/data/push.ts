@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,16 +23,18 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type { Action as ReduxAction } from "redux";
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, put } from "typed-redux-saga";
-import type { Action, AnyAction, Success } from "typescript-fsa";
+
+import type { Action, Success } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import type { Activity } from "../../../../activity/index.js";
 import { ActivityActions, ActivitySelectors } from "../../../../activity/index.js";
@@ -43,7 +45,7 @@ import { ActivityUtils } from "../utils.js";
 /** @internal */
 export function pushActivitySaga(): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (_: Activity.Descriptor, action: AnyAction) => ActivityActions.push.match(action),
+		canHandle: (_: Activity.Descriptor, action: ReduxAction) => ActivityActions.push.match(action),
 		handle: (action: Action<ActivityActions.PushPayload>) =>
 			handlePushActivity(action.payload.activity)
 	};
@@ -52,7 +54,7 @@ export function pushActivitySaga(): ApplicationSaga.Descriptor {
 /** @internal */
 export function cancelActivitySaga(): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (_: Activity.Descriptor, action: AnyAction) =>
+		canHandle: (_: Activity.Descriptor, action: ReduxAction) =>
 			ActivityActions.cancel.match(action) && action.payload.replacementActivity !== undefined,
 		handle: (action: Action<Required<ActivityActions.CancelPayload>>) =>
 			handlePushActivity(action.payload.replacementActivity)
@@ -62,7 +64,7 @@ export function cancelActivitySaga(): ApplicationSaga.Descriptor {
 /** @internal */
 export function commitDoneActivitySaga(): ApplicationSaga.Descriptor {
 	return {
-		canHandle: (_: Activity.Descriptor, action: AnyAction) =>
+		canHandle: (_: Activity.Descriptor, action: ReduxAction) =>
 			ActivityActions.commit.done.match(action) &&
 			action.payload.params.replacementActivity !== undefined,
 		handle: (action: Action<Success<Required<ActivityActions.CommitPayload>, {}>>) =>
@@ -77,6 +79,6 @@ function* handlePushActivity(activity: Activity): SagaGenerator<void> {
 			yield* put(ActivityActions.loadData({ activityId: activity.id }));
 		}
 	} catch (error) {
-		yield* call(ActivityUtils.handleError, activity.id, "loading", error);
+		yield* call(() => ActivityUtils.handleError(activity.id, "loading", error));
 	}
 }

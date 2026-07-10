@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,14 +34,13 @@ import type { JSX } from "react";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivityActions, ModelSelectors } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ModalNotification } from "@com.mgmtp.a12.widgets/widgets-core/lib/modal-notification/main/modal-notification.view.js";
+import { Button, ModalNotification } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { PersonForm } from "../../../mocks/SimpleForm/forms/person-form.js";
 
-export function BrokenForm(props: View): JSX.Element {
+export function BrokenForm(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 	const errors = useSelector(ModelSelectors.allModelErrorsInScene(props.activityId));
 

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -39,18 +39,20 @@ import {
 } from "node:assert/strict";
 
 import type { Activity, Model } from "@com.mgmtp.a12.client/client-core";
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js";
-import type {
-	ComputedFieldInstance,
-	EntityInstancePath,
-	Message
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
-import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/facade.js";
+import {
+	DocumentServiceFactory,
+	type ComputedFieldInstance,
+	type EntityInstancePath,
+	type GeneratedCodeRtConfig,
+	type Message
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { initializeDataComponent } from "../../../core/api/initializeDataComponent.js";
 import type { FormModel } from "../../../core/api/model/form-model.js";
 import type { NotRelevantConfig } from "../../../core/api/model/relevance/notRelevantConfig.js";
 import { DocumentPath } from "../../../core/api/path/documentPath.js";
+import type { KernelTypes } from "../../../data-mutation/types.js";
 import { DocServiceFactory } from "../../../data-mutation/validation-computation/docServiceFactory.js";
 import { KernelMessage } from "../../../data-mutation/validation-computation/message.js";
 import type { ValidationData } from "../../../data-mutation/validation-computation/types.js";
@@ -62,7 +64,6 @@ import { DataActions } from "../../../redux/api/actions.js";
 import type { DgClAndValidationDataHolderShape } from "../../../redux/api/types.js";
 import { assertCondition } from "../../../typeguards.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
-import type { KernelTypes } from "../../../data-mutation/types.js";
 
 import { message } from "./mocks/mockMessage.js";
 
@@ -546,7 +547,6 @@ describe("redux.api.reducers", () => {
 				KernelFixtures.RtService.runtimeFactory({
 					computation: {
 						appliedTo: doc => TEST_DOC_AFTER_COMP,
-						computedFieldInstances: [computedFieldInstance, clearedFieldInstance],
 						computedFieldInstancesWithChanges: [computedFieldInstance],
 						computedFieldInstancesWithErrors: [],
 						computedFieldInstancesWithoutErrors: [computedFieldInstance],
@@ -731,7 +731,6 @@ describe("redux.api.reducers", () => {
 				KernelFixtures.RtService.runtimeFactory({
 					computation: {
 						appliedTo: doc => TEST_DOC_AFTER_CHANGE,
-						computedFieldInstances: [],
 						computedFieldInstancesWithChanges: [],
 						computedFieldInstancesWithErrors: [],
 						computedFieldInstancesWithoutErrors: [],
@@ -830,7 +829,6 @@ describe("redux.api.reducers", () => {
 				KernelFixtures.RtService.runtimeFactory({
 					computation: {
 						appliedTo: doc => TEST_DOC_AFTER_UPDATE,
-						computedFieldInstances: [],
 						computedFieldInstancesWithChanges: [],
 						computedFieldInstancesWithErrors: [errorFieldInstance],
 						computedFieldInstancesWithoutErrors: [],
@@ -1170,6 +1168,84 @@ describe("redux.api.reducers", () => {
 				});
 			});
 		});
+
+		describe("kernel options", () => {
+			function setupKernelOptionsTest(customOptions?: GeneratedCodeRtConfig) {
+				const TEST_DOC: DgDocument = {
+					docRef: "foo/1",
+					document: {},
+					documentModel: emptyDmTestInstance(),
+					loadingState: "loaded"
+				};
+
+				DocumentRuntimeServiceFactory.set(KernelFixtures.RtService.runtimeFactory({}));
+				DocServiceFactory.set(
+					KernelFixtures.DocService.instance({
+						getByPath: {
+							id: "aField-id",
+							name: "aField",
+							fieldType: {
+								type: "StringType"
+							},
+							type: "Field"
+						},
+						updateEntityInstance: {
+							base: {
+								aGroup: {
+									aField: "test"
+								}
+							}
+						}
+					})
+				);
+
+				const testDh = setupDataHolderWithDocuments([TEST_DOC]);
+
+				// reset calls from initializeDataComponent
+				KernelFixtures.RtService.resetHistory();
+
+				handleChangeValue(customOptions)(
+					testDh,
+					DataActions.changeValue({
+						activityId: "test-activity",
+						dataReference: "/base[1]/aGroup[1]/aField[1]",
+						value: "test",
+						userValue: "test"
+					})
+				);
+
+				return KernelFixtures.RtService.getCallArgs();
+			}
+
+			it("hands the given kernel options to the runtime service", () => {
+				const customKernelOptions: GeneratedCodeRtConfig = {
+					customConditionFactory: { createCustomCondition: () => null }
+				};
+
+				const callArgs = setupKernelOptionsTest(customKernelOptions);
+
+				// three calls for: parsing + computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 3);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, {
+						ignoreUnknownFields: true,
+						...customKernelOptions
+					});
+				});
+			});
+
+			it("uses default options if no custom options are given", () => {
+				const callArgs = setupKernelOptionsTest();
+
+				// three calls for: parsing + computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 3);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, { ignoreUnknownFields: true });
+				});
+			});
+		});
 	});
 });
 
@@ -1191,7 +1267,7 @@ function setupDataHolderWithDocuments(
 		dirty: false,
 		slices: {},
 		data: {
-			...initializeDataComponent(documents, [], entryPoint),
+			...initializeDataComponent({ documents, entryPoint }),
 			validation: validation ?? {}
 		}
 	};
@@ -1249,7 +1325,8 @@ function dmMultiSelectTestInstance(): Model.DocumentAndValidationModel {
 						]
 					}
 				]
-			}
+			},
+			documentUniquenessCriteria: []
 		},
 		generatedCodeAccessor: {
 			getCalculator() {},

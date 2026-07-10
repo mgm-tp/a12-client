@@ -2,7 +2,7 @@
   "header": {
     "id": "SubType_FastFood-document",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.3.0",
     "locales": [
       {
         "code": "en"
@@ -29,7 +29,6 @@
     ],
     "modelReferences": [
       {
-        "alias": "SubType_Unhealthy-document",
         "modelType": "document",
         "purpose": "include",
         "reference": "SubType_Unhealthy-document"
@@ -63,7 +62,9 @@
                 "name": "Food",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "SubType_Unhealthy-document"
+                  "includeConfig": {
+                    "reference": "SubType_Unhealthy-document"
+                  }
                 }
               },
               {

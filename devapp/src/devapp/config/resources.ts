@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -40,16 +40,23 @@
 import type {
 	LocalizationTree,
 	LocalizationTreeMap
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/LocalizationTree.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
 
 const en: LocalizationTree = {
 	application: {
 		title: "Dev App"
 	},
 	version: {
+		versionInfo: "Version Information",
 		info: {
 			currentVersion: {
 				label: "Current Version"
+			},
+			environment: {
+				label: "Environment"
+			},
+			shortVersion: {
+				label: "Short Version"
 			},
 			dependencies: "Dependencies"
 		}
@@ -67,10 +74,8 @@ const en: LocalizationTree = {
 	vetoOnClose: "There are unsaved or locked activities.",
 	theme: {
 		title: "Theme",
-		default: "Default",
-		compact: "Compact",
-		flat: "Flat",
-		flat_compact: "Flat Compact"
+		base: "Base",
+		base_flat: "Base Flat"
 	},
 	language: {
 		title: "Language"
@@ -163,9 +168,16 @@ const de: LocalizationTree = {
 		title: "Beispielanwendung"
 	},
 	version: {
+		versionInfo: "Versionsinformationen",
 		info: {
 			currentVersion: {
 				label: "Aktuelle Version"
+			},
+			environment: {
+				label: "Umgebung"
+			},
+			shortVersion: {
+				label: "Kurzversion"
 			},
 			dependencies: "Abhängigkeiten"
 		}
@@ -183,10 +195,8 @@ const de: LocalizationTree = {
 	vetoOnClose: "Es gibt ungespeicherte oder gesperrte Aktivitäten.",
 	theme: {
 		title: "Theme",
-		default: "Standard",
-		compact: "Kompakt",
-		flat: "Flat",
-		flat_compact: "Flat Kompakt"
+		base: "Base",
+		base_flat: "Base Flat"
 	},
 	language: {
 		title: "Sprache"
@@ -275,9 +285,7 @@ const de: LocalizationTree = {
 	}
 };
 
-const SAMPLE_APPLICATION_TRANSLATIONS: LocalizationTreeMap = {
+export const SAMPLE_APPLICATION_TRANSLATIONS: LocalizationTreeMap = {
 	en,
 	de
 };
-
-export default SAMPLE_APPLICATION_TRANSLATIONS;

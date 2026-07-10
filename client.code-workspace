@@ -30,7 +30,7 @@
 		}
 	],
 	"settings": {
-		"typescript.tsdk": "core/node_modules/typescript/lib",
+		"js/ts.tsdk.path": "core/node_modules/typescript/lib",
 		"files.exclude": {
 			"appmodel-migration": true,
 			"codemod": true,

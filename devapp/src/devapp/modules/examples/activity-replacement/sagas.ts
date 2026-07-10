@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,13 +32,14 @@
 
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, put, select, takeLatest } from "typed-redux-saga";
-import type { Action } from "typescript-fsa";
 
 import type { Selector } from "@com.mgmtp.a12.client/client-core";
 import { Activity, ActivityActions, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
-import { SimpleFormActions, SingleDocumentData } from "../../../mocks/SimpleForm/index.js";
-import { DocumentListData } from "../../../mocks/SimpleOverview/data.js";
+import { isSingleDocumentData } from "../../../mocks/SimpleForm/data.js";
+import { SimpleFormActions } from "../../../mocks/SimpleForm/index.js";
+import { isDocumentListData } from "../../../mocks/SimpleOverview/data.js";
 
 export function* eventTriggerSaga(): SagaGenerator<void> {
 	yield* takeLatest(SimpleFormActions.onEventTriggered, handle);
@@ -49,10 +50,10 @@ function* handle(
 ): SagaGenerator<void> {
 	const { activityId, eventName: direction } = action.payload;
 	if (direction === "back") {
-		const replacementActivity = yield* call(createReplacementActivity, activityId, direction);
+		const replacementActivity = yield* call(() => createReplacementActivity(activityId, direction));
 		yield* put(ActivityActions.cancelRequested({ activityIds: [activityId], replacementActivity }));
 	} else if (direction === "forward") {
-		const replacementActivity = yield* call(createReplacementActivity, activityId, direction);
+		const replacementActivity = yield* call(() => createReplacementActivity(activityId, direction));
 		yield* put(ActivityActions.commit.started({ activityId, replacementActivity }));
 	}
 }
@@ -82,8 +83,8 @@ export function selectNextDocumentId(
 	return state => {
 		const { activity, initiatingActivity } = selectActivities(activityId)(state);
 
-		const singleDocumentData = getDefaultData(activity, SingleDocumentData.isInstance);
-		const documentListData = getDefaultData(initiatingActivity, DocumentListData.isInstance);
+		const singleDocumentData = getDefaultData(activity, isSingleDocumentData);
+		const documentListData = getDefaultData(initiatingActivity, isDocumentListData);
 		if (!singleDocumentData || !documentListData) {
 			return undefined;
 		}

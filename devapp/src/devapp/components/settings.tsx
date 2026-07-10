@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -36,15 +36,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { LocaleActions, LocaleSelectors } from "@com.mgmtp.a12.client/client-core";
 import { isWdyrEnabled, toggleWdyr } from "@com.mgmtp.a12.devtools/why-did-you-render";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import { HeaderTrigger } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { List } from "@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.view.js";
-import { PopUpMenu } from "@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.view.js";
+import { Locale } from "@com.mgmtp.a12.utils/utils-localization";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
+import { HeaderTrigger, Icon, List, PopUpMenu } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { isDevelopmentMode } from "../config/development.js";
-import { ThemeContext } from "../theme-provider.js";
+import { ThemeContext } from "../provider/themeProvider.js";
 
 export function Settings(): JSX.Element {
 	return (

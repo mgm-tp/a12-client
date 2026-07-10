@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -37,10 +37,10 @@ import type { RunSagaOptions, Saga } from "redux-saga";
 import { runSaga } from "redux-saga";
 import { expectSaga } from "redux-saga-test-plan";
 import { takeEvery } from "redux-saga/effects";
-import type { Action } from "typescript-fsa";
-import { actionCreatorFactory } from "typescript-fsa";
 
-import { LogLevel, MinLogLevelLoggingStrategy, Settings } from "@com.mgmtp.a12.utils/utils-logging";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { MinLogLevelLoggingStrategy, Settings } from "@com.mgmtp.a12.utils/utils-logging";
 
 import type { Activity } from "../../../../core/activity/index.js";
 import { ActivityActions } from "../../../../core/activity/index.js";
@@ -415,7 +415,11 @@ describe("extensions.deep-linking.internal.deepLinkingSagas", () => {
 
 		describe("given a Configuration with updateTriggers", () => {
 			it("reacts on an action out of those updateTriggers", () => {
-				const dummyAction = actionCreatorFactory()<{ activityId: string }>("DUMMY");
+				interface DummyActionPayload extends ActivityActions.ActivityActionPayload {
+					readonly otherProp: string;
+				}
+
+				const dummyAction = actionCreatorFactory()<DummyActionPayload>("DUMMY");
 				const configLocal: Configuration = {
 					deepLinkCoder: new ActivityDescriptorBasedDeepLinkCoder(),
 					updateTriggers: [dummyAction]
@@ -569,10 +573,7 @@ describe("extensions.deep-linking.internal.deepLinkingSagas", () => {
 					it("contains an activity descriptor not matching a scene and no 'withoutData' flag", async () => {
 						const action1 = actionCreatorFactory("Test")<{ name?: string }>("ACTION_1");
 						const mockLogger = mock.fn();
-						Settings.LogStrategy = new MinLogLevelLoggingStrategy(
-							{ digest: mockLogger },
-							LogLevel.ERROR
-						);
+						Settings.LogStrategy = new MinLogLevelLoggingStrategy({ digest: mockLogger }, "error");
 
 						const configLocal: Configuration = {
 							applyTriggers: [action1]

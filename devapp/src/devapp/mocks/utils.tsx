@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -36,21 +36,23 @@ import { useSelector } from "react-redux";
 
 import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { Activity, ActivitySelectors, ViewViews } from "@com.mgmtp.a12.client/client-core";
-import type { Container } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/base-props.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import type { ButtonGroupContainerProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/button-group-container/main/button-group-container.api.js";
-import { ButtonGroupContainer } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/button-group-container/main/button-group-container.view.js";
+import {
+	type Container,
+	ActionContentbox,
+	ContentBoxElements,
+	type ButtonGroupContainerProps,
+	ButtonGroupContainer
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { assert } from "../utils/types.js";
 
-import { SingleDocumentData } from "./SimpleForm/data.js";
+import { isSingleDocumentData } from "./SimpleForm/data.js";
 
 declare const __PROFILE__: string;
 
 export function withActivityContext<P extends ViewNGProps>(
 	Component: ComponentType<P> | FunctionComponent<P>,
-	dataPredicate: (data: unknown) => boolean = SingleDocumentData.isInstance
+	dataPredicate: (data: unknown) => boolean = isSingleDocumentData
 ): FC<P> {
 	return props => {
 		const dataExistsAndMatches = useSelector(state => {
@@ -125,8 +127,8 @@ export function EngineFrame(props: EngineFrameProps) {
 					<ContentBoxElements.Footer>
 						<ButtonGroupContainer
 							responsive
-							leftSlotButtons={props.footer?.leftButtons}
-							rightSlotButtons={props.footer?.rightButtons}
+							leftSlotButtons={props.footer.leftButtons}
+							rightSlotButtons={props.footer.rightButtons}
 						/>
 					</ContentBoxElements.Footer>
 				) : null

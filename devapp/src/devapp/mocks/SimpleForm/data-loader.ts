@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,14 +32,15 @@
 
 import type { Activity, DataLoader } from "@com.mgmtp.a12.client/client-core";
 import { NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
-import { Dispatcher } from "@com.mgmtp.a12.dataservices/dataservices-access/lib/dispatch/index.js";
-import type { DocumentModel } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
-import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/facade.js";
+import { Dispatcher } from "@com.mgmtp.a12.dataservices/dataservices-access";
+import type { DocumentModel } from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import { documentProvider } from "../MockServices.js";
 import { isPlatformServerProfile } from "../utils.js";
 
-import { SingleDocumentData } from "./data.js";
+import type { SingleDocumentData } from "./data.js";
+import { isSingleDocumentData } from "./data.js";
 
 const language = "en";
 const documentService = new DocumentServiceFactory().getDocumentService();
@@ -50,16 +51,20 @@ export class SimpleFormDataLoader implements DataLoader<Data> {
 	readonly name = "SimpleFormDataLoader";
 
 	private operationCounter = 0;
+	private readonly params?: {
+		initialDocument: Record<string, unknown>;
+		canHandle: (ad: Activity.Descriptor) => boolean;
+	};
 
-	constructor(
-		private readonly params?: {
-			initialDocument: Record<string, unknown>;
-			canHandle: (ad: Activity.Descriptor) => boolean;
-		}
-	) {}
+	constructor(params?: {
+		initialDocument: Record<string, unknown>;
+		canHandle: (ad: Activity.Descriptor) => boolean;
+	}) {
+		this.params = params;
+	}
 
 	canHandle(ad: Activity.Descriptor): boolean {
-		return this.params?.canHandle?.(ad) ?? !!ad.instance;
+		return this.params?.canHandle(ad) ?? !!ad.instance;
 	}
 	useActivityDescriptorModel() {
 		return true;
@@ -127,7 +132,7 @@ export class SimpleFormDataLoader implements DataLoader<Data> {
 			return Promise.reject("Instance must be set to load a document!");
 		}
 
-		if (!SingleDocumentData.isInstance(data)) {
+		if (!isSingleDocumentData(data)) {
 			return Promise.reject("Activity does not contain suitable data!");
 		}
 
@@ -143,7 +148,6 @@ export class SimpleFormDataLoader implements DataLoader<Data> {
 	}
 
 	private async add(documentModel: DocumentModel, data: Data): Promise<Data> {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { modelId, id, ...documentWithoutModelAndDocumentId } = data.document;
 
 		if (isPlatformServerProfile()) {
@@ -168,8 +172,7 @@ export class SimpleFormDataLoader implements DataLoader<Data> {
 	}
 
 	private async modify(documentModel: DocumentModel, data: Data): Promise<Data> {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { modelId, id, ...documentWithoutModelAndDocumentId } = data.document;
+		const { id, modelId, ...documentWithoutModelAndDocumentId } = data.document;
 
 		if (isPlatformServerProfile()) {
 			await Dispatcher.rpc(language, [
@@ -178,7 +181,7 @@ export class SimpleFormDataLoader implements DataLoader<Data> {
 					method: "MODIFY_DOCUMENT",
 					id: `${this.name}-${this.operationCounter++}`,
 					params: {
-						docRef: data.document.id,
+						docRef: id,
 						document: documentService.formatDates(documentWithoutModelAndDocumentId, documentModel),
 						locale: language
 					}

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,14 +23,15 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Action } from "typescript-fsa";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import type { GeneratedCodeRtConfig } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import type { DataActions } from "../../redux/api/actions.js";
 import type { DgClAndValidationDataHolderShape, ReducerSignature } from "../../redux/api/types.js";
@@ -44,7 +45,9 @@ import { parseWithTypeCheck } from "./changeValue/parseWithTypeCheck.js";
 import { documentAndModelsForChange } from "./documentAndModelsForChange.js";
 import { updateDocumentInDg } from "./updateDocumentInDg.js";
 
-export function handleChangeValue(): ReducerSignature<DataActions.ChangeValuePayload> {
+export function handleChangeValue(
+	kernelOptions?: GeneratedCodeRtConfig
+): ReducerSignature<DataActions.ChangeValuePayload> {
 	return (
 		dataHolder: DgClAndValidationDataHolderShape,
 		action: Action<DataActions.ChangeValuePayload>
@@ -56,7 +59,7 @@ export function handleChangeValue(): ReducerSignature<DataActions.ChangeValuePay
 		const { document, docRef, dm, fm, notRelevantConfigs, computedFields } =
 			documentAndModelsForChange(dataHolder.data);
 
-		const parseResult = parseWithTypeCheck(dataReference, dm, value, userValue);
+		const parseResult = parseWithTypeCheck(dataReference, dm, value, userValue, kernelOptions);
 
 		if (parseResult.type === "error") {
 			// TODO: the code in this IF block is a copy of the parsingFailed reducer, this must be consolidated once
@@ -76,7 +79,8 @@ export function handleChangeValue(): ReducerSignature<DataActions.ChangeValuePay
 				dm,
 				fm,
 				notRelevantConfigs,
-				computedFields
+				computedFields,
+				kernelOptions
 			);
 
 			const validation: ValidationData = ValidationData.addParseError(
@@ -123,7 +127,8 @@ export function handleChangeValue(): ReducerSignature<DataActions.ChangeValuePay
 			dm,
 			fm,
 			notRelevantConfigs,
-			computedFields
+			computedFields,
+			kernelOptions
 		);
 
 		const errorValuesEqual = ValidationData.areErrorValuesEqualForDocument(

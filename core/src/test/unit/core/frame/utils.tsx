@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,14 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { AnyAction, Store } from "redux";
+import { isAction, type Action, type Store } from "redux";
 
 import type { Activity, ActivityMap } from "../../../../core/activity/index.js";
 import { StoreFactories } from "../../../../core/store/internal/factories.js";
@@ -95,7 +95,7 @@ export function createViewWithActivity(
 }
 
 export interface MockStore extends Store<ClientState> {
-	getActions(): AnyAction[];
+	getActions(): Action[];
 }
 
 export function createStoreForTest({
@@ -104,7 +104,7 @@ export function createStoreForTest({
 	locale,
 	initialState
 }: Config = {}): MockStore {
-	const actions: AnyAction[] = [];
+	const actions: Action[] = [];
 
 	const { store } = createApplicationSetup({
 		appModel,
@@ -112,6 +112,9 @@ export function createStoreForTest({
 		additionalMiddlewares: [
 			...(additionalMiddlewares ?? []),
 			StoreFactories.createMiddleware((_, next, action) => {
+				if (!isAction(action)) {
+					throw new Error("Expected only actions to be dispatched!");
+				}
 				actions.push(action);
 				return next(action);
 			})

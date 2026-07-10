@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,17 +33,13 @@
 import type { JSX } from "react";
 import { useSelector } from "react-redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { Tile } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/tile/tile.view.js";
+import { Tile } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { ArticleData } from "./articleDataLoader.js";
 
-export default function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-function DashboardIntroTile(props: View): JSX.Element {
+export function DashboardIntroTile(props: ViewNGProps): JSX.Element {
 	return (
 		<Tile
 			title="Dashboard (Single Activity)"
@@ -78,7 +74,7 @@ function DashboardIntroTile(props: View): JSX.Element {
 	);
 }
 
-function MultipleActivitiesDashboardIntroTile(props: View): JSX.Element {
+export function MultipleActivitiesDashboardIntroTile(props: ViewNGProps): JSX.Element {
 	return (
 		<Tile
 			title="Dashboard (Multiple Activities)"
@@ -136,13 +132,13 @@ function MultipleActivitiesDashboardIntroTile(props: View): JSX.Element {
 	);
 }
 
-function DashboardCalendarTile(props: View): JSX.Element {
+export function DashboardCalendarTile(props: ViewNGProps): JSX.Element {
 	return (
 		<Tile title="Calendar" color="#00686b" icon="calendar_today" ariaLevel={props.ariaLevel} />
 	);
 }
 
-function DashboardArticleTile({ activityId, ariaLevel }: View): JSX.Element {
+export function DashboardArticleTile({ activityId, ariaLevel }: ViewNGProps): JSX.Element {
 	const data = useSelector(ActivitySelectors.data(activityId)) as ArticleData | undefined;
 	return (
 		<Tile
@@ -156,24 +152,14 @@ function DashboardArticleTile({ activityId, ariaLevel }: View): JSX.Element {
 	);
 }
 
-function DashboardNotesTile(props: View): JSX.Element {
+export function DashboardNotesTile(props: ViewNGProps): JSX.Element {
 	return <Tile title="Notes" color="#00686b" icon="speaker_notes" ariaLevel={props.ariaLevel} />;
 }
 
-function DashboardTasksTile(props: View): JSX.Element {
+export function DashboardTasksTile(props: ViewNGProps): JSX.Element {
 	return <Tile title="Tasks" color="#bb006c" icon="list" ariaLevel={props.ariaLevel} />;
 }
 
-function DashboardMessagesTile(props: View): JSX.Element {
+export function DashboardMessagesTile(props: ViewNGProps): JSX.Element {
 	return <Tile title="Messages" color="#bb006c" icon="list" ariaLevel={props.ariaLevel} />;
 }
-
-const Views: { [name: string]: View.ViewComponent } = {
-	DashboardIntroTile,
-	MultipleActivitiesDashboardIntroTile,
-	DashboardCalendarTile,
-	DashboardArticleTile,
-	DashboardNotesTile,
-	DashboardTasksTile,
-	DashboardMessagesTile
-};

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,13 +35,13 @@ import type { ComponentType, HTMLAttributes, JSX, ReactNode } from "react";
 import { memo, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { localizableFromLocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/LocalizableFactory.js";
-import type { ButtonProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.api.js";
-import { addPrefix } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
-import type { ApplicationFrameProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/application-frame/main/application-frame.api.js";
-import { SizeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
-import type { SizeDetectorProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-detector.api.js";
+import { localizableFromLocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	addPrefix,
+	SizeContext,
+	type SizeDetectorProps
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ActivitySelectors } from "../../../../activity/index.js";
 import { ActivityActions } from "../../../../activity/internal/actions.js";
@@ -62,12 +62,15 @@ import {
 	DEFAULT_TRANSLATIONS,
 	RESOURCE_KEYS as FRAME_RESOURCE_KEYS
 } from "../../languages/index.js";
-import type { HeaderItemProps, SidebarContextProps } from "../../layout/ApplicationFrameLayout.js";
+import type { HeaderItemProps } from "../../layout/applicationFrameLayout/applicationFrameLayout.js";
 import {
 	ContentWrapper,
-	FallbackLogo,
-	SidebarContextMemoWrapper
-} from "../../layout/ApplicationFrameLayout.js";
+	FallbackLogo
+} from "../../layout/applicationFrameLayout/applicationFrameLayout.js";
+import {
+	SidebarContextMemoWrapper,
+	type SidebarContextProps
+} from "../../layout/applicationFrameLayout/sidebarContext.js";
 import type { MainMenuContextProps } from "../../layout/MainMenuContext.js";
 import { MainMenuContext } from "../../layout/MainMenuContext.js";
 import {
@@ -138,9 +141,6 @@ function ApplicationFrameLayoutNGComponentInternal(props: ApplicationFrameLayout
 		globalMessageBox,
 		logo,
 		logoURL,
-		// TODO: Remove with A12-17777
-		// eslint-disable-next-line @typescript-eslint/no-deprecated
-		widgetMap,
 		mainMenuComponent,
 		title,
 		footer,
@@ -246,9 +246,6 @@ function ApplicationFrameLayoutNGComponentInternal(props: ApplicationFrameLayout
 					mobileMode={mobileMode}
 					subExpanded={subExpanded}
 					onSubExpanded={setSubExpanded}
-					// TODO: Remove with A12-17777
-					// eslint-disable-next-line @typescript-eslint/no-deprecated
-					widgetMap={widgetMap}
 					mainMenuComponent={mainMenuComponent}
 					additionalHeaderItems={additionalHeaderItems}
 					footer={hideHeaderFooter ? undefined : footer}
@@ -370,26 +367,6 @@ export interface PageProps {
 	};
 
 	/**
-	 * @deprecated since Client 16.1.0. This property will be removed in the next major release.
-	 * Use the {@link ClientWidgetMapContext} instead.
-	 *
-	 * A map of components, that will be used instead of the corresponding
-	 * default components, if they are provided.
-	 */
-	readonly widgetMap?: {
-		/**
-		 * This component is used for the main menu button in the application header
-		 * instead of the default button, if it is provided.
-		 */
-		readonly mainMenuButtonComponent?: ComponentType<ButtonProps>;
-
-		/**
-		 * If provided, this component is used as the root component of the ApplicationFrameLayout
-		 */
-		readonly applicationFrame?: ComponentType<ApplicationFrameProps>;
-	};
-
-	/**
 	 * This component is used for the main menu in the application header
 	 * instead of the default main menu, if it is provided.
 	 */
@@ -419,17 +396,14 @@ function PageTemplate(props: PageProps): JSX.Element {
 	const rightViews = [];
 	const leftViews = [];
 
-	// TODO: Remove with A12-17777
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
-	const { widgetMap, onSubExpanded, subExpanded } = props;
+	const { onSubExpanded, subExpanded } = props;
 
 	const hamburgerButtonRef = useRef<HTMLElement | null>(null);
 	if (props.mobileMode) {
 		const hamburgerIcon = <Icon>menu</Icon>;
-		const HamburgerButtonComponent = widgetMap?.mainMenuButtonComponent ?? Button;
 
 		const hamburgerButton = (
-			<HamburgerButtonComponent
+			<Button
 				icon={hamburgerIcon}
 				onClick={onMainMenuExpansionChange}
 				className={addPrefix("nav__trigger")}
@@ -497,14 +471,12 @@ function PageTemplate(props: PageProps): JSX.Element {
 		</div>
 	);
 
-	const ApplicationFrameComponent = widgetMap?.applicationFrame ?? ApplicationFrame;
-
 	const handleOnExpansionChange = useCallback(() => {
 		onSubExpanded(!subExpanded);
 	}, [onSubExpanded, subExpanded]);
 
 	return (
-		<ApplicationFrameComponent
+		<ApplicationFrame
 			main={props.hideHeader ? null : main}
 			contentToolbar={props.contentNavigationBar}
 			subToolbar={props.sidebarNavigationBar}
@@ -537,26 +509,6 @@ export interface ApplicationFrameLayoutPropsNG extends LayoutPropsNG {
 
 	/** A custom component to be used for the title */
 	readonly title?: ReactNode;
-
-	/**
-	 * @deprecated since Client 16.1.0. This property will be removed in the next major release.
-	 * Use the {@link ClientWidgetMapContext} instead.
-	 *
-	 * A map of components, that will be used instead of the corresponding
-	 * default components, if they are provided.
-	 */
-	readonly widgetMap?: {
-		/**
-		 * This component is used for the main menu button in the application header
-		 * instead of the default button, if it is provided.
-		 */
-		readonly mainMenuButtonComponent?: ComponentType<ButtonProps>;
-
-		/**
-		 * If provided, this component is used as the root component of the ApplicationFrameLayout
-		 */
-		readonly applicationFrame?: ComponentType<ApplicationFrameProps>;
-	};
 
 	/**
 	 * This component is used for the main menu in the application header

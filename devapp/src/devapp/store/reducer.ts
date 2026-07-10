@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,29 +23,30 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { compose, type AnyAction, type Reducer } from "redux";
-import type { Action } from "typescript-fsa";
+import type { Action as ReduxAction } from "redux";
+import { compose, type Reducer } from "redux";
 
 import type { Activity, Modifier } from "@com.mgmtp.a12.client/client-core";
 import { ActivityLenses, modifyIfPresent, modifyWithLens } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
-import { DevAppActions } from "./actions.js";
+import { isCounterData, setCase, triggerStoreUpdate, type SetCasePayload } from "./actions.js";
 
 // example for old slices reducer (now obsolete)
-export function counter(state = 0, action: AnyAction): number {
-	return DevAppActions.triggerStoreUpdate.match(action) ? state + 1 : state;
+export function counter(state = 0, action: ReduxAction): number {
+	return triggerStoreUpdate.match(action) ? state + 1 : state;
 }
 
 export function SetCaseReducer(defaultReducer: Reducer<object>): Reducer<object> {
 	return function (state, action) {
-		return state && DevAppActions.setCase.match(action)
+		return state && setCase.match(action)
 			? setCaseReducer(state, action)
 			: defaultReducer(state, action);
 	};
@@ -53,7 +54,7 @@ export function SetCaseReducer(defaultReducer: Reducer<object>): Reducer<object>
 
 // custom reducer to set Activity.case and increment a counter (representing
 // custom logic).
-function setCaseReducer(state: object, action: Action<DevAppActions.SetCasePayload>): object {
+function setCaseReducer(state: object, action: Action<SetCasePayload>): object {
 	const { activityId, caze } = action.payload;
 
 	const toggleCase = compose(SetCase(caze), incrementCounter);
@@ -73,9 +74,7 @@ function SetCase(caze: string): Modifier<Activity> {
 
 const incrementCounter: Modifier<Activity> = activity => {
 	const dataHolders = activity.dataHolders;
-	const data = DevAppActions.isCounterData(dataHolders[0].data)
-		? dataHolders[0].data
-		: { count: 0 };
+	const data = isCounterData(dataHolders[0].data) ? dataHolders[0].data : { count: 0 };
 	return {
 		...activity,
 		dataHolders: [

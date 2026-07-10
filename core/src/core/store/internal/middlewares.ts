@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,34 +23,38 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Middleware } from "redux";
+import { isAction, type Middleware } from "redux";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { StoreFactories } from "./factories.js";
 
 const logger = LoggerFactory.getLogger("core/store");
 
-export namespace StoreMiddlewares {
+export const StoreMiddlewares = {
 	/**
 	 * redux middleware provider function, which returns a middleware to generate log entries before and after
 	 * an action is dispatched
 	 *
 	 * @returns the logging middleware
 	 */
-	export function logging(): Middleware {
-		return StoreFactories.createMiddleware((api, next, action) => {
-			logger.trace(">>> START ACTION", action.type);
+	logging(): Middleware {
+		return StoreFactories.createMiddleware((_, next, action) => {
+			if (isAction(action)) {
+				logger.trace(">>> START ACTION", action.type);
+			}
 			const retVal = next(action);
-			logger.trace("<<< END ACTION", action.type);
+			if (isAction(action)) {
+				logger.trace("<<< END ACTION", action.type);
+			}
 			return retVal;
 		});
 	}
-}
+};

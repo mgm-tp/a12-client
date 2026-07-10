@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,30 +32,49 @@
 
 import type { JSX, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActivityActions, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { ButtonGroup } from "@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { ButtonGroupContainer } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/button-group-container/main/button-group-container.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ButtonGroup,
+	Button,
+	ActionContentbox,
+	ContentBoxElements,
+	ButtonGroupContainer
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-import type { SampleAppModule } from "../../utils/SampleAppModule.js";
+const INITIAL_DESCRIPTOR = { section: "UIHandling", feature: "MasterDetailEntry" };
 
-import appmodel from "./master-detail.appmodel.json" with { type: "json" };
-
-const MasterDetailModule: SampleAppModule = {
-	id: "ui_handling.master-detail",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
-};
-
-export default MasterDetailModule;
-
-function MasterDetailDescription(props: View): JSX.Element {
+function matchesEntry(descriptor: Activity.Descriptor): boolean {
 	return (
-		<MasterDetailWrapper {...props}>
+		descriptor.section === "UIHandling" &&
+		descriptor.feature === "MasterDetailEntry" &&
+		!descriptor.instance
+	);
+}
+
+function matchesNext(descriptor: Activity.Descriptor): boolean {
+	return !!descriptor.instance;
+}
+
+function matchesAlways(): boolean {
+	return true;
+}
+
+function MasterDetailDescriptionView(props: ViewNGProps): JSX.Element {
+	return (
+		<MasterDetailWrapper constraints={{ type: "MasterDetail" }} {...props}>
 			<p>
 				This is an example ui component to demonstrate the configuration of the master detail
 				layout.
@@ -69,20 +88,145 @@ function MasterDetailDescription(props: View): JSX.Element {
 	);
 }
 
-function MasterDetailView(props: View): JSX.Element {
-	return (
-		<MasterDetailWrapper {...props}>
-			<p>This is an example ui component to demonstrate the master detail layout.</p>
-			<code>{JSON.stringify(props.constraints, undefined, 2)}</code>
-		</MasterDetailWrapper>
+function createMasterDetailView(viewConstraints: MasterDetailConstraints) {
+	return function MasterDetailView(props: ViewNGProps): JSX.Element {
+		return (
+			<MasterDetailWrapper constraints={viewConstraints} {...props}>
+				<p>This is an example ui component to demonstrate the master detail layout.</p>
+				<code>{JSON.stringify(viewConstraints, undefined, 2)}</code>
+			</MasterDetailWrapper>
+		);
+	};
+}
+
+const MasterDetailViewWidth8 = createMasterDetailView({
+	type: "MasterDetail",
+	preferredWidth: 8
+});
+const MasterDetailViewWidth10 = createMasterDetailView({
+	type: "MasterDetail",
+	preferredWidth: 10
+});
+const MasterDetailViewWidth4 = createMasterDetailView({
+	type: "MasterDetail",
+	preferredWidth: 4
+});
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "ui_handling.master-detail",
+		scenes: [
+			{
+				name: "MasterDetailEntry",
+				matches: matchesEntry,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MasterDetailDescriptionView,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail" }
+						}
+					]
+				}
+			},
+			{
+				name: "MasterDetailNext1",
+				priorScene: "MasterDetailEntry",
+				matches: matchesNext,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MasterDetailViewWidth8,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail", preferredWidth: 8 }
+						}
+					]
+				}
+			},
+			{
+				name: "MasterDetailNext2",
+				priorScene: "MasterDetailNext1",
+				matches: matchesAlways,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MasterDetailViewWidth10,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail", preferredWidth: 10 }
+						}
+					],
+					onExit: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MasterDetailViewWidth10,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail", preferredWidth: 10 }
+						}
+					]
+				}
+			},
+			{
+				name: "MasterDetailNext3",
+				priorScene: "MasterDetailNext2",
+				matches: matchesAlways,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MasterDetailViewWidth4,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail", preferredWidth: 4 }
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
 	);
 }
 
-interface WrapperProps extends View {
-	readonly constraints?: {
-		readonly type?: string;
-		readonly preferredWidth?: number;
-	};
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "ui_handling.master-detail",
+			label: {
+				key: "ui_handling.master-detail",
+				defaults: { en: "Master Detail Layout", de: "Master Detail Layout" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const MasterDetailModule: DynamicConfiguration = {
+	id: "ui_handling.master-detail",
+	flows: dynamicFlows,
+	menus: selectMenus
+};
+
+interface MasterDetailConstraints {
+	readonly type?: string;
+	readonly preferredWidth?: number;
+}
+
+interface WrapperProps extends ViewNGProps {
+	readonly constraints?: MasterDetailConstraints;
 	readonly children?: ReactNode;
 }
 
@@ -146,12 +290,3 @@ function MasterDetailWrapper({
 		</ActionContentbox>
 	);
 }
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-const Views: { [name: string]: View.ViewComponent } = {
-	MasterDetailDescription,
-	MasterDetailView
-};

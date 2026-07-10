@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,29 +33,38 @@
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, select } from "typed-redux-saga";
 
-import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
+import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api";
 
 import { StoreSagas } from "../../store/index.js";
 
 import { Model } from "./Model.js";
 import { ModelSelectors } from "./selectors.js";
 
-export namespace ModelSagas {
-	export function* waitForModelsLoaded(activityId: string): SagaGenerator<ModelAPI[]> {
-		const modelDescriptors = yield* select(ModelSelectors.modelDescriptorsByActivityId(activityId));
-		if (modelDescriptors.length === 0) {
-			return [];
-		}
-
-		const models = yield* call(() =>
-			StoreSagas.waitForStateChange(ModelSelectors.modelsLoaded(modelDescriptors))
-		);
-		if (models === undefined || Model.Error.isInstance(models)) {
-			const errMessage = models?.message ?? "Cannot load necessary models.";
-
-			throw new Error(errMessage);
-		}
-
-		return models;
+function* waitForModelsLoaded(activityId: string): SagaGenerator<ModelAPI[]> {
+	const modelDescriptors = yield* select(ModelSelectors.modelDescriptorsByActivityId(activityId));
+	if (modelDescriptors.length === 0) {
+		return [];
 	}
+
+	const models = yield* call(() =>
+		StoreSagas.waitForStateChange(ModelSelectors.modelsLoaded(modelDescriptors))
+	);
+	if (models === undefined || Model.Error.isInstance(models)) {
+		const errMessage = models?.message ?? "Cannot load necessary models.";
+
+		throw new Error(errMessage);
+	}
+
+	return models;
 }
+
+export const ModelSagas: {
+	/**
+	 * Waits for all models associated with the given activity to be loaded.
+	 *
+	 * @returns A promise that resolves to an array of loaded ModelAPI instances
+	 */
+	waitForModelsLoaded: (activityId: string) => SagaGenerator<ModelAPI[]>;
+} = {
+	waitForModelsLoaded
+};

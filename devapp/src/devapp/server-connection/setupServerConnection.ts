@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,12 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
+
+import type { Store } from "redux";
 
 import type { Notification } from "@com.mgmtp.a12.client/client-core";
 import {
@@ -36,14 +38,11 @@ import {
 	ModelActions,
 	NotificationActions
 } from "@com.mgmtp.a12.client/client-core";
-import { loadDataServicesConfiguration } from "@com.mgmtp.a12.dataservices/dataservices-access";
-import { ModelGraph } from "@com.mgmtp.a12.dataservices/dataservices-access/lib/Relationship/index.js";
 import {
-	ConnectorLocator,
-	RestServerConnector
-} from "@com.mgmtp.a12.utils/utils-connector/lib/main/index.js";
-
-import type { CustomSetup } from "../steps/factories.js";
+	loadDataServicesConfiguration,
+	ModelGraph
+} from "@com.mgmtp.a12.dataservices/dataservices-access";
+import { ConnectorLocator, RestServerConnector } from "@com.mgmtp.a12.utils/utils-connector";
 
 import { JwtTokenFilter } from "./JwtTokenFilter.js";
 import { waitForServer } from "./wait.js";
@@ -57,7 +56,7 @@ const DEV_CREDENTIALS = { username: "dev", password: "dev" };
  *
  * This needs to run before any server request is done.
  */
-export async function setupServerConnection({ store }: CustomSetup): Promise<void> {
+export async function setupServerConnection(store: Store): Promise<void> {
 	const dispatch = store.dispatch;
 	const jwtTokenFilter = new JwtTokenFilter();
 
@@ -66,7 +65,7 @@ export async function setupServerConnection({ store }: CustomSetup): Promise<voi
 
 	dispatch(ApplicationActions.setBusy(true));
 
-	await waitForServer(dispatch);
+	await waitForServer(store);
 
 	await loadDataServicesConfiguration(store);
 

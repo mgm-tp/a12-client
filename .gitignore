@@ -11,7 +11,7 @@ yarn.lock
 build
 target
 .gradle
-/gradle
+/gradle/wrapper
 /gradlew
 /gradlew.bat
 
@@ -49,8 +49,15 @@ atlas-archives
 /services-server.log*
 /dataservices-server.log*
 
+# build output
 lib/
 dist/
 coverage/
 !bin/
 *.tsbuildinfo
+
+# local work files
+.local/
+
+# claude
+.claude/settings.local.json

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,23 +23,29 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { notStrictEqual, partialDeepStrictEqual, strictEqual } from "node:assert/strict";
+import {
+	deepStrictEqual,
+	notStrictEqual,
+	partialDeepStrictEqual,
+	strictEqual
+} from "node:assert/strict";
 
-import type { ModelPath } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
+import type { ModelPath } from "@com.mgmtp.a12.base/base-model-api";
 import type { Activity, Model } from "@com.mgmtp.a12.client/client-core";
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js";
 import type {
 	EntityInstancePath,
 	FieldInstanceValue,
+	GeneratedCodeRtConfig,
 	Message
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { initializeDataComponent } from "../../../core/api/initializeDataComponent.js";
 import type {
@@ -242,7 +248,7 @@ describe("redux.api.reducers", () => {
 				})
 			);
 
-			strictEqual(newState.data!.validation!["foo/1"]!.messages![0], testMessage);
+			strictEqual(newState.data!.validation["foo/1"]!.messages[0], testMessage);
 		});
 
 		it("does not remove unknown data slices from the dataholder", () => {
@@ -287,6 +293,61 @@ describe("redux.api.reducers", () => {
 
 			partialDeepStrictEqual(updatedDh.data, { unknownSlice });
 		});
+
+		describe("kernel options", () => {
+			function setupKernelOptionsTest(customOptions?: GeneratedCodeRtConfig) {
+				const TEST_DOC: DgDocument = {
+					docRef: "foo/1",
+					document: {},
+					documentModel: dmTestInstance(),
+					loadingState: "loaded"
+				};
+
+				DocumentRuntimeServiceFactory.set(KernelFixtures.RtService.runtimeFactory({}));
+
+				const testDh = setupDataHolderWithDocuments([TEST_DOC]);
+
+				// reset calls from initializeDataComponent
+				KernelFixtures.RtService.resetHistory();
+
+				handleValidatePart(customOptions)(
+					testDh,
+					DataActions.validatePart({
+						activityId: "test-activity",
+						relevantInstances: []
+					})
+				);
+
+				return KernelFixtures.RtService.getCallArgs();
+			}
+
+			it("hands the given kernel options to the runtime service", () => {
+				const customKernelOptions: GeneratedCodeRtConfig = {
+					customConditionFactory: { createCustomCondition: () => null }
+				};
+
+				const callArgs = setupKernelOptionsTest(customKernelOptions);
+
+				strictEqual(callArgs.createDocumentRtService.length, 1);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, {
+						ignoreUnknownFields: true,
+						...customKernelOptions
+					});
+				});
+			});
+
+			it("uses default options if no custom options are given", () => {
+				const callArgs = setupKernelOptionsTest();
+
+				strictEqual(callArgs.createDocumentRtService.length, 1);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, { ignoreUnknownFields: true });
+				});
+			});
+		});
 	});
 });
 
@@ -304,7 +365,7 @@ function setupDataHolderWithDocuments(documents: DgDocument[]): DgClAndValidatio
 		savingState: "not_saved",
 		dirty: false,
 		slices: {},
-		data: initializeDataComponent(documents, [], entryPoint)
+		data: initializeDataComponent({ documents: documents, entryPoint })
 	};
 }
 
@@ -372,7 +433,8 @@ function dmTestInstance(): Model.DocumentAndValidationModel {
 						]
 					}
 				]
-			}
+			},
+			documentUniquenessCriteria: []
 		},
 		generatedCodeAccessor: {
 			getCalculator() {},

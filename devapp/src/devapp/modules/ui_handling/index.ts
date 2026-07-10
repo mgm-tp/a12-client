@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,29 +23,29 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Module } from "@com.mgmtp.a12.client/client-core";
+import type { SampleAppModule } from "../../utils/SampleAppModule.js";
 
-import ApplicationFrameLayoutModule from "./application-frame-layout/index.js";
-import CaseConceptModule from "./case-concept.js";
-import CustomRegionModule from "./customRegion/custom-region.js";
-import DashboardLayoutModule from "./dashboard-layout/index.js";
-import EntityLinkingModule from "./entity-linking.js";
-import MasterDetailModule from "./master-detail.js";
-import MobileNavigationCustomModule from "./mobile-navigation/custom/index.js";
-import MobileNavigationModule from "./mobile-navigation/index.js";
-import ModalRegionModule from "./modal-region.js";
-import NotificationsModule from "./notifications/index.js";
+import { ApplicationFrameLayoutModule } from "./application-frame-layout/index.js";
+import { CaseConceptModule } from "./case-concept.js";
+import { CustomRegionModule } from "./customRegion/custom-region.js";
+import { DashboardLayoutModule } from "./dashboard-layout/index.js";
+import { EntityLinkingModule } from "./entity-linking.js";
+import { MasterDetailModule } from "./master-detail.js";
+import { MobileNavigationCustomModule } from "./mobile-navigation/custom/index.js";
+import { MobileNavigationModule } from "./mobile-navigation/index.js";
+import { ModalRegionModule } from "./modal-region.js";
+import { NotificationsModule } from "./notifications/index.js";
 import { PermissionModule } from "./permissions/index.js";
-import ViewsConceptModule from "./viewsConcept/index.js";
+import { ViewsConceptModule } from "./viewsConcept/index.js";
 
-const UIHandlingModules: Module[] = [
+export const UIHandlingModules: SampleAppModule[] = [
 	ViewsConceptModule,
 	MasterDetailModule,
 	DashboardLayoutModule,
@@ -59,5 +59,3 @@ const UIHandlingModules: Module[] = [
 	ApplicationFrameLayoutModule,
 	PermissionModule
 ];
-
-export default UIHandlingModules;

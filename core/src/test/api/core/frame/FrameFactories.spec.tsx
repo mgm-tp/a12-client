@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,8 +34,8 @@ import { strictEqual, throws } from "node:assert/strict";
 
 import { FrameFactories } from "../../../../core/frame/index.js";
 import { ErrorBoundary } from "../../../../core/frame/internal/components/error-boundary/ErrorBoundary.js";
-import ApplicationFrameLayout from "../../../../core/frame/internal/layout/ApplicationFrameLayout.js";
-import { GenericCaseMenu } from "../../../../core/frame/internal/layout/ApplicationFrameLayout/generic-component.js";
+import ApplicationFrameLayout from "../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
+import { GenericCaseMenu } from "../../../../core/frame/internal/layout/applicationFrameLayout/genericComponent.js";
 import DashboardRegionLayout from "../../../../core/frame/internal/layout/DashboardLayout.js";
 import { DefaultRegionUi } from "../../../../core/frame/internal/layout/DefaultRegionUi.js";
 import MasterDetailRegionLayout from "../../../../core/frame/internal/layout/MasterDetailRegionLayout.js";

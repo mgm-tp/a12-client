@@ -1,8 +1,0 @@
-{
-	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./indexImport.ts", "./select.tsx", "./locales.ts"],
-	"compilerOptions": {
-		"noEmit": true,
-		"noCheck": true
-	}
-}

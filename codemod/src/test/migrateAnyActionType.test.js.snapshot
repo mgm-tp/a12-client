@@ -1,0 +1,24 @@
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate aliased.ts correctly 1`] = `
+import { Action as ReduxAction } from "redux";
+export const dispatchedActions: ReduxAction[] = [];
+const originalActions: ReduxAction = [...dispatchedActions];
+
+`;
+
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate existing.ts correctly 1`] = `
+import { Action } from "redux";
+export const dispatchedActions: Action[] = [];
+const originalActions: Action = [...dispatchedActions];
+
+`;
+
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate imports.ts correctly 1`] = `
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { Action } from "redux";
+const actionCreator = actionCreatorFactory("forms");
+const actionFactory = actionCreator.async<void, void>("TEST");
+export const fsaAction: Action = actionFactory.started();
+export const fsaCompatAction: Action = actionFactory.started();
+export const reduxAction: Action = actionFactory.started();
+
+`;

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,17 +34,15 @@ import type { ReactNode } from "react";
 import { useContext } from "react";
 import { useSelector } from "react-redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivitySelectors, FrameViews } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { SizeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
-import { Typography } from "@com.mgmtp.a12.widgets/widgets-core/lib/typography/main/typography.view.js";
+import { Button, SizeContext, Typography } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import isOnSmallDevice from "../../../utils/isOnSmallDevice.js";
+import { isOnSmallDevice } from "../../../utils/isOnSmallDevice.js";
 
 import type { DataType } from "./simpleSaga.js";
 
-export function SimpleSagaStatusTemplate(props: View): ReactNode {
+export function SimpleSagaStatusTemplate(props: ViewNGProps): ReactNode {
 	const sidebarContextProps = useContext(FrameViews.SidebarContext);
 	const currentSize = useContext(SizeContext).currentSize;
 

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,18 +35,23 @@ import { Provider } from "react-redux";
 import type { Store } from "redux";
 import { StyleSheetManager, ThemeProvider } from "styled-components";
 
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
 import {
 	defaultDataFormats,
 	defaultLocalizerFactory,
 	defaultValueConversion
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import { shouldForwardProp } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/should-forward-prop.js";
-import type { SizeContextProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
-import { SizeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
-import { useWindowSize } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-detector.view.js";
-import { GlobalStyles } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/base/global-styles.js";
-import { defaultTheme } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/default/default-theme.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
+import {
+	LocalizerContext,
+	type LocalizerContextProps
+} from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	GlobalStyles,
+	SizeContext,
+	getBaseTheme,
+	shouldForwardProp,
+	useWindowSize,
+	type SizeContextProps
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ClientWidgetMapContext, type ClientWidgetMap } from "../../../core/ClientWidgetMap.js";
 
@@ -73,7 +78,7 @@ export function TestWrapper({
 
 interface TestInnerWrapperProps extends PropsWithChildren {
 	readonly sizeContextValue?: SizeContextProps;
-	readonly localizerContextValue?: LocalizerContext.Type;
+	readonly localizerContextValue?: LocalizerContextProps;
 	readonly customWidgetMap?: Partial<ClientWidgetMap>;
 }
 
@@ -87,7 +92,7 @@ function TestInnerWrapper(props: TestInnerWrapperProps) {
 	const dataFormats = defaultDataFormats(locale);
 	const conversion = defaultValueConversion(dataFormats);
 
-	const localizerContextValue: LocalizerContext.Type = props.localizerContextValue ?? {
+	const localizerContextValue: LocalizerContextProps = props.localizerContextValue ?? {
 		locale,
 		dataFormats,
 		conversion,
@@ -108,7 +113,7 @@ function TestInnerWrapper(props: TestInnerWrapperProps) {
 	return (
 		<SizeContext.Provider value={sizeContextValue}>
 			<StyleSheetManager shouldForwardProp={shouldForwardProp}>
-				<ThemeProvider theme={defaultTheme}>
+				<ThemeProvider theme={getBaseTheme()}>
 					<GlobalStyles />
 					<LocalizerContext.Provider value={localizerContextValue}>
 						<ClientWidgetMapContext.Provider value={widgetMap}>

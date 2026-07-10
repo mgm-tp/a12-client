@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,10 +31,9 @@
  */
 
 import type { Middleware } from "redux";
-// TODO: A12C-3195, SagaIterator to SagaGenerator
-// eslint-disable-next-line no-restricted-imports
-import type { SagaIterator } from "redux-saga";
+import type { SagaGenerator } from "typed-redux-saga";
 
+import type { ActivityMap } from "../../../activity/index.js";
 import type { ActivityReducers } from "../../../activity/internal/reducers/index.js";
 import type { DataEditor } from "../../../data/internal/DataEditor.js";
 import type { DataProvider } from "../../../data/internal/DataProvider.js";
@@ -74,8 +73,10 @@ import type { ReducerMap } from "./reducerMap.js";
  * Finally, Modules can contribute Activity data reducers, Data Providers and
  * Editors.
  *
- * All properties have the form of a factory function with access to the whole
- * state. This means you can use information from the (initial) state to decide
+ * All properties have the form of a factory function. Except for the dataReducers
+ * factory, all of them have access to the whole state. The dataReducers factory
+ * only receives the activities slice.
+ * This means you can use information from the given (initial) state to decide
  * what to return. Because some properties are only evaluated once (model,
  * sagas), it is better to not rely on dynamic state.
  */
@@ -84,9 +85,9 @@ export interface Module {
 	readonly model?: Selector<ApplicationModel>;
 	readonly views?: Selector<(componentName: string) => View.ViewComponent | undefined>;
 	readonly reducersMap?: Selector<ReducerMap>;
-	readonly dataReducers?: Selector<ReadonlyArray<ActivityReducers.DataReducer>>;
+	readonly dataReducers?: (activityMap: ActivityMap) => ReadonlyArray<ActivityReducers.DataReducer>;
 	readonly middlewares?: Selector<ReadonlyArray<Middleware>>;
-	readonly sagas?: Selector<ReadonlyArray<() => SagaIterator<void>>>;
+	readonly sagas?: Selector<ReadonlyArray<() => SagaGenerator<void>>>;
 	readonly dataProviders?: Selector<DataProvider[]>;
 	// We cannot make dataEditors a selector because they need to be available before the store is created
 	readonly dataEditors?: ReadonlyArray<DataEditor>;

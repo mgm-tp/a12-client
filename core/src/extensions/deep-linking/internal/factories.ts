@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,17 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-// TODO: A12C-3195, SagaIterator to SagaGenerator
-// eslint-disable-next-line no-restricted-imports
-import type { SagaIterator } from "redux-saga";
-import { call } from "typed-redux-saga";
+import { call, type SagaGenerator } from "typed-redux-saga";
 
 import type * as InternalDeepLinkCoder from "./deepLinkCoder.js";
 import * as DeepLinkingSagas from "./deepLinkingSagas.js";
@@ -44,15 +41,15 @@ export type Configuration = DeepLinkingSagas.Configuration;
 /**
  * Provides the application sagas that are necessary for the deep linking functionality
  */
-export function createSagas(config: Configuration = {}): (() => SagaIterator<void>)[] {
+export function createSagas(config: Configuration = {}): (() => SagaGenerator<void>)[] {
 	return [
-		function* (): SagaIterator<void> {
+		function* (): SagaGenerator<void> {
 			yield* call(DeepLinkingSagas.updateDeepLink, config);
 		},
-		function* (): SagaIterator<void> {
+		function* (): SagaGenerator<void> {
 			yield* call(DeepLinkingSagas.clearDeepLink, config);
 		},
-		function* (): SagaIterator<void> {
+		function* (): SagaGenerator<void> {
 			yield* call(DeepLinkingSagas.applyDeepLink, config);
 		}
 	];
@@ -66,8 +63,8 @@ export function createSagas(config: Configuration = {}): (() => SagaIterator<voi
  * a welcome page automatically if an initial activity is defined in the app model and no
  * deep link is set.
  */
-export function createWelcomePageSaga(config: Configuration = {}): () => SagaIterator<void> {
-	return function* (): SagaIterator<void> {
+export function createWelcomePageSaga(config: Configuration = {}): () => SagaGenerator<void> {
+	return function* (): SagaGenerator<void> {
 		yield* call(DeepLinkingSagas.loadWelcomePage, config);
 	};
 }

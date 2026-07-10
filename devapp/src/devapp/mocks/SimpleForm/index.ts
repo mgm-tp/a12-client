@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,39 +23,25 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Module, View } from "@com.mgmtp.a12.client/client-core";
+import type { SampleAppModule } from "../../utils/SampleAppModule.js";
 
-import { SimpleFormDataLoader } from "./data-loader.js";
-import { OfferForm } from "./forms/offer-form.js";
-import { PersonForm } from "./forms/person-form.js";
 import { SimpleFormSagas } from "./sagas.js";
 
 export * as SimpleFormActions from "./actions.js";
-export { SingleDocumentData } from "./data.js";
+export type { SingleDocumentData } from "./data.js";
 export * from "./inputs/index.js";
 export { SimpleForm } from "./view.js";
 
-export namespace SimpleFormFactories {
-	export const DataLoader = SimpleFormDataLoader;
-	export const createSagas = () => SimpleFormSagas;
-
-	export function createModule(): Module {
-		return {
-			id: "SimpleFormModule",
-			sagas: createSagas,
-			views: () => componentName => Views[componentName]
-		};
-	}
+export function createSimpleFormModule(): SampleAppModule {
+	return {
+		id: "SimpleFormModule",
+		sagas: () => SimpleFormSagas
+	};
 }
-
-const Views: { [name: string]: View.ViewComponent | undefined } = {
-	PersonForm,
-	OfferForm
-};

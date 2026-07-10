@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -62,7 +62,7 @@ function dynamicRegionName(id: string): string {
 /**
  * An example module that showcases the {@link DynamicConfiguration} API.
  *
- * Instead of setting an appmodel and a view provider that matches the view names from scenes to react components,
+ * Instead of setting an application model and a view provider that matches the view names from scenes to react components,
  * this module contributes everything dynamically, e.g. based on state.
  *
  * ### Note on memoization & performance
@@ -76,7 +76,7 @@ function dynamicRegionName(id: string): string {
  * If possible, stable return values can also be achieved by moving non-dynamic parts out of the selector, e.g.
  * when the contributed menu entry is always the same (it does not depend on any state).
  *
- * ### Appmodel contributions
+ * ### Contributions
  *
  * #### Regions
  *

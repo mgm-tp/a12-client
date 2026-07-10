@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,9 +32,9 @@
 
 import { ActivitySelectors, NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
 
-import { ActionAssertions } from "../ActionAssertion.js";
+import { documentWithPartialData } from "../ActionAssertion.js";
 import type { ActionSequence } from "../ActionSequence.js";
-import { Extractors } from "../dataFromModelSelectors.js";
+import { extractFieldValue, extractId } from "../dataFromModelSelectors.js";
 
 export const openNewMultiDashboardOffer: ActionSequence = {
 	name: "Open New Multi Dashboard Offer",
@@ -60,20 +60,20 @@ export const openNewMultiDashboardOffer: ActionSequence = {
 			type: "NEW_DOCUMENT",
 			modelName: "Offer-document",
 			test: state => {
-				ActionAssertions.documentWithPartialData({
+				documentWithPartialData({
 					state: state,
 					expectedResult: NEW_INSTANCE_IDENTIFIER,
-					dataEntrySelector: Extractors.extractId
+					dataEntrySelector: extractId
 				});
-				ActionAssertions.documentWithPartialData({
+				documentWithPartialData({
 					state: state,
 					expectedResult: null,
-					dataEntrySelector: Extractors.extractFieldValue("Id", "Offer")
+					dataEntrySelector: extractFieldValue("Id", "Offer")
 				});
-				ActionAssertions.documentWithPartialData({
+				documentWithPartialData({
 					state: state,
 					expectedResult: null,
-					dataEntrySelector: Extractors.extractFieldValue("Title", "Offer")
+					dataEntrySelector: extractFieldValue("Title", "Offer")
 				});
 			}
 		}

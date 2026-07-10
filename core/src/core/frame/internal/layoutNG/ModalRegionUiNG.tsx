@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,18 +23,15 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ComponentType } from "react";
 import { useCallback, useContext, type JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import type { ModalOverlayProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/modal-overlay/main/modal-overlay.api.js";
 
 import { ActivityActions } from "../../../activity/index.js";
 import { ClientWidgetMapContext } from "../../../ClientWidgetMap.js";
@@ -46,34 +43,18 @@ import { ROOT_REGION_REF } from "./layoutPropsNG.js";
 
 /**
  * @experimental
- */
-export interface ModalRegionUiNGProps extends RegionUiPropsNG {
-	/**
-	 * @deprecated since Client 16.1.0. This property will be removed in the next major release.
-	 * Use the {@link ClientWidgetMapContext} instead.
-	 */
-	readonly widgetMap?: {
-		readonly ModalOverlay?: ComponentType<ModalOverlayProps>;
-	};
-}
-
-/**
- * @experimental
  *
  * A wrapper around the dynamic default region that renders the views inside a modal
  *
  * NOTE: Not passing a `regionRef` is considered the entry point,
  * aka the "root region". This should only happen once in your application.
  */
-export function ModalRegionUiNG(props: ModalRegionUiNGProps): JSX.Element | null {
+export function ModalRegionUiNG(props: RegionUiPropsNG): JSX.Element | null {
 	const regionRef = props.regionRef ?? ROOT_REGION_REF;
 	const dispatch = useDispatch();
 	const region = useSelector(DynamicModelSelectors.dynamicRegionInfo(regionRef));
 
 	const { ModalOverlay } = useContext(ClientWidgetMapContext);
-	// TODO: Remove with A12-17777
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
-	const ModalComponent = props.widgetMap?.ModalOverlay ?? ModalOverlay;
 
 	const onClose = useCallback(() => {
 		dispatch(
@@ -84,9 +65,9 @@ export function ModalRegionUiNG(props: ModalRegionUiNGProps): JSX.Element | null
 	}, [dispatch, region.views]);
 
 	return region.views.length > 0 ? (
-		<ModalComponent closeOnEsc closeOnOutsideClick onClose={onClose}>
+		<ModalOverlay closeOnEsc closeOnOutsideClick onClose={onClose}>
 			<DynamicRegionUi {...props} />
-		</ModalComponent>
+		</ModalOverlay>
 	) : null;
 }
 

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,32 +23,34 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { ModelPath } from "@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js";
+import { ModelPath } from "@com.mgmtp.a12.base/base-model-api";
 import type { Model } from "@com.mgmtp.a12.client/client-core";
 import { Activity, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import type * as Collections from "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts/lib/main/js/a12internal/CollectionsWrapper.js";
-import type { IMetaField } from "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts/lib/main/js/a12internal/meta/IMetaField.js";
-import { IMetaKeys } from "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts/lib/main/js/a12internal/utils/IMetaKeys.js";
+import type {
+	HashSet,
+	IMetaField
+} from "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts/a12internal";
+import { IMetaKeys } from "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts/a12internal";
 import type {
 	DocumentModel,
 	EntityInstancePath,
 	FieldInstanceValue,
 	GroupInstance,
 	Message
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
 import type {
 	Localizer,
 	SupportedType,
 	ValueConversion,
 	ValueConversionConfig
-} from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+} from "@com.mgmtp.a12.utils/utils-localization";
 import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import type { DataReference } from "../../core/api/data-reference.js";
@@ -167,7 +169,7 @@ export function selectUiValueByPath(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return undefined;
 		}
 		assertDataRefInRootDoc(state, activityId, dataRef, ["FieldLike"]);
@@ -210,7 +212,7 @@ export function selectUiValueByPath(
 				);
 			} else {
 				const conversionConfig = conversionConfigForModelPath(
-					document.documentModel as DocumentModel,
+					document.documentModel as unknown as DocumentModel,
 					documentPath
 				);
 
@@ -260,7 +262,7 @@ export function selectDocumentModelName(state: object, activityId: string): stri
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return undefined;
 		}
 
@@ -291,7 +293,7 @@ export function selectDataTypeByPath(
 	) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 		return document?.loadingState === "loaded"
-			? getDataType(document.documentModel as DocumentModel, dataRef)
+			? getDataType(document.documentModel as unknown as DocumentModel, dataRef)
 			: undefined;
 	}
 	return undefined;
@@ -319,11 +321,11 @@ export function selectModelElement(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return undefined;
 		}
 
-		return getModelElement(document.documentModel as DocumentModel, modelPath);
+		return getModelElement(document.documentModel as unknown as DocumentModel, modelPath);
 	}
 	return undefined;
 }
@@ -343,12 +345,12 @@ export function selectElementPath(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return undefined;
 		}
 
 		return DocServiceFactory.get()
-			.getDocumentModelSearchService(document.documentModel as DocumentModel)
+			.getDocumentModelSearchService(document.documentModel as unknown as DocumentModel)
 			.getPathById(elementId);
 	}
 	return undefined;
@@ -365,12 +367,12 @@ export function selectGranularityForDataReference(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return undefined;
 		}
 
 		return computeGranularity(
-			document.documentModel as DocumentModel,
+			document.documentModel as unknown as DocumentModel,
 			DocumentPath.fromString(dataRef)
 		);
 	}
@@ -388,13 +390,16 @@ export function selectConversionConfigForModelPath(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			throw new Error(
 				`Cannot retrieve conversion config for [docRef: ${dataHolder.data.entryPoint}] that is not in loadingState "loaded".`
 			);
 		}
 
-		return conversionConfigForModelPath(document.documentModel as DocumentModel, modelPath);
+		return conversionConfigForModelPath(
+			document.documentModel as unknown as DocumentModel,
+			modelPath
+		);
 	}
 	throw new Error("Cannot return value conversion config for non-DG DataHolder!");
 }
@@ -410,7 +415,7 @@ export function selectFieldRequired(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return false;
 		}
 
@@ -447,7 +452,7 @@ export function selectFieldComputed(
 	if (isSetDgCl(dataHolder?.data) && dataHolder.data.entryPoint) {
 		const document = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
 
-		if (!document || document.loadingState !== "loaded") {
+		if (document?.loadingState !== "loaded") {
 			return false;
 		}
 
@@ -457,9 +462,9 @@ export function selectFieldComputed(
 
 		const id = ModelPath.toString(DocumentPath.fromString(dataRef));
 
-		const result = <Collections.HashSet<IMetaField>>(
-			validatorProvider.getMetaModel().getValue(IMetaKeys.MODEL_CALC_FIELDS, "Server")
-		);
+		const result = validatorProvider
+			.getMetaModel()
+			.getValue(IMetaKeys.MODEL_CALC_FIELDS, "Server") as HashSet<IMetaField>;
 
 		return (
 			result !== null &&
@@ -486,12 +491,12 @@ export function selectIsNotRelevant(
 		const entryPoint = dataHolder.data.entryPoint;
 		const entryDoc = dg.documents.byDocRef[entryPoint];
 
-		assertCondition(entryDoc !== undefined && entryDoc.loadingState === "loaded");
+		assertCondition(entryDoc?.loadingState === "loaded");
 
 		const elementPath = DocumentPath.fromString(dataReference);
 
 		return isNotRelevant(
-			entryDoc.documentModel as DocumentModel,
+			entryDoc.documentModel as unknown as DocumentModel,
 			entryDoc.document as GroupInstance,
 			elementPath,
 			entryDoc.notRelevantConfigs as NotRelevantConfig[] | undefined
@@ -627,7 +632,7 @@ export function selectMessagesByDataRef(
 		);
 
 		const doc = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
-		assertCondition(doc !== undefined && doc.loadingState === "loaded");
+		assertCondition(doc?.loadingState === "loaded");
 		return expandMessages(state, activityId, doc as LoadedDgDocument, messages);
 	}
 
@@ -669,7 +674,7 @@ function selectAllMessagesAndDocument(
 		);
 
 		const doc = dataHolder.data.documentGraph.documents.byDocRef[dataHolder.data.entryPoint];
-		assertCondition(doc !== undefined && doc.loadingState === "loaded");
+		assertCondition(doc?.loadingState === "loaded");
 		return {
 			messages,
 			document: doc as LoadedDgDocument

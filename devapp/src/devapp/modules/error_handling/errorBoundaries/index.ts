@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,25 +31,24 @@
  */
 
 import type { JSX } from "react";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
+import { withErrorBoundary } from "../../../utils/withErrorBoundary.js";
+import { withProgressIndicator } from "../../../utils/withProgressIndicator.js";
 
 import { ErrorBoundaries } from "./ErrorBoundaries.js";
-import appmodel from "./errorBoundaries.appmodel.json" with { type: "json" };
-
-const ErrorBoundariesModule: SampleAppModule = {
-	id: "error_handling.error-boundaries",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
-};
-
-export default ErrorBoundariesModule;
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
 
 function EngineWithError(): JSX.Element {
 	throw new Error(
@@ -57,7 +56,82 @@ function EngineWithError(): JSX.Element {
 	);
 }
 
-const Views: { [name: string]: View.ViewComponent } = {
-	ErrorBoundaries,
-	EngineWithError
+const INITIAL_DESCRIPTOR = { section: "ErrorHandling", feature: "ErrorBoundaries" };
+
+function matchesErrorBoundaries(d: Activity.Descriptor): boolean {
+	return d.section === "ErrorHandling" && d.feature === "ErrorBoundaries";
+}
+
+function matchesEngineWithError(d: Activity.Descriptor): boolean {
+	return d.feature === "EngineWithError" && d.model === "Book-document" && !d.instance;
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "error_handling.error-boundaries",
+		scenes: [
+			{
+				name: "ErrorBoundaries",
+				matches: matchesErrorBoundaries,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: withProgressIndicator(ErrorBoundaries),
+							region: "/CONTENT"
+						}
+					]
+				}
+			},
+			{
+				name: "EngineWithError",
+				priorScene: "ErrorBoundaries",
+				matches: matchesEngineWithError,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: withErrorBoundary(withProgressIndicator(EngineWithError)),
+							region: "/CONTENT",
+							models: [{ modelType: "document", name: "Book-document" }]
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "error_handling.error-boundaries",
+			label: {
+				key: "error_handling.error-boundaries",
+				defaults: { en: "Error Boundaries", de: "Error Boundaries" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const ErrorBoundariesModule: DynamicConfiguration = {
+	id: "error_handling.error-boundaries",
+	flows: dynamicFlows,
+	menus: selectMenus
 };

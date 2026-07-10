@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -110,31 +110,29 @@ export const SaveTodosProvider: DataProvider = {
 			typeof descriptor.listId === "string"
 		);
 	},
-	*provideData({ dataHolders, operation, details }: DataProvider.SaveConfig): SagaGenerator<void> {
-		if (operation === "save") {
-			const dataToSave = dataHolders.filter(
-				dh => dh.savingState === "saving"
-			) as Activity.DataHolder<TodoData>[];
+	*provideData({ dataHolders, details }: DataProvider.SaveConfig): SagaGenerator<void> {
+		const dataToSave = dataHolders.filter(
+			dh => dh.savingState === "saving"
+		) as Activity.DataHolder<TodoData>[];
 
-			if (dataToSave.length > 0) {
-				yield* delay(2000);
-				yield* put(details.saving.done({}));
+		if (dataToSave.length) {
+			yield* delay(2000);
+			yield* put(details.saving.done({}));
 
-				yield* put(
-					NotificationActions.add({
-						message: {
-							key: "examples.data-handling.multiple-data-holders.saved",
-							args: {
-								data: {
-									type: "plain",
-									value: dataToSave.map(dh => JSON.stringify(dh.data?.todos ?? [])).join("\n")
-								}
+			yield* put(
+				NotificationActions.add({
+					message: {
+						key: "examples.data-handling.multiple-data-holders.saved",
+						args: {
+							data: {
+								type: "plain",
+								value: dataToSave.map(dh => JSON.stringify(dh.data?.todos ?? [])).join("\n")
 							}
-						},
-						duration: 5000
-					})
-				);
-			}
+						}
+					},
+					duration: 5000
+				})
+			);
 		}
 	}
 };

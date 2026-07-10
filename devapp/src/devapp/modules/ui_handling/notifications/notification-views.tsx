@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,15 +33,17 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import type { ActivityMap, View } from "@com.mgmtp.a12.client/client-core";
+import type { ActivityMap } from "@com.mgmtp.a12.client/client-core";
 import { ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { ButtonGroup } from "@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import type { SelectItem } from "@com.mgmtp.a12.widgets/widgets-core/lib/input/select/main/select.api.js";
-import { TextAffix } from "@com.mgmtp.a12.widgets/widgets-core/lib/input/text-field/text-field.view.js";
-import type { LayoutGridProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.api.js";
-import { LayoutGrid } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.view.js";
-import { HintTooltip } from "@com.mgmtp.a12.widgets/widgets-core/lib/tooltip/hint/main/hint.view.js";
+import {
+	ButtonGroup,
+	Button,
+	type SelectItem,
+	TextAffix,
+	type LayoutGridProps,
+	LayoutGrid,
+	HintTooltip
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { useSingleDocumentValue } from "../../../mocks/SimpleForm/hooks.js";
 import {
@@ -57,7 +59,7 @@ const { Grid, Row, Column } = LayoutGrid;
 
 const SIZE = { sm: 12, md: 12, lg: 6 } as LayoutGridProps.ColumnSize;
 
-const NotificationsForm = withActivityContext(props => {
+export const NotificationsForm = withActivityContext(props => {
 	const activities = useSelector(ActivitySelectors.activities());
 	const activityChain = useMemo(
 		() => selectActivityChain(activities, props.activityId),
@@ -214,11 +216,3 @@ function createScopeItems(activityIds: string[]): SelectItem[] {
 		[{ value: "global", label: "Global" }]
 	);
 }
-
-export default function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-const Views: { [name: string]: View.ViewComponent } = {
-	NotificationsForm
-};

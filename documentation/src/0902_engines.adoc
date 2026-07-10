@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -123,9 +123,3 @@ Please be aware that it is not possible to use just one scene for rendering two 
 The second `VIEW_ADD` directive wants to initialize the Overview Engine for the `Offer-overview` model which references the `DomainOffer` model.
 
 Note that the match conditions for this overall scene only have one `model` key. Its value is `CRUD`. The Client is not able to successfully render this second Overview Engine, because it expects `CRUD` models and documents.
-
-== How to Compute Values / Modify Document With Form Engine?
-
-In Client, you should never change the document inside the Form Engine state. It will create an inconsistency between engine and store. Instead, you should change the document in `activity.data` - which in turn should update the engine document. The Form Engine's internal document should only be used in non-standard based scenarios.
-
-We provide the `FormEngineStateAdapter` exactly for this reason. It allows you to pass a document from the store to the Form Engine. Please refer to the link:/docs/FORM_ENGINE/formengine-documentation-bundle/index.html#_api_documentation[Form Engine API documentation] for more details about the `FormEngineStateAdapter`.

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,41 +23,101 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
+import type { Dispatch } from "redux";
 
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
-import { SimpleSagaStatus } from "../../examples/simpleSaga/simpleSagaView.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
-import SampleSidebarContent from "./sidebar.js";
-import appmodel from "./viewsConcept.appmodel.json" with { type: "json" };
+import { SampleSidebarContent } from "./sidebar.js";
 import { ViewsConceptEmpty } from "./viewsConceptEmptyTemplate.js";
-import ViewsConcept from "./viewsConceptTemplate.js";
+import { ViewsConceptTemplate } from "./viewsConceptTemplate.js";
 
-const ViewsConceptModule: SampleAppModule = {
-	id: "ui_handling.views-concept",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
-};
+const INITIAL_DESCRIPTOR = { section: "UIHandling", feature: "ViewsConcept" };
 
-export default ViewsConceptModule;
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName] || AppFrameViews[componentName];
+function matchesViewsConcept(descriptor: Activity.Descriptor): boolean {
+	return descriptor.section === "UIHandling" && descriptor.feature === "ViewsConcept";
 }
 
-const Views: { [name: string]: View.ViewComponent } = {
-	ViewsConcept,
-	ViewsConceptEmpty,
-	SampleSidebarContent
-};
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "ui_handling.views-concept",
+		scenes: [
+			{
+				name: "ViewsConcept",
+				matches: matchesViewsConcept,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/SIDEBAR" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: ViewsConceptEmpty,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail" }
+						},
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: ViewsConceptTemplate,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail" }
+						},
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: SampleSidebarContent,
+							region: "/SIDEBAR"
+						}
+					]
+				}
+			}
+		]
+	}
+];
 
-const AppFrameViews: { [name: string]: View.ViewComponent } = {
-	SimpleSagaStatus: SimpleSagaStatus
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "ui_handling.views-concept",
+			label: {
+				key: "ui_handling.views-concept",
+				defaults: { en: "Views Concept", de: "Views-Konzept" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const ViewsConceptModule: DynamicConfiguration = {
+	id: "ui_handling.views-concept",
+	flows: dynamicFlows,
+	menus: selectMenus
 };

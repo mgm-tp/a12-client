@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -36,15 +36,18 @@ import { mock } from "node:test";
 import { Fragment, useContext, type ComponentType, type Context } from "react";
 
 import { query, render } from "@com.mgmtp.a12.devtools/react";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import type { A11yDefinition } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/a11y-localization/a11y-key-definition.api.js";
-import { A11YLanguageContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/a11y-localization/language-context.js";
 import {
+	LocalizerContext,
+	type LocalizerContextProps
+} from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	type A11yDefinition,
+	A11YLanguageContext,
 	DateTimeContext,
-	type DateTimeContextType
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/date-time/date-time-context.js";
-import type { ListItemProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.api.js";
-import type { PopUpMenuProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.api.js";
+	type DateTimeContextType,
+	type ListItemProps,
+	type PopUpMenuProps
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { assertObject } from "../../../../core/assertion.js";
 import { FrameViews } from "../../../../core/frame/internal/views.js";
@@ -141,7 +144,7 @@ describe("extensions.localizations.applicationFactory", () => {
 					supportedLocales: [LOCALE_ENGLISH]
 				}
 			};
-			const assertLocalizerContext = (value: LocalizerContext.Type) => {
+			const assertLocalizerContext = (value: LocalizerContextProps) => {
 				equal(value.locale, expectedLocale);
 			};
 

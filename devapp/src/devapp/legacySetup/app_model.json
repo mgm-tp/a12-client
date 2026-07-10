@@ -1,0 +1,254 @@
+{
+  "header": {
+    "id": "app_model",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "master-detail-flow",
+        "menu": {
+          "name": "master-detail-flow",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Master-Detail-Flow"
+            },
+            {
+              "locale": "de",
+              "text": "Master-Detail-Flow"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "section": "master-detail-flow"
+            },
+            "withoutData": true
+          }
+        },
+        "flows": [
+          {
+            "name": "welcome.flow",
+            "scenes": [
+              {
+                "name": "welcome.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "welcome"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "WelcomeView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "master-detail-flow.flow",
+            "scenes": [
+              {
+                "name": "master-detail-flow.detail.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "master-detail-flow"
+                  },
+                  {
+                    "key": "mode",
+                    "mustEqual": "detail"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "MasterDetailFlowDetailView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "master-detail-flow.overview.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "master-detail-flow"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "MasterDetailFlowOverviewView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "about",
+        "menu": {
+          "name": "about",
+          "label": [
+            {
+              "locale": "en",
+              "text": "About"
+            },
+            {
+              "locale": "de",
+              "text": "Über"
+            }
+          ],
+          "children": [
+            {
+              "name": "contact",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Contact"
+                },
+                {
+                  "locale": "de",
+                  "text": "Kontakt"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "section": "contact"
+                },
+                "withoutData": true
+              }
+            },
+            {
+              "name": "version-info",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Version Information"
+                },
+                {
+                  "locale": "de",
+                  "text": "Versionsinformationen"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "section": "version-info"
+                },
+                "withoutData": true
+              }
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "contact.flow",
+            "scenes": [
+              {
+                "name": "contact.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "contact"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ContactView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "version-info.flow",
+            "scenes": [
+              {
+                "name": "version-info.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "version-info"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "VersionInfoView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "SIDEBAR",
+          "layout": {
+            "name": "Null"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ]
+  }
+}

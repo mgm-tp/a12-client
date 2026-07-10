@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,17 +35,19 @@ import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 
 import { ActivityActions, NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import type { LayoutGridProps } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.api.js";
-import { LayoutGrid } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.view.js";
-import type { BaseColumnType } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/column.api.js";
-import type { TableRenderPropsType } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/table-renderer.api.js";
-import { Table } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/table.view.js";
-import { Typography } from "@com.mgmtp.a12.widgets/widgets-core/lib/typography/main/typography.view.js";
+import {
+	Button,
+	type LayoutGridProps,
+	LayoutGrid,
+	type BaseColumnType,
+	type TableRenderPropsType,
+	Table,
+	Typography
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { useSingleDocumentValue } from "../../../../mocks/SimpleForm/hooks.js";
 import { SimpleForm, StringInput } from "../../../../mocks/SimpleForm/index.js";
-import type { BaseInput } from "../../../../mocks/SimpleForm/inputs/base-input.js";
+import type { BaseInputProps } from "../../../../mocks/SimpleForm/inputs/base-input.js";
 import { useActivityId, withActivityContext } from "../../../../mocks/utils.js";
 
 import type { BookDetails } from "../data/Book.js";
@@ -79,7 +81,7 @@ export const DataEditorSource = withActivityContext(props => {
 	);
 });
 
-function Repeat(props: BaseInput.Props): JSX.Element {
+function Repeat(props: BaseInputProps): JSX.Element {
 	const [value] = useSingleDocumentValue<{ BookDetails: BookDetails }[] | undefined>(props.path);
 	const data = (value ?? []).map(({ BookDetails }) => BookDetails);
 

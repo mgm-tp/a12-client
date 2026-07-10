@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,10 +33,11 @@
 import { strictEqual, throws } from "node:assert/strict";
 import { mock, type Mock } from "node:test";
 
-import type { AnyAction, Middleware } from "redux";
+import type { Action, Middleware } from "redux";
 import { take } from "redux-saga/effects";
 import type { SagaGenerator } from "typed-redux-saga";
 
+import type { ActivityMap, ActivityReducers } from "../../../../core/activity/index.js";
 import { ActivityActions } from "../../../../core/activity/index.js";
 import type { ApplicationSetup, Module, ReducerMap } from "../../../../core/application/index.js";
 import {
@@ -85,15 +86,14 @@ describe("core.application", () => {
 				describe("and the module has middlewares", () => testMiddlewares(setup));
 				describe("and the module has sagas", () => testSagas(setup));
 				describe("and the module has reducers", () => testReducers(setup));
+				describe("and the module has dataReducers", () => testDataReducers(setup));
 				describe("and the module has models", () => testModels(setup));
 			}
 		});
 	});
 });
 
-interface SetupModulesAndApplication {
-	(...modules: Module[]): ApplicationSetup;
-}
+type SetupModulesAndApplication = (...modules: Module[]) => ApplicationSetup;
 
 function testMiddlewares(setup: SetupModulesAndApplication) {
 	function prepare() {
@@ -193,7 +193,7 @@ function createMockSaga() {
 	const dummyActionProcessedSpy = mock.fn();
 
 	const saga = function* mockSaga(): SagaGenerator<void> {
-		yield take((a: AnyAction) => a.type === dummyAction.type);
+		yield take((a: Action) => a.type === dummyAction.type);
 		dummyActionProcessedSpy();
 	};
 
@@ -273,7 +273,7 @@ function testReducers(setup: SetupModulesAndApplication) {
 	});
 }
 
-function reducer(state: object, action: AnyAction, spy: Mock<() => unknown>): object {
+function reducer(state: object, action: Action, spy: Mock<() => unknown>): object {
 	if (action.type === "Mock-Actions/DUMMY") {
 		spy();
 	}
@@ -283,14 +283,117 @@ function reducer(state: object, action: AnyAction, spy: Mock<() => unknown>): ob
 function mockReducerSelector(spies: { [key: string]: Mock<() => unknown> }): Selector<ReducerMap> {
 	return state => {
 		const reducerMap: {
-			[key: string]: (state: object, action: AnyAction) => object;
+			[key: string]: (state: object, action: Action) => object;
 		} = {};
 		for (const [key, spy] of Object.entries(spies)) {
-			reducerMap[key] = (s: object, action: AnyAction) => reducer(state, action, spy);
+			reducerMap[key] = (s: object, action: Action) => reducer(state, action, spy);
 		}
 
 		return reducerMap;
 	};
+}
+
+function testDataReducers(setup: SetupModulesAndApplication) {
+	function prepare() {
+		const dataReducerSpies = [1, 2, 3, 4].map(createMockDataReducer);
+		const dataReducers = dataReducerSpies.map(({ dataReducer }) => dataReducer);
+
+		const selectorSpyM1 = mock.fn<
+			(state: ActivityMap, action?: Action) => ReadonlyArray<ActivityReducers.DataReducer>
+		>(() => dataReducers.slice(0, 2));
+		const selectorSpyM2 = mock.fn<
+			(state: ActivityMap, action?: Action) => ReadonlyArray<ActivityReducers.DataReducer>
+		>(() => dataReducers.slice(2));
+		const selectorSpies = [selectorSpyM1, selectorSpyM2];
+
+		const module1WithDataReducers = createModuleMock({
+			id: "M1DataReducers",
+			dataReducers: selectorSpyM1
+		});
+		const module2WithDataReducers = createModuleMock({
+			id: "M2DataReducers",
+			dataReducers: selectorSpyM2
+		});
+		const config = setup(module1WithDataReducers, module2WithDataReducers);
+
+		return { config, dataReducerSpies, selectorSpies, module1WithDataReducers };
+	}
+
+	it("considers the dataReducers when processing data reducer actions", () => {
+		const { config, dataReducerSpies, selectorSpies } = prepare();
+
+		// Create an activity first
+		config.store.dispatch(
+			ActivityActions.create({
+				activityDescriptor: { page: "test_page" },
+				activityId: "test-activity",
+				loadingState: "without"
+			})
+		);
+
+		// Dispatch a data reducer action
+		const dataReducerAction: ActivityActions.DataReducerAction = {
+			type: "test/DATA_REDUCER_ACTION",
+			payload: { activityId: "test-activity" }
+		};
+		config.store.dispatch(dataReducerAction);
+
+		dataReducerSpies.forEach(({ reduceSpy }) => strictEqual(reduceSpy.mock.callCount(), 1));
+
+		// Check that the selectors were called with correct parameters
+		selectorSpies.forEach(spy => {
+			strictEqual(spy.mock.callCount(), 1);
+
+			const [activities] = spy.mock.calls[0].arguments;
+
+			strictEqual(activities["test-activity"]?.descriptor.page, "test_page");
+		});
+	});
+
+	describe("and a module was removed later", () => {
+		it("doesn't consider the dataReducers of this module anymore", () => {
+			const { config, dataReducerSpies, module1WithDataReducers } = prepare();
+			registry().removeModule(module1WithDataReducers);
+
+			// Create an activity first
+			config.store.dispatch(
+				ActivityActions.create({
+					activityDescriptor: { page: "test_page" },
+					activityId: "test-activity",
+					loadingState: "without"
+				})
+			);
+
+			// Dispatch a data reducer action
+			const dataReducerAction: ActivityActions.DataReducerAction = {
+				type: "test/DATA_REDUCER_ACTION",
+				payload: { activityId: "test-activity" }
+			};
+			config.store.dispatch(dataReducerAction);
+
+			dataReducerSpies
+				.slice(0, 2)
+				.forEach(({ reduceSpy }) => strictEqual(reduceSpy.mock.callCount(), 0));
+			dataReducerSpies
+				.slice(2)
+				.forEach(({ reduceSpy }) => strictEqual(reduceSpy.mock.callCount(), 1));
+		});
+	});
+}
+
+function createMockDataReducer() {
+	const reduceSpy = mock.fn();
+
+	const dataReducer: ActivityReducers.DataReducer = {
+		reduce(dataHolders, action) {
+			if (action.type === "test/DATA_REDUCER_ACTION") {
+				reduceSpy();
+			}
+			return dataHolders;
+		}
+	};
+
+	return { reduceSpy, dataReducer };
 }
 
 function testModels(setup: SetupModulesAndApplication) {

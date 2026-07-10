@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,18 +31,14 @@
  */
 
 // tag::content[]
-import type { ComposeEnhancer } from "@com.mgmtp.a12.client/client-core";
+import { composeWithDevTools } from "@redux-devtools/extension";
 
-declare let window: Window & {
-	__REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: ComposeEnhancer;
-};
+import { actionSanitizer, type ComposeEnhancer } from "@com.mgmtp.a12.client/client-core";
 
-/**
- * Trick to enable Redux DevTools with TS: see https://www.npmjs.com/package/redux-ts
- */
-export function enableReduxDevTools(): ComposeEnhancer | undefined {
-	return typeof window !== "undefined" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ !== undefined
-		? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-		: undefined;
+export function enableReduxDevTools(): ComposeEnhancer {
+	return composeWithDevTools({
+		name: "My Application",
+		actionSanitizer
+	});
 }
 // end::content[]

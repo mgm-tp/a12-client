@@ -1,9 +1,10 @@
 {
 	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["src/assets/typescript", "scripts"],
+	"include": ["src/assets/typescript", "./@types", "scripts"],
 	"compilerOptions": {
 		"types": ["node", "mocha"],
 		"noEmit": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"erasableSyntaxOnly": true
 	}
 }

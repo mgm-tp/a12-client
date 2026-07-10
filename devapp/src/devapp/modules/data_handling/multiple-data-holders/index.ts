@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -38,6 +38,8 @@ import {
 	ActivitySelectors,
 	ApplicationActions
 } from "@com.mgmtp.a12.client/client-core";
+
+import { withProgressIndicator } from "../../../utils/withProgressIndicator.js";
 
 import { SaveTodosProvider, TodosProviderListA, TodosProviderListB } from "./data-providers.js";
 import { EXAMPLE_DESCRIPTOR, isExampleDescriptor } from "./descriptor.js";
@@ -69,7 +71,7 @@ const dynamicFlows: DynamicFlow[] = [
 						{
 							type: "DYNAMIC_ADD_VIEW",
 							region: "/CONTENT",
-							component: MultipleDataHoldersView
+							component: withProgressIndicator(MultipleDataHoldersView)
 						}
 					]
 				}
@@ -84,7 +86,7 @@ export const MultipleDataHoldersModule: DynamicConfiguration = {
 	sagas: () => [initializeDataHolders],
 	dataProviders: () => [SaveTodosProvider, TodosProviderListA, TodosProviderListB],
 	menus: state => {
-		const [activity] = ActivitySelectors.activitiesByDescriptor(EXAMPLE_DESCRIPTOR)(state);
+		const activity = ActivitySelectors.activitiesByDescriptor(EXAMPLE_DESCRIPTOR)(state).at(0);
 		const selected = activity !== undefined;
 
 		return [

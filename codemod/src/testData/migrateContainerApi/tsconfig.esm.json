@@ -1,8 +1,0 @@
-{
-	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./index.esm.ts", "./select.esm.tsx"],
-	"compilerOptions": {
-		"noEmit": true,
-		"noCheck": true
-	}
-}

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,9 +33,9 @@
 import { ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
 
 import type { Action } from "../Action.js";
-import { ActionAssertions } from "../ActionAssertion.js";
+import { deepEqual, documentWithPartialData, openDocument } from "../ActionAssertion.js";
 import type { ActionSequence } from "../ActionSequence.js";
-import { Extractors } from "../dataFromModelSelectors.js";
+import { extractFieldValue, extractId } from "../dataFromModelSelectors.js";
 
 export const dirtyHandling: ActionSequence = {
 	name: "Dirty Handling",
@@ -56,20 +56,20 @@ export const dirtyHandling: ActionSequence = {
 			documentModelName: "SubType_Fruits-document",
 			documentIndex: 0,
 			test: state => {
-				ActionAssertions.openDocument({
+				openDocument({
 					state
 				});
 
-				ActionAssertions.documentWithPartialData({
+				documentWithPartialData({
 					state,
 					expectedResult: "SubType_Fruits-document/1",
-					dataEntrySelector: Extractors.extractId
+					dataEntrySelector: extractId
 				});
 
-				ActionAssertions.documentWithPartialData({
+				documentWithPartialData({
 					state,
 					expectedResult: "Fruit1",
-					dataEntrySelector: Extractors.extractFieldValue("Name", "root")
+					dataEntrySelector: extractFieldValue("Name", "root")
 				});
 			}
 		},
@@ -108,7 +108,7 @@ export const dirtyHandling: ActionSequence = {
 function assertNumberOfActivities(expected: number): Action.Base["test"] {
 	return state => {
 		const actualNumberOfActivities = Object.keys(ActivitySelectors.activities()(state)).length;
-		ActionAssertions.deepEqual({
+		deepEqual({
 			actual: actualNumberOfActivities,
 			expected,
 			message: "Wrong number of activities"

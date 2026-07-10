@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,9 +35,10 @@ import type {
 	Document,
 	DocumentModel,
 	EntityInstancePath,
+	GeneratedCodeRtConfig,
 	GroupInstance,
 	Message
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import { filterDocumentByRelevance } from "../../core/api/model/relevance/filterDocumentByRelevance.js";
 import { isNotRelevant } from "../../core/api/model/relevance/isNotRelevant.js";
@@ -54,11 +55,13 @@ import type { ValidationData, ValidationEntry, ValidationSlice } from "./types.j
 import { ValidationConfig } from "./validationConfig/validationConfig.js";
 import { DocumentRuntimeServiceFactory } from "./validationRuntimeService.js";
 
-export function handleValidateFull(): ReducerSignature<DataActions.ValidateFullPayload> {
+export function handleValidateFull(
+	kernelOptions?: GeneratedCodeRtConfig
+): ReducerSignature<DataActions.ValidateFullPayload> {
 	return dataHolder => {
 		assertObject(dataHolder.data);
 
-		const newValidationData = validateFull(dataHolder.data);
+		const newValidationData = validateFull(dataHolder.data, kernelOptions);
 
 		const validation = addMessagesToValidationData(
 			dataHolder.data.validation,
@@ -80,7 +83,10 @@ export function handleValidateFull(): ReducerSignature<DataActions.ValidateFullP
 	};
 }
 
-export function validateFull(data: DgSlice & DgChangeLogSlice & ValidationSlice): ValidationData {
+export function validateFull(
+	data: DgSlice & DgChangeLogSlice & ValidationSlice,
+	kernelOptions?: GeneratedCodeRtConfig
+): ValidationData {
 	if (!data.entryPoint) {
 		return data.validation;
 	}
@@ -94,9 +100,7 @@ export function validateFull(data: DgSlice & DgChangeLogSlice & ValidationSlice)
 
 	const documentRtService = DocumentRuntimeServiceFactory.get().createDocumentRtService(
 		(document.documentModel as Model.DocumentAndValidationModel).generatedCodeAccessor,
-		{
-			ignoreUnknownFields: true
-		}
+		{ ignoreUnknownFields: true, ...kernelOptions }
 	);
 
 	const validationEntry = data.validation[data.entryPoint];
@@ -127,7 +131,9 @@ export function validateFull(data: DgSlice & DgChangeLogSlice & ValidationSlice)
 	return convertMessagesToValidationData(data.entryPoint, newMessages);
 }
 
-export function handleValidatePart(): ReducerSignature<DataActions.ValidatePartPayload> {
+export function handleValidatePart(
+	kernelOptions?: GeneratedCodeRtConfig
+): ReducerSignature<DataActions.ValidatePartPayload> {
 	return (dataHolder, action) => {
 		assertObject(dataHolder.data);
 
@@ -139,7 +145,7 @@ export function handleValidatePart(): ReducerSignature<DataActions.ValidatePartP
 			"partial"
 		);
 
-		const newValidationData = validatePart(dataHolder.data, validationScope);
+		const newValidationData = validatePart(dataHolder.data, validationScope, kernelOptions);
 
 		const validation = addMessagesToValidationData(
 			dataHolder.data.validation,
@@ -167,7 +173,8 @@ export function handleValidatePart(): ReducerSignature<DataActions.ValidatePartP
 
 export function validatePart(
 	data: DgSlice & DgChangeLogSlice & ValidationSlice,
-	relevantInstances: EntityInstancePath[]
+	relevantInstances: EntityInstancePath[],
+	kernelOptions?: GeneratedCodeRtConfig
 ): ValidationData {
 	if (!data.entryPoint) {
 		return data.validation;
@@ -183,9 +190,7 @@ export function validatePart(
 
 	const documentRtService = DocumentRuntimeServiceFactory.get().createDocumentRtService(
 		(document.documentModel as Model.DocumentAndValidationModel).generatedCodeAccessor,
-		{
-			ignoreUnknownFields: true
-		}
+		{ ignoreUnknownFields: true, ...kernelOptions }
 	);
 
 	const validationEntry = data.validation[data.entryPoint];

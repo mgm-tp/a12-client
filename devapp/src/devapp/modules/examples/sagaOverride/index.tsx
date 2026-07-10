@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,40 +32,38 @@
 
 import type { JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActivityActions, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { addPrefix } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { List } from "@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.view.js";
-import { MessageBox } from "@com.mgmtp.a12.widgets/widgets-core/lib/message-box/main/message-box.view.js";
+import type {
+	Activity,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	Button,
+	addPrefix,
+	ActionContentbox,
+	ContentBoxElements,
+	Icon,
+	List,
+	MessageBox
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
 
 import { commitActivitySaga } from "./customCommit.js";
 import { customCommitDataLoader } from "./customCommitDataLoader.js";
 import { addNestedActivitySaga, nestedActivitySaga } from "./nestedActivitySaga.js";
-import appModel from "./sagaOverride.appmodel.json" with { type: "json" };
 
-const SagaOverrideModule: SampleAppModule = {
-	id: "examples.saga-override",
-	model: () => appModel as ApplicationModel,
-	sagas: () => [nestedActivitySaga],
-	views: () => viewProvider,
-	dataLoaders: [customCommitDataLoader],
-	applicationSagas: [commitActivitySaga]
-};
+const INITIAL_DESCRIPTOR = { section: "Examples", example: "SagaOverride" };
 
-export default SagaOverrideModule;
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return ViewsMap[componentName];
-}
-
-function CustomCommit(props: View): JSX.Element {
+function CustomCommit(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 
 	const error = useSelector(ActivitySelectors.error(props.activityId));
@@ -131,7 +129,7 @@ function NotificationArea(errorText: string): JSX.Element {
 	return <MessageBox icon={<Icon iconTheme="custom">error</Icon>} label={errorText} />;
 }
 
-function SagaOverride(props: View): JSX.Element {
+function SagaOverview(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 	const loadingState = useSelector(ActivitySelectors.loadingStateById(props.activityId));
 	const savingState = useSelector(ActivitySelectors.savingStateById(props.activityId));
@@ -172,7 +170,81 @@ function SagaOverride(props: View): JSX.Element {
 	);
 }
 
-const ViewsMap: { [name: string]: View.ViewComponent } = {
-	CustomCommit,
-	SagaOverride
+function matchesOverview(d: Activity.Descriptor): boolean {
+	return d.section === "Examples" && d.example === "SagaOverride" && !d.instance;
+}
+
+function matchesDetail(d: Activity.Descriptor): boolean {
+	return !!d.instance;
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "examples.saga-override",
+		scenes: [
+			{
+				name: "SagaOverride",
+				matches: matchesOverview,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: SagaOverview,
+							region: "/CONTENT"
+						}
+					]
+				}
+			},
+			{
+				name: "SagaOverrideDetail",
+				priorScene: "SagaOverride",
+				matches: matchesDetail,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: CustomCommit,
+							region: "/CONTENT"
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "examples.saga-override",
+			label: {
+				key: "examples.saga-override",
+				defaults: { en: "Saga Override", de: "Saga überschreiben" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const SagaOverrideModule: SampleAppModule = {
+	id: "examples.saga-override",
+	flows: dynamicFlows,
+	menus: selectMenus,
+	sagas: () => [nestedActivitySaga],
+	dataLoaders: [customCommitDataLoader],
+	applicationSagas: [commitActivitySaga]
 };

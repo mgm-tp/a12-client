@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,18 +32,18 @@
 
 import { Activity } from "@com.mgmtp.a12.client/client-core";
 
-import { DocumentListData } from "../mocks/SimpleOverview/data.js";
+import { isDocumentListData } from "../mocks/SimpleOverview/data.js";
 
 /**
  * Gets a document from one activity based on its index in the overview table
  */
 export function getIdOfDocument(activity: Activity, instanceIdx: number): string | undefined {
 	const data = Activity.findDefaultDataHolder(activity)?.data;
-	if (!DocumentListData.isInstance(data)) {
+	if (!isDocumentListData(data)) {
 		return undefined;
 	}
 
-	const document = data.documents[instanceIdx];
+	const document = data.documents.at(instanceIdx);
 	if (document === undefined) {
 		return undefined;
 	} else {

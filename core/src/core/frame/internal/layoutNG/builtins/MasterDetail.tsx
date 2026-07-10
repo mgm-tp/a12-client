@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,61 +23,34 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ComponentType, JSX } from "react";
+import type { JSX } from "react";
 import { useContext, useEffect, useRef } from "react";
 
-import type {
-	Animation,
-	MasterDetailProps,
-	ViewWidth,
-	VisibleView
-} from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/master-detail/main/master-detail.api.js";
-import { SizeContext } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-context.js";
+import { type ViewWidth, type VisibleView, SizeContext } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ClientWidgetMapContext } from "../../../../ClientWidgetMap.js";
 import { ApplicationModel } from "../../../../model/index.js";
 import { isOnSmallDevice } from "../../../../view/internal/size-context.js";
 import type { ViewNG } from "../../../../view/internal/viewNG.js";
+import { getAnimation } from "../../utils/getAnimation.js";
 
 import { AriaLevelContext } from "../AriaLevelContext.js";
 import type { LayoutNG, LayoutPropsNG } from "../layoutPropsNG.js";
 
-const LEFT_TO_RIGHT_ANIMATION: Animation = { animateSingleItem: "ltr" };
-const RIGHT_TO_LEFT_ANIMATION: Animation = { animateSingleItem: "rtl" };
-
-/**
- * Props used to render the MasterDetailRegionLayoutNG component
- */
-export interface MasterDetailLayoutPropsNG extends LayoutPropsNG {
-	/**
-	 * @deprecated since Client 16.1.0. This property will be removed in the next major release.
-	 * Use the {@link ClientWidgetMapContext} instead.
-	 * A map of components that will be used instead of the corresponding
-	 * default components, if they are provided.
-	 */
-	readonly widgetMap?: {
-		/**
-		 * Component used instead of the layouts default root component, if provided.
-		 */
-		readonly masterDetail: ComponentType<MasterDetailProps>;
-	};
-}
-
 /**
  * RegionLayout based on A12 Master Detail Layout.
  */
-function MasterDetailRegionLayoutComponentNG(props: MasterDetailLayoutPropsNG): JSX.Element | null {
+function MasterDetailRegionLayoutComponentNG(props: LayoutPropsNG): JSX.Element | null {
 	const sizeContext = useContext(SizeContext);
-	// TODO: Remove with A12-17777
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
-	const { views, widgetMap } = props;
+
+	const { views } = props;
 
 	const { MasterDetail } = useContext(ClientWidgetMapContext);
 
@@ -91,19 +64,12 @@ function MasterDetailRegionLayoutComponentNG(props: MasterDetailLayoutPropsNG): 
 		return <div />;
 	}
 
-	/*
-	 * The animation direction shall only change if the view stack changes.
-	 * In all other case the direction of the last stack change shall be used.
-	 * This makes the animation more robust when having several render calls in close succession.
-	 */
-	const animation: Animation | undefined =
-		!isOnSmallDevice(sizeContext.currentSize) || previousViews.current.length === 0
-			? undefined
-			: previousViews.current.length < views.length
-				? RIGHT_TO_LEFT_ANIMATION
-				: previousViews.current.length > views.length
-					? LEFT_TO_RIGHT_ANIMATION
-					: undefined;
+	const animation = getAnimation(
+		// eslint-disable-next-line react-hooks/refs
+		previousViews.current.length,
+		views.length,
+		sizeContext.currentSize
+	);
 
 	const onSmallDevice = isOnSmallDevice(sizeContext.currentSize);
 
@@ -139,10 +105,8 @@ function MasterDetailRegionLayoutComponentNG(props: MasterDetailLayoutPropsNG): 
 		};
 	});
 
-	const MasterDetailComponent = widgetMap?.masterDetail ?? MasterDetail;
-
 	return (
-		<MasterDetailComponent
+		<MasterDetail
 			visibleViews={visibleViews}
 			animation={onSmallDevice ? animation : undefined}
 			key={views[0].props.activityId}
@@ -158,6 +122,6 @@ MasterDetailRegionLayoutComponentNG.whyDidYouRender = true;
  * A layout that uses the MasterDetail widget to position the views.
  * Should only be used with `DynamicConfiguration`.
  */
-export const MasterDetailRegionLayoutNG: LayoutNG<MasterDetailLayoutPropsNG> = {
+export const MasterDetailRegionLayoutNG: LayoutNG<LayoutPropsNG> = {
 	component: MasterDetailRegionLayoutComponentNG
 };

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -38,10 +38,10 @@ import { compose } from "redux";
 import createSagaMiddleware, { type SagaMiddlewareOptions } from "redux-saga";
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, takeEvery } from "typed-redux-saga";
-import { isType } from "typescript-fsa";
 
-import { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/index.js";
+import { isType } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { Locale } from "@com.mgmtp.a12.utils/utils-localization";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { ActivityActions, ActivitySelectors } from "../../../../core/activity/index.js";
 import type {
@@ -83,14 +83,6 @@ export type ViewKey = string | number | null;
 
 interface TestSlice {
 	test: string;
-}
-
-namespace TestSlice {
-	function isInstance(slice: unknown): slice is TestSlice {
-		return isRecord(slice);
-	}
-
-	export const selector = createSliceSelector("testSlice", isInstance);
 }
 
 describe("core.application", () => {
@@ -698,12 +690,14 @@ describe("core.application", () => {
 					};
 
 					it("returns a store enhanced by the enhancer", () => {
+						const selector = createSliceSelector("testSlice", (s): s is TestSlice => isRecord(s));
+
 						const newSetup: ApplicationFactories.Config = {
 							...defaultSetup,
 							composeEnhancer
 						};
 						const setupResult = ApplicationFactories.createApplicationSetup(newSetup);
-						const sliceValue = TestSlice.selector(setupResult.store.getState());
+						const sliceValue = selector(setupResult.store.getState());
 						strictEqual(sliceValue.test, "Test");
 					});
 				});
@@ -721,7 +715,6 @@ describe("core.application", () => {
 						});
 					}
 
-					// @ts-expect-error https://github.com/redux-saga/redux-saga/issues/2705
 					const customSagaMiddleware = createSagaMiddleware(testSagaMiddlewareOptions);
 
 					const testConfig: ApplicationFactories.Config = {

@@ -1,5 +1,5 @@
 {
-	"extends": "@com.mgmtp.a12.devtools/tsconfig",
+	//"extends": "@com.mgmtp.a12.devtools/tsconfig", // TODO: Enable after api-extractor supports ES2025
 	"include": ["./src/**/*", "./test/**/*"],
 	"exclude": ["node_modules", "lib", "target"],
 	"compilerOptions": {
@@ -7,9 +7,28 @@
 		"rootDir": "./src",
 		"types": ["node", "mocha"],
 		"skipLibCheck": true,
-		"verbatimModuleSyntax": true,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
 		"isolatedModules": true,
-		"noUncheckedSideEffectImports": true,
-		"moduleDetection": "force"
+		"jsx": "react-jsx",
+		"lib": ["DOM", "ES2024"],
+		"module": "NodeNext",
+		"moduleDetection": "force",
+		"moduleResolution": "NodeNext",
+		"newLine": "LF",
+		"noEmitOnError": true,
+		"noErrorTruncation": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": false,
+		"preserveConstEnums": true,
+		"resolveJsonModule": true,
+		"sourceMap": true,
+		"stripInternal": true,
+		"target": "ES2024",
+		"verbatimModuleSyntax": true
 	}
 }

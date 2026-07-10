@@ -1,16 +1,14 @@
-import groovy.yaml.YamlSlurper
+rootProject.name = 'client'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.apache.groovy:groovy-yaml:4.0.28'
+dependencyResolutionManagement {
+    versionCatalogs {
+        if (file('gradle/a12-internal.versions.toml').exists()) {
+            create('a12Internal') {
+                from(files('gradle/a12-internal.versions.toml'))
+            }
+        }
     }
 }
-
-rootProject.name = 'client'
 
 include ':coreTestModels', ':devappModels', ':devappServices',
     'appmodel-migration', 'codemod', 'core', 'data', 'devapp', 'documentation'
@@ -24,53 +22,3 @@ include ':coreTestModels', ':devappModels', ':devappServices',
 project(':coreTestModels').projectDir = file('core/resources/testModels')
 project(':devappModels').projectDir = file('devapp/resources/models')
 project(':devappServices').projectDir = file('devapp/resources/server')
-
-dependencyResolutionManagement {
-    final def a12Version = getA12Versions()
-
-    versionCatalogs {
-        gradlePluginLibs {
-            version('docker', '9.4.0')
-            version('spotless', '8.3.0')
-
-            library('docker-plugin', 'com.bmuschko', 'gradle-docker-plugin').versionRef('docker')
-            plugin('docker', 'com.bmuschko.docker-remote-api').versionRef('docker')
-            plugin('spotless', 'com.diffplug.spotless').versionRef('spotless')
-        }
-
-        a12Libs {
-            version('dataservices', a12Version.dataservices)
-            version('build-utilities', '0.3.0')
-            version('prepare-models', '0.6.0')
-            version('devtools-deploy', '0.6.2')
-            version('artifact-publish', '0.4.0-rc.1')
-
-            if (file('docker').exists() || file('publish').exists()) {
-                library('artifact-publish-plugin', 'com.mgmtp.a12.bd.artifact-publish', 'com.mgmtp.a12.bd.artifact-publish.gradle.plugin').versionRef('artifact-publish')
-                library('devtools-deploy-plugin', 'com.mgmtp.a12.devtools.plugins.deployment', 'com.mgmtp.a12.devtools.plugins.deployment.gradle.plugin').versionRef('devtools-deploy')
-
-                plugin('devtools-deploy', 'com.mgmtp.a12.devtools.plugins.deployment').versionRef('devtools-deploy')
-            }
-
-            plugin('prepare-models', 'com.mgmtp.a12.devtools.plugins.prepare-models').versionRef('prepare-models')
-            library('build-utilities', 'com.mgmtp.a12.devtools.plugins', 'build-utilities').versionRef('build-utilities')
-
-            // The A12 dataservices bom is used for determining the A12 dependency versions
-            library('dataservices-bom', 'com.mgmtp.a12.dataservices', 'dataservices-parent').versionRef('dataservices')
-
-            library('kernel-md-model', 'com.mgmtp.a12.kernel', 'kernel-md-model').withoutVersion()
-            library('kernel-md-facade', 'com.mgmtp.a12.kernel', 'kernel-md-facade').withoutVersion()
-            library('kernel-migration', 'com.mgmtp.a12.kernel', 'kernel-tool-model-migration').withoutVersion()
-        }
-    }
-}
-
-HashMap<String, String> getA12Versions() {
-    Closure<String> getVersion = { new YamlSlurper().parse(file("./pnpm-workspace.yaml")).catalogs.a12[it] as String }
-
-    return [
-            dataservices : getVersion('@com.mgmtp.a12.dataservices/dataservices-access'),
-    ]
-}
-
-

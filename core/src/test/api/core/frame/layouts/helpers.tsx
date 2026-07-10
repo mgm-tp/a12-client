@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -36,9 +36,8 @@ import type { Store } from "redux";
 import { StyleSheetManager, ThemeProvider } from "styled-components";
 
 import { render } from "@com.mgmtp.a12.devtools/react";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { shouldForwardProp } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/should-forward-prop.js";
-import { defaultTheme } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/default/default-theme.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
+import { getBaseTheme, shouldForwardProp } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { FrameFactories } from "../../../../../core/frame/internal/factories.js";
 import type { LayoutProps } from "../../../../../core/frame/internal/layout/LayoutProps.js";
@@ -84,7 +83,7 @@ export function renderLayout<P extends FrameViews.LayoutProps>(
 	return act(() =>
 		render(
 			<StyleSheetManager shouldForwardProp={shouldForwardProp}>
-				<ThemeProvider theme={defaultTheme}>
+				<ThemeProvider theme={getBaseTheme()}>
 					<Provider store={store}>
 						<LocalizerContext.Provider value={KEY_OUTPUT_LOCALIZER_CONTEXT}>
 							<Component {...props} views={views} settings={settings} />

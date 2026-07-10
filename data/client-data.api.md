@@ -4,33 +4,33 @@
 
 ```ts
 
-import type { Action } from 'typescript-fsa';
-import { ActionCreator } from 'typescript-fsa';
+import type { Action } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
+import { ActionCreator } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
 import type { Activity } from '@com.mgmtp.a12.client/client-core';
 import type { ActivityReducers } from '@com.mgmtp.a12.client/client-core';
-import type { Annotation } from '@com.mgmtp.a12.base/base-model-api/lib/main/header/index.js';
-import type { Document as Document_2 } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import { DocumentComputationResult } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import { DocumentModel } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { DocumentModelSearchService } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { DocumentRtServiceA12internal } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js';
-import type { DocumentService } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { EntityInstancePath } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { FieldInstanceValue } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { GeneratedCodeRtConfig } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { GroupInstance } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import type { Localizable } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
-import type { Localizer } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
-import type { Message } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
+import type { Annotation } from '@com.mgmtp.a12.base/base-model-api';
+import type { Document as Document_2 } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import { DocumentComputationResult } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import { DocumentModel } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { DocumentModelSearchService } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import { DocumentRtServiceA12internal } from '@com.mgmtp.a12.kernel/kernel-md-facade/a12internal';
+import type { DocumentService } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { EntityInstancePath } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { FieldInstanceValue } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { GeneratedCodeRtConfig } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { GroupInstance } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade';
+import type { Localizable } from '@com.mgmtp.a12.utils/utils-localization';
+import type { Localizer } from '@com.mgmtp.a12.utils/utils-localization';
+import type { Message } from '@com.mgmtp.a12.kernel/kernel-md-facade';
 import type { Model } from '@com.mgmtp.a12.client/client-core';
-import type { Model as Model_2 } from '@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js';
-import { ModelPath } from '@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js';
+import type { Model as Model_2 } from '@com.mgmtp.a12.base/base-model-api';
+import { ModelPath } from '@com.mgmtp.a12.base/base-model-api';
 import type { ModelProcessor } from '@com.mgmtp.a12.client/client-core';
-import type { Relationship as Relationship_2 } from '@com.mgmtp.a12.dataservices/dataservices-access/lib/Relationship/Relationship.js';
-import type { SupportedType } from '@com.mgmtp.a12.utils/utils-localization/lib/main/conversion.js';
-import type { ValueConversion } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
-import type { ValueConversionConfig } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
+import type { Relationship as Relationship_2 } from '@com.mgmtp.a12.dataservices/dataservices-access';
+import type { SupportedType } from '@com.mgmtp.a12.utils/utils-localization';
+import type { ValueConversion } from '@com.mgmtp.a12.utils/utils-localization';
+import type { ValueConversionConfig } from '@com.mgmtp.a12.utils/utils-localization';
 
 // @public (undocumented)
 export type AbstractElementType = (typeof AbstractElementTypes)[number];
@@ -64,7 +64,7 @@ export interface ChangeLog<SNAPSHOT_TYPE> {
 export type _ChangeLogT_ = DeepReadonly<DocumentGraph>;
 
 // @public (undocumented)
-export function changeValue(document: Document_2, docRef: string, dataReference: DataReference, value: KernelTypes.Value, parseErrorForChangedField: ParseError | undefined, validationData: ValidationData, dm: Model.DocumentAndValidationModel, fm?: FormModel, notRelevantConfigs?: NotRelevantConfig[], computedFields?: ComputedFields): {
+export function changeValue(document: Document_2, docRef: string, dataReference: DataReference, value: KernelTypes.Value, parseErrorForChangedField: ParseError | undefined, validationData: ValidationData, dm: Model.DocumentAndValidationModel, fm?: FormModel, notRelevantConfigs?: NotRelevantConfig[], computedFields?: ComputedFields, kernelOptions?: GeneratedCodeRtConfig): {
     document: Document_2;
     validationData: ValidationData;
     changedFieldPaths: EntityInstancePath[];
@@ -99,6 +99,7 @@ export function computeDocument(params: {
         elementDataType: DocumentModel.FieldType | string | undefined;
         elementPath: EntityInstancePath;
     };
+    kernelOptions?: GeneratedCodeRtConfig;
 }): {
     computationResult: DocumentComputationResult;
     computedDocument: Document_2;
@@ -175,7 +176,7 @@ export namespace DataActions {
 }
 
 // @public (undocumented)
-export const dataComponentReducersFactory: () => ActivityReducers.DataReducer[];
+export const dataComponentReducerFactory: (kernelOptions?: GeneratedCodeRtConfig) => ActivityReducers.DataReducer;
 
 // @public (undocumented)
 export type DataReference = string;
@@ -573,22 +574,27 @@ export type Granularity = ModelPath[];
 export function granularityDistance(g1: Granularity, g2: Granularity): number;
 
 // @public (undocumented)
-export function handleChangeValue(): ReducerSignature<DataActions.ChangeValuePayload>;
+export function handleChangeValue(kernelOptions?: GeneratedCodeRtConfig): ReducerSignature<DataActions.ChangeValuePayload>;
 
 // @public (undocumented)
-export function handleParsingFailed(): ReducerSignature<DataActions.ParsingFailedPayload>;
+export function handleParsingFailed(kernelOptions?: GeneratedCodeRtConfig): ReducerSignature<DataActions.ParsingFailedPayload>;
 
 // @public (undocumented)
-export function handleRowAdded(): ReducerSignature<DataActions.RowAddedPayload>;
+export function handleRowAdded(kernelOptions?: GeneratedCodeRtConfig): ReducerSignature<DataActions.RowAddedPayload>;
 
 // @public (undocumented)
-export function handleValidateFull(): ReducerSignature<DataActions.ValidateFullPayload>;
+export function handleValidateFull(kernelOptions?: GeneratedCodeRtConfig): ReducerSignature<DataActions.ValidateFullPayload>;
 
 // @public (undocumented)
-export function handleValidatePart(): ReducerSignature<DataActions.ValidatePartPayload>;
+export function handleValidatePart(kernelOptions?: GeneratedCodeRtConfig): ReducerSignature<DataActions.ValidatePartPayload>;
 
 // @public (undocumented)
-export function initializeDataComponent(docs: DgDocument[], links?: DgLinkInternal[], entryPoint?: string): DgSlice & DgChangeLogSlice & ValidationSlice;
+export function initializeDataComponent(options: {
+    documents: DgDocument[];
+    links?: DgLinkInternal[];
+    entryPoint?: string;
+    kernelOptions?: GeneratedCodeRtConfig;
+}): DgSlice & DgChangeLogSlice & ValidationSlice;
 
 // @public (undocumented)
 export function isDateRangeArray(value: KernelTypes.Value): value is Date[];
@@ -731,7 +737,7 @@ export interface ParseResult {
 }
 
 // @public (undocumented)
-export function parseWithTypeCheck(dataRef: DataReference, dm: Model.DocumentAndValidationModel, value: KernelTypes.Value, userValue?: string): ParseResult;
+export function parseWithTypeCheck(dataRef: DataReference, dm: Model.DocumentAndValidationModel, value: KernelTypes.Value, userValue?: string, kernelOptions?: GeneratedCodeRtConfig): ParseResult;
 
 // @public (undocumented)
 export interface ReadonlyObjectMap<T> {
@@ -846,13 +852,14 @@ export function updateValidationMessages(params: {
     dm: Model.DocumentAndValidationModel;
     notRelevantConfigs: NotRelevantConfig[];
     computedFields: ComputedFields;
+    kernelOptions?: GeneratedCodeRtConfig;
 }): ValidationData;
 
 // @public (undocumented)
-export function validateFull(data: DgSlice & DgChangeLogSlice & ValidationSlice): ValidationData;
+export function validateFull(data: DgSlice & DgChangeLogSlice & ValidationSlice, kernelOptions?: GeneratedCodeRtConfig): ValidationData;
 
 // @public (undocumented)
-export function validatePart(data: DgSlice & DgChangeLogSlice & ValidationSlice, relevantInstances: EntityInstancePath[]): ValidationData;
+export function validatePart(data: DgSlice & DgChangeLogSlice & ValidationSlice, relevantInstances: EntityInstancePath[], kernelOptions?: GeneratedCodeRtConfig): ValidationData;
 
 // @public (undocumented)
 export interface ValidationConfig {

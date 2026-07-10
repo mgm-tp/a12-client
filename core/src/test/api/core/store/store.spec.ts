@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,9 +33,10 @@
 import { strictEqual } from "node:assert/strict";
 import { mock } from "node:test";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/index.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { StoreFactories } from "../../../../core/store/index.js";
+import { dummyAction } from "../../../mocks/application/actionMocks.js";
 import { createStoreForTest } from "../../../unit/core/frame/utils.js";
 
 const logger = LoggerFactory.getLogger("core/store");
@@ -47,10 +48,8 @@ describe("core.store.factories", () => {
 				"as parameters and an action as return value",
 			() => {
 				it("returns conveniently a function applicable as redux middleware", () => {
-					const dummyAction = { type: "dummy", payload: "Hiho" };
-
 					const dummyMiddleware = StoreFactories.createMiddleware((api, next, action) => {
-						if (action === dummyAction) {
+						if (dummyAction.match(action)) {
 							action.payload = "Hihi";
 							return next(action);
 						}
@@ -58,9 +57,9 @@ describe("core.store.factories", () => {
 					});
 					const store = createStoreForTest({ additionalMiddlewares: [dummyMiddleware] });
 
-					store.dispatch(dummyAction);
+					store.dispatch(dummyAction("Hiho"));
 
-					const changedPayload = store.getActions().find(a => a.type === dummyAction.type)?.payload;
+					const changedPayload = store.getActions().find(dummyAction.match)?.payload;
 
 					strictEqual(changedPayload, "Hihi");
 				});
@@ -78,7 +77,7 @@ describe("core.store.middlewares", () => {
 
 					const store = createStoreForTest();
 
-					const action = { type: "dummy" };
+					const action = dummyAction("Test");
 					store.dispatch(action);
 
 					const callArgs = logStub.mock.calls;

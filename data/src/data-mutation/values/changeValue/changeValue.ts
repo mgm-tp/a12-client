@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,8 +34,9 @@ import type { Model } from "@com.mgmtp.a12.client/client-core";
 import type {
 	Document,
 	DocumentModel,
-	EntityInstancePath
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
+	EntityInstancePath,
+	GeneratedCodeRtConfig
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import type { DataReference } from "../../../core/api/data-reference.js";
 import { getValue } from "../../../core/api/data/getValue.js";
@@ -63,7 +64,8 @@ export function changeValue(
 	dm: Model.DocumentAndValidationModel,
 	fm?: FormModel,
 	notRelevantConfigs: NotRelevantConfig[] = [],
-	computedFields: ComputedFields = {}
+	computedFields: ComputedFields = {},
+	kernelOptions?: GeneratedCodeRtConfig
 ): {
 	document: Document;
 	validationData: ValidationData;
@@ -104,7 +106,8 @@ export function changeValue(
 		change: {
 			elementDataType: changedElementDataType,
 			elementPath: changedElementPath
-		}
+		},
+		kernelOptions
 	});
 
 	const { changedFieldPaths, changedGroupPaths } = collectChangedDocumentPaths(
@@ -139,7 +142,8 @@ export function changeValue(
 		computationResult,
 		dm,
 		notRelevantConfigs,
-		computedFields
+		computedFields,
+		kernelOptions
 	});
 
 	return {

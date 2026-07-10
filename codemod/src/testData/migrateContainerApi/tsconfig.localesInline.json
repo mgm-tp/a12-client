@@ -1,8 +1,0 @@
-{
-	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./indexInline.ts", "./select.tsx"],
-	"compilerOptions": {
-		"noEmit": true,
-		"noCheck": true
-	}
-}

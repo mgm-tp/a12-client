@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,16 +23,16 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type { Action as ReduxAction } from "redux";
 import type { SagaGenerator } from "typed-redux-saga";
 import { put, select, takeEvery } from "typed-redux-saga";
-import type { Action, AnyAction } from "typescript-fsa";
 
 import {
 	Activity,
@@ -41,8 +41,10 @@ import {
 	NotificationActions,
 	NotificationSelectors
 } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
-import { SimpleFormActions, SingleDocumentData } from "../../../mocks/SimpleForm/index.js";
+import { isSingleDocumentData } from "../../../mocks/SimpleForm/data.js";
+import { SimpleFormActions } from "../../../mocks/SimpleForm/index.js";
 
 import type { CustomNotification } from "./notification.js";
 
@@ -50,7 +52,7 @@ export const NotificationsSagas = [eventButtonTriggeredSaga];
 
 function* eventButtonTriggeredSaga(): SagaGenerator<void> {
 	yield* takeEvery(
-		(action: AnyAction) => SimpleFormActions.onEventTriggered.match(action),
+		(action: ReduxAction) => SimpleFormActions.onEventTriggered.match(action),
 		function* (action: Action<SimpleFormActions.EventButtonTriggeredPayload>) {
 			const { activityId } = action.payload;
 			const activity = yield* select(ActivitySelectors.activityById(action.payload.activityId));
@@ -70,17 +72,15 @@ function* eventButtonTriggeredSaga(): SagaGenerator<void> {
 				case "close-activity":
 					yield* put(ActivityActions.cancel({ activityId }));
 					break;
-				case "create-notification":
-					// eslint-disable-next-line no-case-declarations
+				case "create-notification": {
 					const data = Activity.findDefaultDataHolder(activity)?.data;
-					if (!SingleDocumentData.isInstance(data)) {
+					if (!isSingleDocumentData(data)) {
 						break;
 					}
-					// eslint-disable-next-line no-case-declarations
+
 					const { scope, duration, severity, position, icon, title, message } =
 						data.document as unknown as NotificationDocument;
 
-					// eslint-disable-next-line no-case-declarations
 					const notification: Omit<CustomNotification, "id"> = {
 						// The split removes the "activity-" prefix that is necessary for the sorting of the external enum
 						activityId: scope !== "global" ? scope.split("-")[1] : undefined,
@@ -105,6 +105,7 @@ function* eventButtonTriggeredSaga(): SagaGenerator<void> {
 					// After creating a notification the activity should not be considered dirty
 					yield* put(ActivityActions.setDirty({ activityId, dirty: false }));
 					break;
+				}
 				case "remove-notifications":
 					yield* put(
 						NotificationActions.remove(

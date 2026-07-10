@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,12 +35,12 @@ import { mock } from "node:test";
 
 import { pipe } from "fp-ts/lib/function.js";
 import { Fragment, type PropsWithChildren } from "react";
-import type { Middleware, Reducer, StoreEnhancer } from "redux";
+import type { Middleware, Reducer, Action as ReduxAction, StoreEnhancer } from "redux";
 import { type Store } from "redux";
 import type { Action } from "redux-saga";
 import type { SagaGenerator } from "typed-redux-saga";
-import type { ActionCreator, AnyAction } from "typescript-fsa";
 
+import type { ActionCreator } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import { render, within } from "@com.mgmtp.a12.devtools/react";
 
 import type { ActivityReducers } from "../../../../core/activity/index.js";
@@ -99,10 +99,10 @@ describe("core.application.applicationFactory", () => {
 	});
 
 	it("addReduxSetupAction", () => {
-		const expected1: AnyAction = {
+		const expected1: ReduxAction = {
 			type: "Action1"
 		};
-		const expected2: AnyAction = {
+		const expected2: ReduxAction = {
 			type: "Action2"
 		};
 		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });

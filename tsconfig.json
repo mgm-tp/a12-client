@@ -1,26 +1,25 @@
 {
 	"include": [
 		".pnpmfile.mjs",
-		"./eslint.config.js",
-		"prettier.config.ts",
-		"scripts/validateA12Peers.ts",
-		"**/scripts/**/*.cjs"
+		"eslint.root.config.ts",
+		"eslint.config.ts",
+		"prettier.config.js",
+		"scripts/validateA12Peers.ts"
 	],
 	"compilerOptions": {
+		"allowImportingTsExtensions": true,
 		"allowJs": true,
 		"checkJs": true,
-		"noEmit": true,
-		"module": "NodeNext",
-		"resolveJsonModule": true,
-		"lib": ["ESNext"],
-		"allowImportingTsExtensions": true,
 		"erasableSyntaxOnly": true,
-		"verbatimModuleSyntax": true,
 		"isolatedModules": true,
-		"noUncheckedSideEffectImports": true,
+		"lib": ["ESNext"],
+		"module": "NodeNext",
 		"moduleDetection": "force",
+		"noEmit": true,
+		"resolveJsonModule": true,
 		"strictNullChecks": true,
 		"types": ["node"],
+		"verbatimModuleSyntax": true,
 		"paths": {
 			// eslint provides its own types, but some dependencies pull in @types/eslint, which causes conflicts
 			// therefore we force type resolution here

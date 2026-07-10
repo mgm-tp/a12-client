@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,7 +33,7 @@
 import type { DataEditor } from "@com.mgmtp.a12.client/client-core";
 import { Activity, NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
 
-import { SingleDocumentData } from "../../../../mocks/SimpleForm/index.js";
+import { isSingleDocumentData } from "../../../../mocks/SimpleForm/data.js";
 
 import type { AuthorDocument } from "./Author.js";
 import type { Book } from "./Book.js";
@@ -78,12 +78,14 @@ export class BookDataEditor implements DataEditor<AuthorData, BookData> {
 	read(parentActivity: Activity, child: Activity.Descriptor): BookData {
 		const { instance } = child;
 		const data = Activity.findDefaultDataHolder(parentActivity)?.data;
-		if (!SingleDocumentData.isInstance(data)) {
+		if (!isSingleDocumentData(data)) {
 			throw new Error("Default data holder does not contain SingleDocumentData!");
 		}
 
-		const authorDoc = data.document as AuthorDocument;
-		const { Books: books } = authorDoc.Author ?? { Books: undefined };
+		const authorDoc = data.document;
+		const { Books: books }: { Books: Book[] | undefined } = authorDoc.Author ?? {
+			Books: undefined
+		};
 		if (instance === NEW_INSTANCE_IDENTIFIER) {
 			return {
 				...data,
@@ -116,12 +118,12 @@ export class BookDataEditor implements DataEditor<AuthorData, BookData> {
 			}
 		} = childData;
 		const data = Activity.findDefaultDataHolder(parentActivity)?.data;
-		if (!SingleDocumentData.isInstance(data)) {
+		if (!isSingleDocumentData(data)) {
 			throw new Error("Default data holder does not contain SingleDocumentData!");
 		}
 
-		const authorDoc = data.document as AuthorDocument;
-		const books = authorDoc.Author?.Books ?? [];
+		const authorDoc = data.document;
+		const books: Book[] = authorDoc.Author?.Books ?? [];
 
 		const bookIdx = books.findIndex(b => b.BookDetails.id === id);
 		const updatedBooks =

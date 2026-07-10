@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,14 +32,15 @@
 
 import { deepStrictEqual, strictEqual } from "node:assert/strict";
 
-import type { Action } from "typescript-fsa";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { ApplicationActions, ApplicationReducers } from "../../../../core/application/index.js";
+import type { ApplicationState } from "../../../../core/application/internal/reducers.js";
 
 describe("core.application", () => {
 	describe("ApplicationReducers", () => {
-		const initialApplication = { busy: false };
-		const emptyAction: Action<{}> = { type: "EmptyAction", payload: {} };
+		const initialApplication: ApplicationState = { busy: false, registeredModules: [] };
+		const emptyAction: Action<object> = { type: "EmptyAction", payload: {} };
 
 		describe("application", () => {
 			describe("Given a state", () => {

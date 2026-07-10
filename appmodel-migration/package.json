@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-application-model-migration",
-  "version": "16.3.0-SNAPSHOT",
+  "version": "17.0.0",
   "description": "ApplicationModel migration CLI tool",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -15,17 +15,21 @@
     "test": "mocha",
     "test:coverage": "c8 mocha",
     "typescript": "tsc --project ./tsconfig.dev.json",
-    "watch": "tsc --project ./tsconfig.dev.json --watch"
+    "watch": "tsc --project ./tsconfig.dev.json --watch",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
+    "lint:fix": "node --run lint -- --fix",
+    "lint:onlyErrors": "node --run lint -- --quiet"
   },
   "bin": "lib/main/cli.js",
   "devDependencies": {
     "@com.mgmtp.a12.base/base-model-api": "catalog:a12",
-    "@com.mgmtp.a12.devtools/build-tools": "catalog:a12",
     "@com.mgmtp.a12.devtools/tsconfig": "catalog:a12",
+    "@com.mgmtp.a12.devtools/build-tools": "catalog:a12",
     "@com.mgmtp.a12.migrationtool/migrationtool-utils": "catalog:a12",
     "@types/mocha": "catalog:",
     "@types/node": "catalog:",
     "c8": "catalog:",
+    "eslint": "catalog:",
     "mocha": "catalog:",
     "rimraf": "catalog:",
     "source-map-support": "catalog:",
@@ -48,10 +52,5 @@
     "THIRD_PARTY_NOTICES",
     "licenses"
   ],
-  "exports": {
-    ".": "./lib/main/api.js",
-    "./lib/*": "./lib/*.js",
-    "./lib/*.js": "./lib/*.js"
-  },
-  "types": "lib/main/api.d.ts"
+  "exports": "./lib/main/api.js"
 }

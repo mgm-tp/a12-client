@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,12 +32,12 @@
 
 import { ModuleTestExtensions } from "@com.mgmtp.a12.client/client-core";
 
-import { model } from "../devapp/appmodel.js";
+import { createComposableApplication } from "../devapp/composableSetup/createComposableAppsetup.js";
 import type { ActionSequence } from "../devapp/steps/ActionSequence.js";
 import { SequencesProcessor } from "../devapp/steps/SequencesProcessor.js";
 import { stepTestActionSequences } from "../devapp/steps/stepTestActionSequences.js";
 
-import { createAppSetup } from "./steps.setup.js";
+import { newFileSystemModelLoader } from "./mocks/ModelLoader.js";
 
 describe("steps", () => {
 	after(ModuleTestExtensions.reset);
@@ -53,11 +53,15 @@ describe("steps", () => {
  * Creates mocha test cases dynamically for a sequence in a BDD way.
  * Each sequence step is executed and tested in an 'it' section.
  * @param sequenceNumber The number of the sequence the test cases shall be provided for
+ *
+ * Step tests only support dynamic configuration setups.
  */
 function createSequenceMochaTests(sequence: ActionSequence) {
 	describe(`[${sequence.name}]`, () => {
 		it("executes the test successfully", async () => {
-			const config = createAppSetup(model);
+			ModuleTestExtensions.reset();
+			const config = createComposableApplication(newFileSystemModelLoader);
+			await config.initialActions();
 
 			const sequencesProcessor = new SequencesProcessor(
 				stepTestActionSequences,

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,27 +33,33 @@
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { Module, ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActivityActions, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { ModalOverlay } from "@com.mgmtp.a12.widgets/widgets-core/lib/modal-overlay/main/modal-overlay.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions,
+	NEW_INSTANCE_IDENTIFIER
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	Button,
+	ActionContentbox,
+	ContentBoxElements,
+	Icon,
+	ModalOverlay
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { PersonForm } from "../../../mocks/SimpleForm/forms/person-form.js";
 import { withActivityContext } from "../../../mocks/utils.js";
 
-import appmodel from "./maximizeForm.appmodel.json" with { type: "json" };
-
-const MaximizeFormModule: Module = {
-	id: "examples.maximize-form",
-	model: () => appmodel as ApplicationModel,
-	views: () => name => ViewsMap[name]
-};
-
-export default MaximizeFormModule;
+const INITIAL_DESCRIPTOR = { section: "Examples", example: "MaximizeForm" };
 
 const MaximizeFormView = withActivityContext(props => {
 	const [maximized, setMaximized] = useState(true);
@@ -83,11 +89,11 @@ const MaximizeFormView = withActivityContext(props => {
 const childActivityDescriptor = {
 	section: "Examples",
 	example: "MaximizeForm",
-	instance: "__NEW__",
+	instance: NEW_INSTANCE_IDENTIFIER,
 	model: "Person-document"
 };
 
-function MaximizeOverview(props: View): JSX.Element {
+function MaximizeOverview(props: ViewNGProps): JSX.Element {
 	const activeChildActivities = useSelector(
 		ActivitySelectors.activitiesByDescriptor(childActivityDescriptor)
 	);
@@ -126,7 +132,80 @@ function MaximizeOverview(props: View): JSX.Element {
 	);
 }
 
-const ViewsMap: { [name: string]: View.ViewComponent } = {
-	MaximizeOverview,
-	MaximizeFormView
+function matchesIntro(d: Activity.Descriptor): boolean {
+	return d.section === "Examples" && d.example === "MaximizeForm" && !d.instance;
+}
+
+function matchesForm(d: Activity.Descriptor): boolean {
+	return d.section === "Examples" && d.example === "MaximizeForm" && !!d.instance;
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "examples.maximize-form",
+		scenes: [
+			{
+				name: "MaximizeFormExampleIntro",
+				matches: matchesIntro,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MaximizeOverview,
+							region: "/CONTENT"
+						}
+					]
+				}
+			},
+			{
+				name: "MaximizeFormExample",
+				priorScene: "MaximizeFormExampleIntro",
+				matches: matchesForm,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: MaximizeFormView,
+							region: "/CONTENT",
+							models: [{ modelType: "document", name: "Person-document" }]
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "examples.maximize-form",
+			label: {
+				key: "examples.maximize-form",
+				defaults: { en: "Maximize Form View", de: "Form View Maximieren" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const MaximizeFormModule: DynamicConfiguration = {
+	id: "examples.maximize-form",
+	flows: dynamicFlows,
+	menus: selectMenus
 };

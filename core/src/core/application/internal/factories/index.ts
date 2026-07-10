@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,16 +31,16 @@
  */
 
 import { identity } from "fp-ts/lib/function.js";
-import type { AnyAction, Middleware, Reducer, Store, StoreEnhancer } from "redux";
+import type { Action, Middleware, Reducer, Store, StoreEnhancer } from "redux";
 import { applyMiddleware, createStore as createReduxStore } from "redux";
-// TODO: A12C-3195, SagaIterator to SagaGenerator
-// eslint-disable-next-line no-restricted-imports
-import type { SagaIterator, SagaMiddleware } from "redux-saga";
+import type { SagaMiddleware } from "redux-saga";
 import createSagaMiddleware from "redux-saga";
-import type { ActionCreator } from "typescript-fsa";
+import type { SagaGenerator } from "typed-redux-saga";
 
-import type { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Locale.js";
+import type { ActionCreator } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import type { Locale } from "@com.mgmtp.a12.utils/utils-localization";
 
+import type { ActivityMap } from "../../../activity/internal/activityMap.js";
 import { ActivityReducers } from "../../../activity/internal/reducers/index.js";
 import type { DataHandler, DataLoader, DataProvider } from "../../../data/index.js";
 import { isDataEditor, isDataLoader, isDataProvider } from "../../../data/index.js";
@@ -120,7 +120,7 @@ export namespace ApplicationFactories {
 		/**
 		 * An optional list of application specific sagas
 		 */
-		customSagas?: (() => SagaIterator<void>)[];
+		customSagas?: (() => SagaGenerator<void>)[];
 
 		/**
 		 * An optional application specific dispatcher saga overriding the
@@ -129,7 +129,7 @@ export namespace ApplicationFactories {
 		 * @param descriptors List of application saga descriptors to be
 		 * considered for handling an incoming action
 		 */
-		dispatchSaga?(descriptors: ApplicationSaga.Descriptor[]): SagaIterator<void>;
+		dispatchSaga?(descriptors: ApplicationSaga.Descriptor[]): SagaGenerator<void>;
 
 		/**
 		 * A set of actions which are executed after the store got initialized.
@@ -140,7 +140,7 @@ export namespace ApplicationFactories {
 		 * Keep in mind that also authentication state will be restored.
 		 * Therefore, this is not suitable for user recovery!
 		 */
-		setupActions?: AnyAction[];
+		setupActions?: Action[];
 
 		/**
 		 * When set to false, computations of a new document will not be
@@ -170,8 +170,8 @@ export namespace ApplicationFactories {
 		/**
 		 * An alternative root reducer factory that is used instead of the built-in one.
 		 *
-		 * The factory gets the default Client root reducer, that includes {@link reducerMap} and
-		 * {@link dataReducers}.
+		 * The factory gets the default Client root reducer, that includes {@link Config.reducerMap} and
+		 * {@link Config.dataReducers}.
 		 */
 		readonly rootReducer?: (defaultReducer: Reducer<object>) => Reducer<object>;
 
@@ -199,7 +199,7 @@ export namespace ApplicationFactories {
 			 * if the preconditions of the reset are fulfilled -
 			 * e.g. all open activities were cancelled
 			 */
-			readonly resetConfirmed: AnyAction;
+			readonly resetConfirmed: Action;
 
 			/** Action which triggers the final reset of the store */
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -246,7 +246,6 @@ export namespace ApplicationFactories {
 		applicationResetTriggers,
 		customSagaMiddleware
 	}: Config): ApplicationSetup {
-		// @ts-expect-error https://github.com/redux-saga/redux-saga/issues/2705
 		const sagaMiddleware = customSagaMiddleware ?? createSagaMiddleware();
 
 		/*
@@ -372,10 +371,10 @@ function createRootReducer(
 	reducerMap: ReducerMap = {},
 	dataReducers: ActivityReducers.DataReducer[] = []
 ): Reducer<object> {
-	const moduleReducers = (state: object) =>
+	const moduleReducers = (activityMap: ActivityMap) =>
 		ModuleRegistryProvider.getInstance()
 			.getAllModules()
-			.flatMap(mod => mod.dataReducers?.(state) ?? []);
+			.flatMap(mod => mod.dataReducers?.(activityMap) ?? []);
 
 	return ModuleExtensions.createModulesReducer(
 		combineReducers({

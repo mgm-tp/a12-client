@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -40,14 +40,47 @@ import { shallowEqualize, shallowEqualizeWithoutArgs } from "../../store/interna
 import type { View } from "./view.js";
 
 /**
+ * @internal
+ *
+ * Rendering directive extending a "REGION_CLEAR"
+ * directive from the app-model
+ */
+export interface ClearDirective extends Omit<ApplicationModel.Directive.Clear, "region"> {
+	readonly region: ApplicationModel.Region.Reference;
+}
+
+/**
+ * @internal
+ *
+ * Rendering directive extending a "VIEW_ADD"
+ * directive from the app-model
+ */
+export interface AddDirective extends Omit<ApplicationModel.Directive.Add, "region"> {
+	readonly activityId: string;
+	readonly region: ApplicationModel.Region.Reference;
+}
+
+/**
+ * @internal
+ */
+export type RenderingDirective = AddDirective | ClearDirective;
+
+/**
+ * @internal
+ */
+export interface ViewDescriptor extends View {
+	readonly regionReference: ApplicationModel.Region.Reference;
+}
+
+/**
  * All views related selectors.
  */
-export namespace ViewSelectors {
+export const ViewSelectors = {
 	/**
 	 * Returns the scene reference by a given activity id based on the
 	 * activities present in the store.
 	 */
-	export function sceneReferenceByActivityId(
+	sceneReferenceByActivityId(
 		activityId: string
 	): Selector<ApplicationModel.SceneReference | undefined> {
 		return state => {
@@ -58,75 +91,24 @@ export namespace ViewSelectors {
 			const relevantActivities = [...ActivitySelectors.initiatingPath(activityId)(state), activity];
 			return InternalModelSelectors.sceneReferenceByActivities(relevantActivities)(state);
 		};
-	}
+	},
 
 	/**
 	 * Returns the ordered list of views based on the activities and model
 	 * configuration present in the store.
 	 */
-	export const region = shallowEqualize(regionInternal, rr => rr.join("/"));
-	function regionInternal(
-		regionReference: ApplicationModel.Region.Reference
-	): Selector<{ layout: ApplicationModel.Layout; views: View[] }> {
-		const selectRegion = ModelSelectors.region(regionReference);
-		const selectAllRegions = allRegions();
+	region: shallowEqualize(regionInternal, rr => rr.join("/"))
+};
 
-		return state => {
-			const currentRegion = selectRegion(state);
-			if (currentRegion === undefined) {
-				throw new Error(`region not found: [${regionReference.join("/")}]`);
-			}
-
-			let views: View[] = [];
-			let layout: ApplicationModel.Layout = currentRegion.layout;
-
-			const renderingDirectives = selectAllRegions(state);
-			for (const directive of [...renderingDirectives].reverse()) {
-				if (!ApplicationModel.Region.Reference.equal(regionReference, directive.region)) {
-					continue;
-				}
-
-				if (directive.type === "REGION_CLEAR") {
-					layout = directive.layout ?? layout;
-					break;
-				}
-
-				const activity = ActivitySelectors.activityById(directive.activityId)(state);
-				if (activity === undefined) {
-					continue;
-				}
-
-				views = [
-					{
-						name: directive.name,
-						modelDescriptors: directive.models,
-						constraints: directive.constraints,
-						configuration: directive.configuration,
-						activityId: activity.id
-					},
-					...views
-				];
-			}
-
-			return { layout, views };
-		};
-	}
-
+/** @internal */
+export const InternalViewSelectors = {
 	/**
-	 * @internal
-	 */
-	export interface ViewDescriptor extends View {
-		readonly regionReference: ApplicationModel.Region.Reference;
-	}
-
-	/**
-	 * @internal
 	 *
 	 * Returns the ordered list of {@link ViewDescriptor} based on the activities
 	 * and model configuration present in the store.
 	 */
-	export function allViews(): Selector<ViewDescriptor[]> {
-		const selectAllRegions = allRegions();
+	allViews(): Selector<ViewDescriptor[]> {
+		const selectAllRegions = InternalViewSelectors.allRegions();
 
 		return state => {
 			let views: ViewDescriptor[] = [];
@@ -152,169 +134,190 @@ export namespace ViewSelectors {
 
 			return views;
 		};
-	}
+	},
 
 	/**
-	 * @internal
 	 * Returns the ordered list of {@link RenderingDirective} based on the activities and model
 	 * configuration present in the store.
 	 */
-	export const allRegions = shallowEqualizeWithoutArgs(allRegionsInternal);
-	function allRegionsInternal(): Selector<RenderingDirective[]> {
-		return state => {
-			const defaultRegion = ModelSelectors.applicationModel()(state).content.defaultRegion;
+	allRegions: shallowEqualizeWithoutArgs(allRegionsInternal)
+};
 
-			/**
-			 * The basic functionality of the selector is as follows. All directives
-			 * of all activities will be processed from newest to oldest until all
-			 * activities are processed.
-			 * During the processing the relevant directives (based on
-			 * phase (onExit, onEnter)) will result in the creation of directive information.
-			 * Directive information can contain information about a view which is added to a region
-			 * or a region clear.
-			 * The selection of the directives based on a given activity is done by
-			 * finding
-			 * * the onEnter directives of an active case of the activity if given
-			 * * the onEnter directives of the matching model scene if given
-			 * * the onExit directives of the initiating activity of the given
-			 *   activity if given and if the remaining list of activities that has
-			 *   to be processed does not contain another activity with the same
-			 *   initiating activity id
-			 *
-			 * Note: onEnter is always relevant. onExit is only relevant on creation
-			 *       of the first child activity.
-			 *
-			 * TODO: It is no necessary anymore to start at the end of the list, because we do not stop
-			 * when having a clear.
-			 */
-			let renderingDirectives: RenderingDirective[] = [];
-			const workList = ActivityMap.toOrderedList(ActivitySelectors.activities()(state));
-			while (workList.length > 0) {
-				const activity = workList.pop();
-				if (activity === undefined) {
-					continue;
+function regionInternal(
+	regionReference: ApplicationModel.Region.Reference
+): Selector<{ layout: ApplicationModel.Layout; views: View[] }> {
+	const selectRegion = ModelSelectors.region(regionReference);
+	const selectAllRegions = InternalViewSelectors.allRegions();
+
+	return state => {
+		const currentRegion = selectRegion(state);
+		if (currentRegion === undefined) {
+			throw new Error(`region not found: [${regionReference.join("/")}]`);
+		}
+
+		let views: View[] = [];
+		let layout: ApplicationModel.Layout = currentRegion.layout;
+
+		const renderingDirectives = selectAllRegions(state);
+		for (const directive of [...renderingDirectives].reverse()) {
+			if (!ApplicationModel.Region.Reference.equal(regionReference, directive.region)) {
+				continue;
+			}
+
+			if (directive.type === "REGION_CLEAR") {
+				layout = directive.layout ?? layout;
+				break;
+			}
+
+			const activity = ActivitySelectors.activityById(directive.activityId)(state);
+			if (activity === undefined) {
+				continue;
+			}
+
+			views = [
+				{
+					name: directive.name,
+					modelDescriptors: directive.models,
+					constraints: directive.constraints,
+					configuration: directive.configuration,
+					activityId: activity.id
+				},
+				...views
+			];
+		}
+
+		return { layout, views };
+	};
+}
+
+function allRegionsInternal(): Selector<RenderingDirective[]> {
+	return state => {
+		const defaultRegion = ModelSelectors.applicationModel()(state).content.defaultRegion;
+
+		/**
+		 * The basic functionality of the selector is as follows. All directives
+		 * of all activities will be processed from newest to oldest until all
+		 * activities are processed.
+		 * During the processing the relevant directives (based on
+		 * phase (onExit, onEnter)) will result in the creation of directive information.
+		 * Directive information can contain information about a view which is added to a region
+		 * or a region clear.
+		 * The selection of the directives based on a given activity is done by
+		 * finding
+		 * * the onEnter directives of an active case of the activity if given
+		 * * the onEnter directives of the matching model scene if given
+		 * * the onExit directives of the initiating activity of the given
+		 *   activity if given and if the remaining list of activities that has
+		 *   to be processed does not contain another activity with the same
+		 *   initiating activity id
+		 *
+		 * Note: onEnter is always relevant. onExit is only relevant on creation
+		 *       of the first child activity.
+		 *
+		 * TODO: It is no necessary anymore to start at the end of the list, because we do not stop
+		 * when having a clear.
+		 */
+		let renderingDirectives: RenderingDirective[] = [];
+		const workList = ActivityMap.toOrderedList(ActivitySelectors.activities()(state));
+		while (workList.length > 0) {
+			const activity = workList.pop();
+			if (activity === undefined) {
+				continue;
+			}
+
+			const relevantActivities = [
+				...ActivitySelectors.initiatingPath(activity.id)(state),
+				activity
+			];
+			const sceneReference =
+				InternalModelSelectors.sceneReferenceByActivities(relevantActivities)(state);
+
+			if (sceneReference !== undefined) {
+				const scene = InternalModelSelectors.sceneByReference(sceneReference)(state);
+				let caze: ApplicationModel.Case | undefined;
+
+				if (activity.case !== undefined) {
+					caze = InternalModelSelectors.caze(activity.case)(scene);
 				}
 
-				const relevantActivities = [
-					...ActivitySelectors.initiatingPath(activity.id)(state),
-					activity
-				];
-				const sceneReference =
-					InternalModelSelectors.sceneReferenceByActivities(relevantActivities)(state);
-
-				if (sceneReference !== undefined) {
-					const scene = InternalModelSelectors.sceneByReference(sceneReference)(state);
-					let caze: ApplicationModel.Case | undefined;
-
-					if (activity.case !== undefined) {
-						caze = InternalModelSelectors.caze(activity.case)(scene);
-					}
-
-					if (caze === undefined && scene.defaultCase !== undefined) {
-						caze = InternalModelSelectors.caze(scene.defaultCase)(scene);
-					}
-
-					if (
-						caze !== undefined &&
-						caze.sceneChange !== undefined &&
-						caze.sceneChange.onEnter !== undefined
-					) {
-						// Add all views that are created by onEnter of the view of the activity
-						renderingDirectives = [
-							...normalizeDirectives(caze.sceneChange.onEnter, activity.id, defaultRegion),
-							...renderingDirectives
-						];
-					}
-
-					if (scene.sceneChange !== undefined && scene.sceneChange.onEnter !== undefined) {
-						// Add all views that are created by onEnter of the scene of the activity
-						renderingDirectives = [
-							...normalizeDirectives(scene.sceneChange.onEnter, activity.id, defaultRegion),
-							...renderingDirectives
-						];
-					}
+				if (caze === undefined && scene.defaultCase !== undefined) {
+					caze = InternalModelSelectors.caze(scene.defaultCase)(scene);
 				}
 
-				const initiatingActivity = relevantActivities[relevantActivities.length - 2];
-				// Fast exit
-				if (initiatingActivity === undefined) {
-					continue;
-				}
-
-				// onExit will be only added the first time it applies. Therefore, do
-				// not add onExit if there is still an activity in the workList with
-				// the same initiatingActivityId.
-				if (workList.some(a => a.initiatingActivityId === initiatingActivity.id)) {
-					continue;
-				}
-
-				const initiatingSceneReference = InternalModelSelectors.sceneReferenceByActivities(
-					relevantActivities.slice(0, relevantActivities.length - 1)
-				)(state);
-
-				if (initiatingSceneReference === undefined) {
-					continue;
-				}
-
-				const initiatingScene =
-					InternalModelSelectors.sceneByReference(initiatingSceneReference)(state);
 				if (
-					initiatingScene.sceneChange !== undefined &&
-					initiatingScene.sceneChange.onExit !== undefined
+					caze !== undefined &&
+					caze.sceneChange !== undefined &&
+					caze.sceneChange.onEnter !== undefined
 				) {
-					// Add all views that are created by onExit of the initiating activity
+					// Add all views that are created by onEnter of the view of the activity
 					renderingDirectives = [
-						...normalizeDirectives(initiatingScene.sceneChange.onExit, activity.id, defaultRegion),
+						...normalizeDirectives(caze.sceneChange.onEnter, activity.id, defaultRegion),
+						...renderingDirectives
+					];
+				}
+
+				if (scene.sceneChange !== undefined && scene.sceneChange.onEnter !== undefined) {
+					// Add all views that are created by onEnter of the scene of the activity
+					renderingDirectives = [
+						...normalizeDirectives(scene.sceneChange.onEnter, activity.id, defaultRegion),
 						...renderingDirectives
 					];
 				}
 			}
-			return renderingDirectives;
-		};
-	}
 
-	/**
-	 * @internal
-	 *
-	 * Rendering directive extending a "VIEW_ADD"
-	 * directive from the app-model
-	 */
-	export interface AddDirective extends Omit<ApplicationModel.Directive.Add, "region"> {
-		readonly activityId: string;
-		readonly region: ApplicationModel.Region.Reference;
-	}
+			const initiatingActivity = relevantActivities[relevantActivities.length - 2];
+			// Fast exit
+			if (initiatingActivity === undefined) {
+				continue;
+			}
 
-	/**
-	 * @internal
-	 *
-	 * Rendering directive extending a "REGION_CLEAR"
-	 * directive from the app-model
-	 */
-	export interface ClearDirective extends Omit<ApplicationModel.Directive.Clear, "region"> {
-		readonly region: ApplicationModel.Region.Reference;
-	}
+			// onExit will be only added the first time it applies. Therefore, do
+			// not add onExit if there is still an activity in the workList with
+			// the same initiatingActivityId.
+			if (workList.some(a => a.initiatingActivityId === initiatingActivity.id)) {
+				continue;
+			}
 
-	/**
-	 * @internal
-	 */
-	export type RenderingDirective = AddDirective | ClearDirective;
+			const initiatingSceneReference = InternalModelSelectors.sceneReferenceByActivities(
+				relevantActivities.slice(0, relevantActivities.length - 1)
+			)(state);
 
-	function normalizeDirectives(
-		directives: ReadonlyArray<ApplicationModel.Directive>,
-		activityId: string,
-		defaultRegion: ApplicationModel.Region.Reference
-	): ReadonlyArray<RenderingDirective> {
-		return directives.map(directive => {
-			return directive.type === "VIEW_ADD"
-				? {
-						...directive,
-						activityId,
-						region: directive.region ? directive.region : defaultRegion
-					}
-				: {
-						...directive,
-						region: directive.region ? directive.region : defaultRegion
-					};
-		});
-	}
+			if (initiatingSceneReference === undefined) {
+				continue;
+			}
+
+			const initiatingScene =
+				InternalModelSelectors.sceneByReference(initiatingSceneReference)(state);
+			if (
+				initiatingScene.sceneChange !== undefined &&
+				initiatingScene.sceneChange.onExit !== undefined
+			) {
+				// Add all views that are created by onExit of the initiating activity
+				renderingDirectives = [
+					...normalizeDirectives(initiatingScene.sceneChange.onExit, activity.id, defaultRegion),
+					...renderingDirectives
+				];
+			}
+		}
+		return renderingDirectives;
+	};
+}
+
+function normalizeDirectives(
+	directives: ReadonlyArray<ApplicationModel.Directive>,
+	activityId: string,
+	defaultRegion: ApplicationModel.Region.Reference
+): ReadonlyArray<RenderingDirective> {
+	return directives.map(directive => {
+		return directive.type === "VIEW_ADD"
+			? {
+					...directive,
+					activityId,
+					region: directive.region ? directive.region : defaultRegion
+				}
+			: {
+					...directive,
+					region: directive.region ? directive.region : defaultRegion
+				};
+	});
 }

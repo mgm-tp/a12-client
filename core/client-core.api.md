@@ -4,76 +4,75 @@
 
 ```ts
 
-import type { Action } from 'typescript-fsa';
+import type { Action } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
 import type { Action as Action_2 } from 'redux';
-import type { ActionContentboxProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.api.js';
-import { ActionCreator } from 'typescript-fsa';
-import type { AnyAction } from 'typescript-fsa';
-import { AnyAction as AnyAction_2 } from 'redux';
-import type { ApplicationFrameProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/layout/application-frame/main/application-frame.api.js';
-import type { ApplicationHeaderProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/application-header/main/application-header.api.js';
-import { AsyncActionCreators } from 'typescript-fsa';
-import type { ButtonGroupProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.api.js';
-import type { ButtonProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.api.js';
+import { ActionContentboxProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ActionCreator } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
+import { ApplicationFrameProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ApplicationHeaderProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { AsyncActionCreators } from '@com.mgmtp.a12.client/typescript-fsa-redux-5-compat';
+import { ButtonGroupProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ButtonProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { ComponentType } from 'react';
-import type { Container } from '@com.mgmtp.a12.widgets/widgets-core/lib/common/main/base-props.js';
-import type { ContentBoxProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.api.js';
+import type { Container } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ContentBoxProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { Context } from 'react';
 import type { CSSProperties } from 'react';
 import type { Dispatch } from 'redux';
-import type { DocumentModel } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
+import type { DocumentModel } from '@com.mgmtp.a12.kernel/kernel-md-facade';
 import { flow } from 'fp-ts/lib/function.js';
-import type { FlyoutMenuProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/menu/main/flyout-menu.api.js';
-import type { Header } from '@com.mgmtp.a12.base/base-model-api/lib/main/header/index.js';
-import type { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.api.js';
-import type { IconProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.api.js';
-import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
+import { FlyoutMenuProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import type { Header } from '@com.mgmtp.a12.base/base-model-api';
+import { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { IconProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade';
 import { JSX } from 'react/jsx-runtime';
 import { JSX as JSX_2 } from 'react';
-import type { LabelProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/input/base/template/base.tpl.api.js';
-import type { LayoutGridProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.api.js';
-import type { ListItemProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.api.js';
-import type { ListProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.api.js';
-import { Locale } from '@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Locale.js';
-import type { Locale as Locale_2 } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
-import type { Localizable } from '@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Localizable.js';
-import type { Localizable as Localizable_2 } from '@com.mgmtp.a12.utils/utils-localization/lib/main/index.js';
-import type { LocalizedModelText } from '@com.mgmtp.a12.utils/utils-localization/lib/main/localization/LocalizedModelText.js';
-import type { Localizer } from '@com.mgmtp.a12.utils/utils-localization/lib/main/localization/Localizer.js';
-import type { MasterDetailProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/layout/master-detail/main/master-detail.api.js';
+import { LabelProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { LayoutGridProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ListItemProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ListProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { Locale } from '@com.mgmtp.a12.utils/utils-localization';
+import type { Localizable } from '@com.mgmtp.a12.utils/utils-localization';
+import type { LocalizedModelText } from '@com.mgmtp.a12.utils/utils-localization';
+import type { Localizer } from '@com.mgmtp.a12.utils/utils-localization';
+import { MasterDetailProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { MemoExoticComponent } from 'react';
-import type { Middleware } from 'redux';
+import { Middleware } from 'redux';
 import type { MiddlewareAPI } from 'redux';
-import type { ModalNotificationProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/modal-notification/main/modal-notification.api.js';
-import type { ModalOverlayProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/modal-overlay/main/modal-overlay.api.js';
-import { Model as Model_2 } from '@com.mgmtp.a12.base/base-model-api/lib/main/model/index.js';
-import type { ModelGraph } from '@com.mgmtp.a12.dataservices/dataservices-access/lib/Relationship/ModelGraph.js';
-import type { PopUpMenuProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/pop-up-menu/main/pop-up-menu.api.js';
-import type { ProgressIndicatorProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/progress-indicator/main/progress-indicator.api.js';
+import { ModalNotificationProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ModalOverlayProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { Model as Model_2 } from '@com.mgmtp.a12.base/base-model-api';
+import type { ModelGraph } from '@com.mgmtp.a12.dataservices/dataservices-access';
+import { PopUpMenuProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ProgressIndicatorProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import type { PropsWithChildren } from 'react';
 import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import type { Reducer } from 'redux';
 import type { RefObject } from 'react';
-import type { SagaGenerator } from 'typed-redux-saga';
-import type { SagaIterator } from 'redux-saga';
+import { SagaGenerator } from 'typed-redux-saga';
 import type { SagaMiddleware } from 'redux-saga';
-import type { SelectProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/input/select/main/select.api.js';
-import type { SizeDetectorProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/layout/size-detector/main/size-detector.api.js';
-import type { SlidingMenuProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/menu/main/sliding-menu.api.js';
+import { SelectProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { SizeDetectorProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { SlidingMenuProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import type { Store } from 'redux';
 import type { StoreEnhancer } from 'redux';
-import type { TextOutputProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/text-output/main/text-output.api.js';
-import type { ToastGroupProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/toast/main/toast-group.api.js';
-import type { ToastProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/toast/main/toast/toast.api.js';
-import type { TreeContainerProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/tree/main/tpl/tree.tpl.api.js';
-import type { TreeNodeProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/tree/main/tpl/tree.tpl.api.js';
+import { TextOutputProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ToastGroupProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { ToastProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { TreeContainerProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { TreeNodeProps } from '@com.mgmtp.a12.widgets/widgets-core';
+import { UnknownAction } from 'redux';
 
 // Warning: (ae-forgotten-export) The symbol "ClientConfig" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export interface A12ApplicationConfig<C extends BaseConfig = BaseConfig> extends ClientConfig<C> {
 }
+
+// @public
+export function actionSanitizer<A extends Action_2>(a: A): A;
 
 // @public
 export interface Activity {
@@ -356,20 +355,19 @@ export interface ActivityMap {
 }
 
 // @public (undocumented)
-export namespace ActivityMap {
-    export function applyActivityChange(activities: ActivityMap, activityId: string, change: (activity: Activity) => Activity | undefined): ActivityMap;
-    // (undocumented)
-    export function isInstance(obj: unknown): obj is ActivityMap;
-    export function toList(activities: ActivityMap): Activity[];
-    export function toOrderedList(activities: ActivityMap): Activity[];
-}
+export const ActivityMap: {
+    applyActivityChange(activities: ActivityMap, activityId: string, change: (activity: Activity) => Activity | undefined): ActivityMap;
+    isInstance(obj: unknown): obj is ActivityMap;
+    toList(activities: ActivityMap): Activity[];
+    toOrderedList(activities: ActivityMap): Activity[];
+};
 
 // @public
 export namespace ActivityReducers {
     // (undocumented)
     export interface Config {
         readonly dataReducers?: ReadonlyArray<DataReducer>;
-        moduleReducers?(state: object): ReadonlyArray<DataReducer>;
+        moduleReducers?(activityMap: ActivityMap): ReadonlyArray<DataReducer>;
     }
     export function createActivityReducers(input?: Config): Reducer;
     export interface DataReducer {
@@ -378,37 +376,38 @@ export namespace ActivityReducers {
 }
 
 // @public (undocumented)
-export namespace ActivitySagas {
-    export function acquireActivityLock(activityId: string, owner: string, details: object): SagaIterator<string | undefined>;
-    export function waitForResponseCancelConfirmation(activityId: string): SagaIterator<boolean>;
-    export function waitForResponseCancelRequested(): SagaIterator<boolean>;
-}
+export const ActivitySagas: {
+    acquireActivityLock(activityId: string, owner: string, details: object): SagaGenerator<string | undefined>;
+    waitForResponseCancelConfirmation(activityId: string): SagaGenerator<boolean>;
+    waitForResponseCancelRequested(): SagaGenerator<boolean>;
+};
 
 // @public
-export namespace ActivitySelectors {
-    export function activities(): Selector<ActivityMap>;
-    export function activitiesByDescriptor(descriptor: Activity.Descriptor): Selector<Activity[]>;
-    export function activitiesByMatchCondition(matches: DynamicMatchCondition): Selector<Activity[]>;
-    export function activityByCancelConfirmationRequired(): Selector<Activity | undefined>;
-    export function activityById(activityId: string): Selector<Activity | undefined>;
-    export function activityPropById<T>(activityId: string, lens: (activity: Activity) => T): Selector<T | undefined>;
-    export function allDirtyOrLockedActivities(activity?: Activity): Selector<Activity[]>;
-    export function busy(activityId: string): Selector<boolean | undefined>;
-    export function childActivityByInstanceId(parentActivity: Activity, instance: string): Selector<Activity | undefined>;
-    export function childActivityWithInstance(parentActivityId: string): Selector<Activity | undefined>;
-    export function data(activityId: string): Selector<object | undefined>;
-    export function dataHolderByDescriptor(activityId: string, descriptor: Activity.DataHolderDescriptor): Selector<Activity.DataHolder | undefined>;
-    export function datasourceActivityId(activityId: string): Selector<string | undefined>;
-    export function dirty(activityId: string): Selector<boolean>;
-    export function error(activityId: string): Selector<Activity.Error | undefined>;
-    export function initiatingPath(activityId: string): Selector<Activity[]>;
-    export function latestActivity(): Selector<Activity | undefined>;
-    export function loadingState(activity: Activity): Activity.LoadingState.Details;
-    export function loadingStateById(activityId: string): Selector<Activity.LoadingState>;
-    export function savingState(activity: Activity): Activity.SavingState.Details;
-    export function savingStateById(activityId: string): Selector<Activity.SavingState>;
-    export function topLevelActivities(): Selector<ActivityMap>;
-}
+export const ActivitySelectors: {
+    activities(): Selector<ActivityMap>;
+    activitiesByDescriptor(descriptor: Activity.Descriptor): Selector<Activity[]>;
+    activitiesByMatchCondition(matches: DynamicMatchCondition): Selector<Activity[]>;
+    activityById(activityId: string): Selector<Activity | undefined>;
+    initiatingPath(activityId: string): Selector<Activity[]>;
+    childActivityWithInstance(parentActivityId: string): Selector<Activity | undefined>;
+    childActivityByInstanceId(parentActivity: Activity, instance: string): Selector<Activity | undefined>;
+    latestActivity(): Selector<Activity | undefined>;
+    loadingState(activity: Activity): Activity.LoadingState.Details;
+    savingState(activity: Activity): Activity.SavingState.Details;
+    data(activityId: string): Selector<object | undefined>;
+    dirty(activityId: string): Selector<boolean>;
+    busy(activityId: string): Selector<boolean | undefined>;
+    error(activityId: string): Selector<Activity.Error | undefined>;
+    datasourceActivityId(activityId: string): Selector<string | undefined>;
+    topLevelActivities(): Selector<ActivityMap>;
+    allDirtyOrLockedActivities(activity?: Activity): Selector<Activity[]>;
+    allDirtyActivities(activity?: Activity): Selector<Activity[]>;
+    activityByCancelConfirmationRequired(): Selector<Activity | undefined>;
+    dataHolderByDescriptor(activityId: string, descriptor: Activity.DataHolderDescriptor): Selector<Activity.DataHolder | undefined>;
+    loadingStateById(activityId: string): Selector<Activity.LoadingState>;
+    savingStateById(activityId: string): Selector<Activity.SavingState>;
+    activityPropById<T>(activityId: string, lens: (activity: Activity) => T): Selector<T | undefined>;
+};
 
 // @public
 export const addAdditionalMiddlewares: <T extends A12ApplicationConfig>(...middlewares: NonNullable<ApplicationFactories.Config["additionalMiddlewares"]>) => (s: T) => T;
@@ -430,6 +429,15 @@ export const addDataReducers: <T extends A12ApplicationConfig>(...dataReducers: 
 
 // @public (undocumented)
 export const addDeepLinkingSagas: <T extends ApplicationWithDeepLinkingConfig>(cfg: T) => T;
+
+// @public (undocumented)
+export const addDirtyConfirmationOnLeave: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => T;
+
+// @public (undocumented)
+export const addDirtyHandlingSagas: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => T;
+
+// @public
+export const addDirtyHandlingWrapper: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => T;
 
 // @public
 export const addErrorBoundary: <T extends A12ApplicationConfig>(regionReference: ApplicationModel.Region.Reference, viewName: string, errorBoundary: ComponentType<View.ErrorBoundaryProvider.PropsType>) => (s: T) => T;
@@ -453,7 +461,7 @@ export const addModelProcessors: <T extends ApplicationWithModelLoaderConfig>(..
 
 // Warning: (ae-forgotten-export) The symbol "ApplicationWithNotificationConfig" needs to be exported by the entry point index.d.ts
 //
-// @public (undocumented)
+// @public
 export const addNotificationFrame: <T extends ApplicationWithNotificationConfig>(cfg: T) => T;
 
 // @public
@@ -492,7 +500,7 @@ export const APPLICATION_MODEL_PLACEHOLDER: ApplicationModel;
 export namespace ApplicationActions {
     // (undocumented)
     export interface StartMainActivityRequestedPayload extends ApplicationModel.InitialActivity {
-        readonly action?: AnyAction;
+        readonly action?: Action_2;
     }
     const startMainActivityRequested: ActionCreator<StartMainActivityRequestedPayload>;
     const setBusy: ActionCreator<boolean>;
@@ -513,15 +521,15 @@ export namespace ApplicationFactories {
         };
         readonly applicationResetTriggers?: {
             readonly resetRequested: ActionCreator<any>[];
-            readonly resetConfirmed: AnyAction_2;
+            readonly resetConfirmed: Action_2;
             readonly reset: ActionCreator<any>[];
         };
         composeEnhancer?: ComposeEnhancer;
         readonly customSagaMiddleware?: SagaMiddleware;
-        customSagas?: (() => SagaIterator<void>)[];
+        customSagas?: (() => SagaGenerator<void>)[];
         dataHandlers?: DataHandler[];
         readonly dataReducers?: ActivityReducers.DataReducer[];
-        dispatchSaga?(descriptors: ApplicationSaga.Descriptor[]): SagaIterator<void>;
+        dispatchSaga?(descriptors: ApplicationSaga.Descriptor[]): SagaGenerator<void>;
         readonly locale?: Locale;
         model: ApplicationModel;
         modelLoader: ModelLoader;
@@ -529,7 +537,7 @@ export namespace ApplicationFactories {
         preComputeNewDocuments?: boolean;
         readonly reducerMap?: ReducerMap;
         readonly rootReducer?: (defaultReducer: Reducer<object>) => Reducer<object>;
-        setupActions?: AnyAction_2[];
+        setupActions?: Action_2[];
     }
     export function createApplicationSetup(input: Config): ApplicationSetup;
 }
@@ -561,11 +569,6 @@ export interface ApplicationFrameLayoutPropsNG extends LayoutPropsNG {
     readonly subExpanded?: boolean;
     readonly subExpandedState?: "maximized" | "minimized";
     readonly title?: ReactNode;
-    // @deprecated (undocumented)
-    readonly widgetMap?: {
-        readonly mainMenuButtonComponent?: ComponentType<ButtonProps>;
-        readonly applicationFrame?: ComponentType<ApplicationFrameProps>;
-    };
 }
 
 // @public
@@ -659,6 +662,8 @@ export namespace ApplicationModel {
         readonly descriptor: Activity.Descriptor;
         readonly withoutData?: boolean;
     }
+    // (undocumented)
+    export function isApplicationModelContent(value: unknown): value is ApplicationConfiguration;
     // (undocumented)
     export function isInstance(value: unknown): value is ApplicationModel;
     export interface Layout {
@@ -775,13 +780,13 @@ export namespace ApplicationModel {
 }
 
 // @public
-export namespace ApplicationReducers {
-    const application: Reducer;
-}
+export const ApplicationReducers: {
+    application: Reducer;
+};
 
 // @public (undocumented)
 export interface ApplicationSaga {
-    watchDispatchSaga(sagas: ApplicationSaga.Descriptor[]): SagaIterator<void>;
+    watchDispatchSaga(sagas: ApplicationSaga.Descriptor[]): SagaGenerator<void>;
 }
 
 // @public
@@ -791,15 +796,15 @@ export namespace ApplicationSaga {
         readonly preComputeNewDocuments?: boolean;
     }
     export interface Descriptor {
-        canHandle(ad: Activity.Descriptor, action: AnyAction_2): boolean;
-        handle(action: AnyAction_2): SagaIterator<void>;
+        canHandle(ad: Activity.Descriptor, action: Action_2): boolean;
+        handle(action: Action_2): SagaGenerator<void>;
     }
 }
 
 // @public (undocumented)
-export namespace ApplicationSelectors {
-    export function busy(): Selector<boolean>;
-}
+export const ApplicationSelectors: {
+    busy(): Selector<boolean>;
+};
 
 // @public
 export interface ApplicationSetup {
@@ -945,7 +950,7 @@ type Configuration = DeepLinkingSagas.Configuration;
 
 // @public
 export function createA12ApplicationSetup(appConfig: A12ApplicationConfig<ApplicationFactories.Config>): {
-    store: Store<object, AnyAction_2>;
+    store: Store<object, UnknownAction, unknown>;
     initialActions: () => Promise<void>;
     Component: JSX.Element;
 };
@@ -960,10 +965,10 @@ export function createHttpModelLoader(input?: HttpModelLoaderOptions): ModelLoad
 export function createPlatformServerModelLoader(input?: PlatformServerModelLoaderOptions): ModelLoader;
 
 // @public
-function createSagas(config?: Configuration): (() => SagaIterator<void>)[];
+function createSagas(config?: Configuration): (() => SagaGenerator<void>)[];
 
 // @public
-function createWelcomePageSaga(config?: Configuration): () => SagaIterator<void>;
+function createWelcomePageSaga(config?: Configuration): () => SagaGenerator<void>;
 
 // @public
 export interface CurrentActivityLocationManager {
@@ -972,8 +977,6 @@ export interface CurrentActivityLocationManager {
     setDeepLink(deepLink: string): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DashboardLayoutComponentPropsNG" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsNG): JSX_2.Element | null;
 
@@ -981,6 +984,12 @@ export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsN
 export namespace DashboardLayoutComponentNG {
     var // (undocumented)
     whyDidYouRender: boolean;
+}
+
+// @public (undocumented)
+export interface DashboardLayoutComponentPropsNG extends LayoutPropsNG {
+    // (undocumented)
+    readonly rows: ApplicationModel.Dashboard.Row[];
 }
 
 // @public
@@ -1029,7 +1038,7 @@ export namespace DataLoader {
 export interface DataProvider {
     canHandle(config: DataProvider.CanHandleConfig): boolean;
     readonly name: string;
-    provideData(config: DataProvider.ProvideDataConfig): SagaIterator<void>;
+    provideData(config: DataProvider.ProvideDataConfig): SagaGenerator<void>;
 }
 
 // @public
@@ -1104,14 +1113,14 @@ export const DIRTY_HANDLING_RESOURCE_KEYS: {
 };
 
 // @public (undocumented)
-export namespace DirtyHandlingFactories {
-    export function createSagas(): ApplicationSaga.Descriptor[];
-}
+export const DirtyHandlingFactories: {
+    createSagas(): ApplicationSaga.Descriptor[];
+};
 
 // @public
-export namespace DirtyHandlingViews {
-    const VetoDialog: ComponentType<VetoDialogProps>;
-}
+export const DirtyHandlingViews: {
+    VetoDialog: ComponentType<VetoDialogProps>;
+};
 
 // @public
 export const documentModelProcessor: ModelProcessor;
@@ -1120,7 +1129,6 @@ export const documentModelProcessor: ModelProcessor;
 //
 // @public (undocumented)
 export interface DynamicAddView extends BaseDirective {
-    // Warning: (ae-forgotten-export) The symbol "ViewNGComponent" needs to be exported by the entry point index.d.ts
     readonly component: ViewNGComponent;
     readonly constraints?: object;
     readonly models?: Model.Descriptor[];
@@ -1257,13 +1265,13 @@ export const FRAME_RESOURCE_KEYS: {
 };
 
 // @public
-export namespace FrameFactories {
-    export function createProgressComponentProvider(): View.ProgressComponentProvider;
-    const layoutProvider: (name: string) => Layout;
-    export function errorBoundaryProvider(): ComponentType<View.ErrorBoundaryProvider.PropsType>;
-    export function regionUiProvider(regionRef: ApplicationModel.Region.Reference): ComponentType<RegionUiProps>;
-    export function viewProvider(componentName: string): ComponentType<View>;
-}
+export const FrameFactories: {
+    regionUiProvider(regionRef: ApplicationModel.Region.Reference): ComponentType<RegionUiProps>;
+    layoutProvider: (name: string) => Layout;
+    viewProvider(componentName: string): View.ViewComponent | undefined;
+    createProgressComponentProvider(): View.ProgressComponentProvider;
+    errorBoundaryProvider(): ComponentType<View.ErrorBoundaryProvider.PropsType>;
+};
 
 // @public (undocumented)
 export namespace FrameViews {
@@ -1284,16 +1292,12 @@ export namespace FrameViews {
     export type MainMenuProps = MainMenuProps;
     const ApplicationFrameLayout: ComponentType<ApplicationFrameLayoutProps>;
     const SidebarContext: Context<SidebarContextProps | undefined>;
-    // Warning: (ae-forgotten-export) The symbol "MasterDetailLayoutProps" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    export type MasterDetailLayoutProps = MasterDetailLayoutProps;
-    const // (undocumented)
-    MainMenuContext: Context<MainMenuContextProps | undefined>;
     // Warning: (ae-forgotten-export) The symbol "NavigationBarTitleProps" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
     export type NavigationBarTitleProps = NavigationBarTitleProps;
+    const // (undocumented)
+    MainMenuContext: Context<MainMenuContextProps | undefined>;
     // Warning: (ae-forgotten-export) The symbol "InternalLayoutProps" needs to be exported by the entry point index.d.ts
     export type ProviderProps = InternalLayoutProps.ProvidersProps;
     export type RegionUiProps = InternalLayoutProps.RegionUiProps;
@@ -1302,7 +1306,7 @@ export namespace FrameViews {
     //
     // (undocumented)
     export type SidebarContextProps = SidebarContextProps;
-    const MasterDetailRegionLayout: ComponentType<MasterDetailLayoutProps>;
+    const MasterDetailRegionLayout: ComponentType<LayoutProps>;
 }
 
 // @public (undocumented)
@@ -1423,61 +1427,51 @@ export const LOCALE_SELECT_RESOURCE_KEYS: {
 };
 
 // @public
-export namespace LocaleActions {
-    const set: ActionCreator<Locale>;
-}
-
-// @public
-export const LocaleLenses: {
-    locale: Lens<object, Locale_2>;
+export const LocaleActions: {
+    set: ActionCreator<Locale>;
 };
 
 // @public
-export namespace LocaleReducers {
-    const locale: Reducer;
-}
+export const LocaleLenses: {
+    locale: Lens<object, Locale>;
+};
 
-// Warning: (ae-forgotten-export) The symbol "LocaleSelectProps" needs to be exported by the entry point index.d.ts
-//
+// @public
+export const LocaleReducers: {
+    locale: Reducer;
+};
+
 // @public
 export function LocaleSelect(props: LocaleSelectProps): JSX_2.Element;
 
 // @public
-export namespace LocaleSelectors {
-    export function locale(): Selector<Locale>;
+export const LocaleSelectors: {
+    locale(): Selector<Locale>;
+};
+
+// @public (undocumented)
+export interface LocaleSelectProps {
+    // (undocumented)
+    readonly hideLabel?: boolean;
+    // (undocumented)
+    readonly locales: Locale[];
 }
 
 // @public (undocumented)
 export type LocalizedLocale = Locale & {
-    name?: Localizable_2;
+    name?: Localizable;
 };
 
 // @public
-export interface MasterDetailLayoutPropsNG extends LayoutPropsNG {
-    // @deprecated (undocumented)
-    readonly widgetMap?: {
-        readonly masterDetail: ComponentType<MasterDetailProps>;
-    };
-}
+export const MasterDetailRegionLayoutNG: LayoutNG<LayoutPropsNG>;
 
 // @public
-export const MasterDetailRegionLayoutNG: LayoutNG<MasterDetailLayoutPropsNG>;
-
-// @public
-export function ModalRegionUiNG(props: ModalRegionUiNGProps): JSX_2.Element | null;
+export function ModalRegionUiNG(props: RegionUiPropsNG): JSX_2.Element | null;
 
 // @public (undocumented)
 export namespace ModalRegionUiNG {
     var // (undocumented)
     whyDidYouRender: boolean;
-}
-
-// @public (undocumented)
-export interface ModalRegionUiNGProps extends RegionUiPropsNG {
-    // @deprecated (undocumented)
-    readonly widgetMap?: {
-        readonly ModalOverlay?: ComponentType<ModalOverlayProps>;
-    };
 }
 
 // @public (undocumented)
@@ -1596,9 +1590,9 @@ export interface ModelProcessor {
 }
 
 // @public (undocumented)
-export namespace ModelReducers {
-    const models: Reducer;
-}
+export const ModelReducers: {
+    models: Reducer;
+};
 
 // @public (undocumented)
 export namespace ModelResult {
@@ -1634,10 +1628,9 @@ export namespace ModelResult {
 }
 
 // @public (undocumented)
-export namespace ModelSagas {
-    // (undocumented)
-    export function waitForModelsLoaded(activityId: string): SagaGenerator<Model_2[]>;
-}
+export const ModelSagas: {
+    waitForModelsLoaded: (activityId: string) => SagaGenerator<Model_2[]>;
+};
 
 // @public (undocumented)
 export interface ModelSearchDescriptor {
@@ -1650,27 +1643,24 @@ export interface ModelSearchDescriptor {
 }
 
 // @public
-export namespace ModelSelectors {
-    export function allLoadedModelsInScene(activityId: string): Selector<(Model_2 | Model.Error)[] | undefined>;
-    export function allModelErrorsInScene(activityId: string): Selector<Model.Error[]>;
-    export function allModelsInScene(activityId: string): Selector<Model_2[]>;
-    export function applicationModel(): Selector<ApplicationModel>;
-    export function modelByName<T extends Model_2 = Model_2>(modelName: string, typeGuard?: ModelTypeGuard<T>): Selector<T | undefined>;
-    // (undocumented)
-    export function modelDescriptorsByActivityId(activityId: string): Selector<Model.Descriptor[]>;
-    export function modelErrorByName(modelName: string): Selector<Model.Error | undefined>;
-    export function modelErrorInScene(input: ModelSearchDescriptor): Selector<Model.Error | undefined>;
-    export function modelGraph(): Selector<ModelGraph>;
-    export function modelInScene<T extends Model_2>(input: ModelSearchDescriptor, typeGuard?: ModelTypeGuard<T>): Selector<T | undefined>;
-    export function modelLoaded<T extends Model_2>(identifier: string, typeGuard?: ModelTypeGuard<T>): Selector<ModelResult.ModelLoaded<T>>;
-    // (undocumented)
-    export function models(): Selector<ModelMap>;
-    // (undocumented)
-    export function modelsLoaded(descriptors: readonly Model.Descriptor[]): Selector<ModelResult.ModelsLoaded>;
-    export function referencedModelsInScene(activityId: string): Selector<ReferencedModel.Instance[]>;
-    export function region(regionReference: ApplicationModel.Region.Reference): Selector<ApplicationModel.Region | undefined>;
-    export function subRegionRefs(regionReference: ApplicationModel.Region.Reference): Selector<ApplicationModel.Region.Reference[]>;
-}
+export const ModelSelectors: {
+    applicationModel(): Selector<ApplicationModel>;
+    modelGraph(): Selector<ModelGraph>;
+    models(): Selector<ModelMap>;
+    modelsLoaded(descriptors: readonly Model.Descriptor[]): Selector<ModelResult.ModelsLoaded>;
+    modelLoaded<T extends Model_2>(identifier: string, typeGuard?: ModelTypeGuard<T>): Selector<ModelResult.ModelLoaded<T>>;
+    modelByName<T extends Model_2 = Model_2>(modelName: string, typeGuard?: ModelTypeGuard<T>): Selector<T | undefined>;
+    modelErrorByName(modelName: string): Selector<Model.Error | undefined>;
+    modelInScene<T extends Model_2>(input: ModelSearchDescriptor, typeGuard?: ModelTypeGuard<T>): Selector<T | undefined>;
+    allModelsInScene(activityId: string): Selector<Model_2[]>;
+    allLoadedModelsInScene(activityId: string): Selector<(Model_2 | Model.Error)[] | undefined>;
+    modelErrorInScene(input: ModelSearchDescriptor): Selector<Model.Error | undefined>;
+    allModelErrorsInScene(activityId: string): Selector<Model.Error[]>;
+    region(regionReference: ApplicationModel.Region.Reference): Selector<ApplicationModel.Region | undefined>;
+    subRegionRefs(regionReference: ApplicationModel.Region.Reference): Selector<ApplicationModel.Region.Reference[]>;
+    modelDescriptorsByActivityId(activityId: string): Selector<Model.Descriptor[]>;
+    referencedModelsInScene(activityId: string): Selector<ReferencedModel.Instance[]>;
+};
 
 // @public (undocumented)
 export type ModelTypeGuard<T extends Model_2> = (m: Model_2) => m is T;
@@ -1697,7 +1687,7 @@ export interface Module {
     // (undocumented)
     readonly dataProviders?: Selector<DataProvider[]>;
     // (undocumented)
-    readonly dataReducers?: Selector<ReadonlyArray<ActivityReducers.DataReducer>>;
+    readonly dataReducers?: (activityMap: ActivityMap) => ReadonlyArray<ActivityReducers.DataReducer>;
     // (undocumented)
     readonly id: string;
     // (undocumented)
@@ -1707,7 +1697,7 @@ export interface Module {
     // (undocumented)
     readonly reducersMap?: Selector<ReducerMap>;
     // (undocumented)
-    readonly sagas?: Selector<ReadonlyArray<() => SagaIterator<void>>>;
+    readonly sagas?: Selector<ReadonlyArray<() => SagaGenerator<void>>>;
     // (undocumented)
     readonly views?: Selector<(componentName: string) => View.ViewComponent | undefined>;
 }
@@ -1725,15 +1715,15 @@ export interface ModuleRegistry {
 }
 
 // @public
-export namespace ModuleRegistryProvider {
-    export function getInstance(): ModuleRegistry;
-    export function getViewProvider(state: object, fallback: View.Provider): View.Provider;
-}
+export const ModuleRegistryProvider: {
+    getInstance(): ModuleRegistry;
+    getViewProvider(state: object, fallback: View.Provider): View.Provider;
+};
 
 // @public
-export namespace ModuleTestExtensions {
-    export function reset(): void;
-}
+export const ModuleTestExtensions: {
+    reset(): void;
+};
 
 // @public
 export const NEW_INSTANCE_IDENTIFIER = "__NEW__";
@@ -1753,11 +1743,11 @@ interface Notification_2 {
 export { Notification_2 as Notification }
 
 // @public
-export namespace NotificationActions {
-    const add: ActionCreator<Omit<Notification_2, "id">>;
-    const remove: ActionCreator<(string | number)[]>;
-    const removeByActivityIds: ActionCreator<string[]>;
-}
+export const NotificationActions: {
+    add: ActionCreator<Omit<Notification_2, "id">>;
+    remove: ActionCreator<(string | number)[]>;
+    removeByActivityIds: ActionCreator<string[]>;
+};
 
 // @public
 export const NotificationLenses: {
@@ -1769,14 +1759,14 @@ export const NotificationLenses: {
 export const NotificationMiddlewares: Middleware[];
 
 // @public
-export namespace NotificationReducers {
-    const notifications: Reducer;
-}
+export const NotificationReducers: {
+    notifications: Reducer;
+};
 
 // @public
-export namespace NotificationSelectors {
-    export function notifications(): Selector<Notification_2[]>;
-}
+export const NotificationSelectors: {
+    notifications(): Selector<Notification_2[]>;
+};
 
 // @public (undocumented)
 export interface NotificationViews {
@@ -1867,19 +1857,19 @@ export interface Slices {
 export const StackRegionLayoutNG: LayoutNG;
 
 // @public (undocumented)
-export namespace StoreActions {
-    const resetState: ActionCreator<void>;
-}
+export const StoreActions: {
+    resetState: ActionCreator<void>;
+};
 
 // @public (undocumented)
-export namespace StoreFactories {
-    export function createMiddleware(func: (api: MiddlewareAPI, next: Dispatch, action: AnyAction_2) => AnyAction_2): Middleware;
-}
+export const StoreFactories: {
+    createMiddleware(func: (api: MiddlewareAPI, next: (action: unknown) => unknown, action: unknown) => unknown): Middleware;
+};
 
 // @public (undocumented)
-export namespace StoreMiddlewares {
-    export function logging(): Middleware;
-}
+export const StoreMiddlewares: {
+    logging(): Middleware;
+};
 
 // @public (undocumented)
 export namespace StoreSagas {
@@ -1988,19 +1978,22 @@ export interface ViewNG {
 }
 
 // @public (undocumented)
+export type ViewNGComponent = ComponentType<ViewNGProps>;
+
+// @public (undocumented)
 export interface ViewNGProps {
     readonly activityId: string;
     readonly ariaLevel?: number;
 }
 
 // @public
-export namespace ViewSelectors {
-    export function sceneReferenceByActivityId(activityId: string): Selector<ApplicationModel.SceneReference | undefined>;
-    const region: (rr: ApplicationModel.Region.Reference) => Selector<{
+export const ViewSelectors: {
+    sceneReferenceByActivityId(activityId: string): Selector<ApplicationModel.SceneReference | undefined>;
+    region: (rr: ApplicationModel.Region.Reference) => Selector<{
         layout: ApplicationModel.Layout;
         views: View[];
     }>;
-}
+};
 
 // @public (undocumented)
 export namespace ViewViews {
@@ -2037,7 +2030,7 @@ export const withDataServicesConfiguration: <T extends ApplicationWithDataServic
 // @public (undocumented)
 export const withDeepLinking: <T extends ApplicationWithDeepLinkingConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "deepLinking">;
 
-// @public (undocumented)
+// @public
 export const withDirtyHandling: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "dirtyHandling">;
 
 // @public
@@ -2055,7 +2048,7 @@ export const withModel: <T extends A12ApplicationConfig>(model: ApplicationFacto
 // @public
 export const withModelLoader: <T extends A12ApplicationConfig>(modelLoader: ApplicationFactories.Config["modelLoader"]) => (input: T) => ApplicationWithConfiguredModelLoader<T>;
 
-// @public (undocumented)
+// @public
 export const withNotifications: <T extends ApplicationWithNotificationConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "notifications">;
 
 // @public (undocumented)

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,8 +33,11 @@
 import { deepStrictEqual, strictEqual, throws } from "node:assert/strict";
 
 import type { Model } from "@com.mgmtp.a12.client/client-core";
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js";
-import type { ComputedFieldInstance } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
+import type {
+	ComputedFieldInstance,
+	GeneratedCodeRtConfig
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { initializeDataComponent } from "../../../core/api/initializeDataComponent.js";
 import { DocumentPath } from "../../../core/api/path/documentPath.js";
@@ -57,10 +60,14 @@ describe("core.api.initializeDataComponent", () => {
 		afterEach(() => {
 			ValidatorProviderFactory.set({ getValidatorProvider: dm => dm.generatedCodeAccessor });
 			DocumentRuntimeServiceFactory.set(DocumentRtServiceFactoryA12internal);
+			KernelFixtures.RtService.resetHistory();
 		});
 
 		it("returns an empty DG, changelog and validation slice when given no documents, links and entry point", () => {
-			const { documentGraph, changeLog, validation, entryPoint } = initializeDataComponent([], []);
+			const { documentGraph, changeLog, validation, entryPoint } = initializeDataComponent({
+				documents: [],
+				entryPoint: undefined
+			});
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {});
 			deepStrictEqual(changeLog, {
@@ -117,10 +124,9 @@ describe("core.api.initializeDataComponent", () => {
 				KernelFixtures.RtService.runtimeFactory({
 					computation: {
 						appliedTo: doc => docAfterComputation,
-						computedFieldInstances: [computedFieldInstance],
 						computedFieldInstancesWithChanges: [],
 						computedFieldInstancesWithErrors: [],
-						computedFieldInstancesWithoutErrors: [],
+						computedFieldInstancesWithoutErrors: [computedFieldInstance],
 						clearedFieldInstances: [],
 						document: docAfterComputation,
 						formalErrorsInOperands: [],
@@ -129,7 +135,7 @@ describe("core.api.initializeDataComponent", () => {
 				})
 			);
 
-			const { documentGraph } = initializeDataComponent(docs);
+			const { documentGraph } = initializeDataComponent({ documents: docs });
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {
 				["foo/1"]: {
@@ -158,7 +164,7 @@ describe("core.api.initializeDataComponent", () => {
 					loadingState: "loading"
 				}
 			];
-			const { documentGraph } = initializeDataComponent(docs);
+			const { documentGraph } = initializeDataComponent({ documents: docs });
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {
 				["foo/1"]: docs[0]
@@ -187,7 +193,7 @@ describe("core.api.initializeDataComponent", () => {
 					rank: 1
 				}
 			];
-			throws(() => initializeDataComponent([], links));
+			throws(() => initializeDataComponent({ documents: [], links }));
 		});
 
 		it("adds the entryPoint to the returned DgSlice as given via parameter", () => {
@@ -205,7 +211,10 @@ describe("core.api.initializeDataComponent", () => {
 					computedFields: {}
 				}
 			];
-			const { documentGraph, entryPoint } = initializeDataComponent(docs, [], rootDoc);
+			const { documentGraph, entryPoint } = initializeDataComponent({
+				documents: docs,
+				entryPoint: rootDoc
+			});
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {
 				[rootDoc]: docs[0]
@@ -217,7 +226,7 @@ describe("core.api.initializeDataComponent", () => {
 		it("checks that the given entry point references an actual document", () => {
 			const rootDoc = "foo/1";
 
-			throws(() => initializeDataComponent([], [], rootDoc), {
+			throws(() => initializeDataComponent({ documents: [], entryPoint: rootDoc }), {
 				message: "Cannot set an entry point reference without the document to refer to."
 			});
 		});
@@ -249,7 +258,7 @@ describe("core.api.initializeDataComponent", () => {
 					}
 				}
 			];
-			const { documentGraph } = initializeDataComponent(docs, [], rootDoc);
+			const { documentGraph } = initializeDataComponent({ documents: docs, entryPoint: rootDoc });
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {
 				[rootDoc]: docs[0]
@@ -304,7 +313,6 @@ describe("core.api.initializeDataComponent", () => {
 				KernelFixtures.RtService.runtimeFactory({
 					computation: {
 						appliedTo: doc => doc,
-						computedFieldInstances: [],
 						computedFieldInstancesWithChanges: [],
 						computedFieldInstancesWithErrors: [errorFieldInstance],
 						computedFieldInstancesWithoutErrors: [],
@@ -316,7 +324,7 @@ describe("core.api.initializeDataComponent", () => {
 				})
 			);
 
-			const { documentGraph, validation } = initializeDataComponent(docs);
+			const { documentGraph, validation } = initializeDataComponent({ documents: docs });
 
 			deepStrictEqual(documentGraph.documents.byDocRef, {
 				["foo/1"]: docs[0],
@@ -325,6 +333,53 @@ describe("core.api.initializeDataComponent", () => {
 			deepStrictEqual(validation, {
 				["foo/1"]: { messages: [], errorValues: { [computedErrorFieldPathString]: "-1" } },
 				["foo/2"]: { messages: [], errorValues: { [computedErrorFieldPathString]: "-1" } }
+			});
+		});
+
+		describe("kernel options", () => {
+			function setupKernelOptionsTest(customOptions?: GeneratedCodeRtConfig) {
+				const docs: DgDocument[] = Array.from({ length: 3 }, (_, i) => ({
+					docRef: "foo/" + i,
+					documentModel: emptyDm(),
+					document: {},
+					loadingState: "loaded",
+					computedFields: {}
+				}));
+
+				DocumentRuntimeServiceFactory.set(KernelFixtures.RtService.runtimeFactory({}));
+
+				initializeDataComponent({ documents: docs, kernelOptions: customOptions });
+
+				return KernelFixtures.RtService.getCallArgs();
+			}
+
+			it("hands the given kernel options to the runtime service", () => {
+				const customKernelOptions: GeneratedCodeRtConfig = {
+					customConditionFactory: { createCustomCondition: () => null }
+				};
+
+				const callArgs = setupKernelOptionsTest(customKernelOptions);
+
+				// one call per document
+				strictEqual(callArgs.createDocumentRtService.length, 3);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, {
+						ignoreUnknownFields: true,
+						...customKernelOptions
+					});
+				});
+			});
+
+			it("uses default options if no custom options are given", () => {
+				const callArgs = setupKernelOptionsTest();
+
+				// one call per document
+				strictEqual(callArgs.createDocumentRtService.length, 3);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, { ignoreUnknownFields: true });
+				});
 			});
 		});
 	});

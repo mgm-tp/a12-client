@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -44,18 +44,21 @@ import type {
 import {
 	ActivityActions,
 	ActivitySelectors,
-	ApplicationActions
+	ApplicationActions,
+	DynamicRegionUi
 } from "@com.mgmtp.a12.client/client-core";
-import { ButtonGroup } from "@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import {
+	ButtonGroup,
+	Button,
+	ActionContentbox,
+	ContentBoxElements
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { memoize } from "../../../3rd-party-licenses/memoize.js";
 
 import { CustomModalLayout } from "./modal-layout.js";
 
-const CustomRegionModule: DynamicConfiguration = {
+export const CustomRegionModule: DynamicConfiguration = {
 	id: "ui_handling.custom-region",
 	regions: [{ name: "GLOBAL", layout: CustomModalLayout }],
 	flows(state) {
@@ -136,8 +139,6 @@ function selectRelevantActivities(state: object): Activity[] {
 	);
 }
 
-export default CustomRegionModule;
-
 function CustomRegion(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 
@@ -201,6 +202,7 @@ function CustomRegion(props: ViewNGProps): JSX.Element {
 				<Button onClick={onStartClick("fullscreen")}>fullscreen</Button>
 			</ButtonGroup>
 			<p>This is activity {props.activityId}.</p>
+			{descriptor?.modal !== "true" && <DynamicRegionUi regionRef="GLOBAL" />}
 		</ActionContentbox>
 	);
 }

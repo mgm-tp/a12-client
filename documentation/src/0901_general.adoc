@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -44,13 +44,18 @@ Have a look at the integration of the A12 server into the DevApp - it uses the p
 
 == How to Enable Redux DevTools in the Client?
 
-The Redux DevTools provide a store enhancer which can be passed as parameter when calling the factory function `ApplicationFactories.createApplicationSetup`.
+The Redux DevTools provide a store enhancer which can be passed as parameter when calling the factory function `ApplicationFactories.createApplicationSetup`. We recommend using the `@redux-devtools/extension` package for this.
 A function creating the enhancer could look like this:
 
 [source,tsx]
 ----
 include::assets/typescript/util/reduxDevTools.ts[tags=content]
 ----
+
+[TIP]
+====
+We also recommend using the `actionSanitizer` to strip properties from the payload that A12 Client injects by default in each activity actions, as these can be very large and cause issues when viewing the state in devtools.
+====
 
 == Why Isn't There a URL-Based Navigation (Routing) Solution? / How Can I Integrate React Router?
 
@@ -60,3 +65,23 @@ of providing links into specific parts of the application.
 A more generic Routing solution can not be provided, because Routing works best for more or less static web pages.
 In contrast, Client applications usually run multiple or even nested Activities, which handle the state of multiple views on the screen. 
 Storing the whole state of all Activities in the URL is not feasible for every project.
+
+== Is it Possible to Extend a Client Extension?
+
+Extensions are optional features of the Client (opt-in). They offer individual means of customization based on the need of users. We provide several examples on how to extend and customize different extensions in the </features,Features>> section.
+
+== Is There a Way to Configure View Sizes?
+
+View sizes cannot be be configured individually, as they are defined by Layouts. To find out how to resize views in our builtin layouts read the <<_resizing,Resizing>> section.
+
+An alternative is writing your own layout provider, this gives you the ability to configure more than what is exposed on our builtin layouts. To find out more read the <<_custom_layouts,Custom Layouts>> section.
+
+== Can you Change Application Models during Runtime?
+
+It is possible to change application models during runtime using module API and dynamic module, an example of this feature is shown in the devapp.
+
+Depending on your use case, it is likely that <<features-dynamic-configuration,Dynamic Configuration>> is the preferred approach.
+
+== Can you Add a Button to Maximize a View?
+
+That is possible. We have a sample implementation in the devapp.

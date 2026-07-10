@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,31 +32,102 @@
 
 import type { JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActivityActions, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { ButtonGroup } from "@com.mgmtp.a12.widgets/widgets-core/lib/button-group/main/button-group.view.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ButtonGroup,
+	Button,
+	ActionContentbox,
+	ContentBoxElements
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-import type { SampleAppModule } from "../../utils/SampleAppModule.js";
+const INITIAL_DESCRIPTOR = { section: "UIHandling", feature: "ModalRegion" };
 
-import appmodel from "./modal-region.appmodel.json" with { type: "json" };
-
-const ModalRegionModule: SampleAppModule = {
-	id: "ui_handling.modal-region",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
-};
-
-export default ModalRegionModule;
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
+function matchesContent(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "UIHandling" && descriptor.feature === "ModalRegion" && !descriptor.modal
+	);
 }
 
-function ModalRegion(props: View): JSX.Element {
+function matchesModal(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "UIHandling" &&
+		descriptor.feature === "ModalRegion" &&
+		descriptor.modal === "true"
+	);
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "ui_handling.modal-region",
+		scenes: [
+			{
+				name: "ModalRegion",
+				matches: matchesContent,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{ type: "DYNAMIC_ADD_VIEW", component: ModalRegion, region: "/CONTENT" }
+					]
+				}
+			},
+			{
+				name: "ModalRegionModal",
+				matches: matchesModal,
+				sceneChange: {
+					onEnter: [{ type: "DYNAMIC_ADD_VIEW", component: ModalRegion, region: "/MODAL" }]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "ui_handling.modal-region",
+			label: {
+				key: "ui_handling.modal-region",
+				defaults: { en: "Modal Region", de: "Modal Region" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const ModalRegionModule: DynamicConfiguration = {
+	id: "ui_handling.modal-region",
+	flows: dynamicFlows,
+	menus: selectMenus
+};
+
+function ModalRegion(props: ViewNGProps): JSX.Element {
 	const descriptor = useSelector(
 		ActivitySelectors.activityPropById(props.activityId, a => a.descriptor)
 	);
@@ -124,7 +195,3 @@ function ModalRegion(props: View): JSX.Element {
 		</ActionContentbox>
 	);
 }
-
-const Views: { [name: string]: View.ViewComponent } = {
-	ModalRegion
-};

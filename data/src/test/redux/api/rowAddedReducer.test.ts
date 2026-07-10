@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -38,13 +38,14 @@ import {
 } from "node:assert/strict";
 
 import type { Activity, Model } from "@com.mgmtp.a12.client/client-core";
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/a12internal/compute.js";
-import type {
-	ComputedFieldInstance,
-	Document,
-	Message
-} from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js";
-import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/facade.js";
+import {
+	DocumentServiceFactory,
+	type ComputedFieldInstance,
+	type Document,
+	type GeneratedCodeRtConfig,
+	type Message
+} from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { initializeDataComponent } from "../../../core/api/initializeDataComponent.js";
 import type { FormModel } from "../../../core/api/model/form-model.js";
@@ -217,7 +218,6 @@ describe("redux.api.reducers", () => {
 					computation: {
 						appliedTo: () => computedDoc,
 						clearedFieldInstances: [],
-						computedFieldInstances: [computedFieldInstance],
 						computedFieldInstancesWithChanges: [computedFieldInstance],
 						computedFieldInstancesWithErrors: [],
 						computedFieldInstancesWithoutErrors: [computedFieldInstance],
@@ -341,6 +341,63 @@ describe("redux.api.reducers", () => {
 
 			partialDeepStrictEqual(updatedDh.data, { unknownSlice });
 		});
+
+		describe("kernel options", () => {
+			function setupKernelOptionsTest(customOptions?: GeneratedCodeRtConfig) {
+				const TEST_DOC: DgDocument = {
+					docRef: "foo/1",
+					document: {},
+					documentModel: dmTestInstance(),
+					loadingState: "loaded"
+				};
+
+				DocumentRuntimeServiceFactory.set(KernelFixtures.RtService.runtimeFactory({}));
+
+				const testDh = setupDataHolderWithDocuments([TEST_DOC]);
+
+				// reset calls from initializeDataComponent
+				KernelFixtures.RtService.resetHistory();
+
+				handleRowAdded(customOptions)(
+					testDh,
+					DataActions.rowAdded({
+						activityId: "test-activity",
+						dataReference: "/base[1]/aGroup[0]"
+					})
+				);
+
+				return KernelFixtures.RtService.getCallArgs();
+			}
+
+			it("hands the given kernel options to the runtime service", () => {
+				const customKernelOptions: GeneratedCodeRtConfig = {
+					customConditionFactory: { createCustomCondition: () => null }
+				};
+
+				const callArgs = setupKernelOptionsTest(customKernelOptions);
+
+				// two calls for: computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 2);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, {
+						ignoreUnknownFields: true,
+						...customKernelOptions
+					});
+				});
+			});
+
+			it("uses default options if no custom options are given", () => {
+				const callArgs = setupKernelOptionsTest();
+
+				// two calls for: computation + validation
+				strictEqual(callArgs.createDocumentRtService.length, 2);
+
+				callArgs.createDocumentRtService.forEach(args => {
+					deepStrictEqual(args.kernelOptions, { ignoreUnknownFields: true });
+				});
+			});
+		});
 	});
 });
 
@@ -362,7 +419,7 @@ function setupDataHolderWithDocuments(
 		dirty: false,
 		slices: {},
 		data: {
-			...initializeDataComponent(documents, [], entryPoint),
+			...initializeDataComponent({ documents, entryPoint }),
 			validation: validation ?? {}
 		}
 	};
@@ -415,7 +472,8 @@ function dmTestInstance(): Model.DocumentAndValidationModel {
 						]
 					}
 				]
-			}
+			},
+			documentUniquenessCriteria: []
 		},
 		generatedCodeAccessor: {
 			getCalculator() {},

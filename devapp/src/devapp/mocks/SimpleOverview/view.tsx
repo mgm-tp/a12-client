@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,18 +33,21 @@
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import type { BaseColumnType } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/column.api.js";
-import type { RowStyles } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/table.api.js";
-import { Table } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/table.view.js";
+import {
+	ContentBoxElements,
+	Icon,
+	type BaseColumnType,
+	type RowStyles,
+	Table
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { EngineFrameProps } from "../utils.js";
 import { EngineFrame, useActivityId, withActivityContext } from "../utils.js";
 
-import { SimpleOverviewActions } from "./actions.js";
-import { DocumentListData } from "./data.js";
+import { isDocumentListData } from "./data.js";
 import { useDocumentListData } from "./hooks.js";
+
+import { SimpleOverviewActions } from "./index.js";
 
 export interface SimpleOverviewProps extends Omit<EngineFrameProps, "type"> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,7 +115,7 @@ export const SimpleOverview = withActivityContext((props: SimpleOverviewProps) =
 			/>
 		</EngineFrame>
 	);
-}, DocumentListData.isInstance);
+}, isDocumentListData);
 
 export interface TableDocument {
 	id: string;

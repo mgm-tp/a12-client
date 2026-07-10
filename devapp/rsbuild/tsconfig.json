@@ -1,6 +1,6 @@
 {
 	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./rsbuild.config.ts"],
+	"include": ["./rsbuild.config.ts", "./pluginModelWatcher.ts"],
 	"compilerOptions": {
 		"noEmit": true,
 		"allowImportingTsExtensions": true,

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,26 +32,101 @@
 
 import type { JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActivityActions, ActivityMap, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements as CBE } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivityMap,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	Button,
+	ActionContentbox,
+	ContentBoxElements as CBE
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-import type { SampleAppModule } from "../../utils/SampleAppModule.js";
+const INITIAL_DESCRIPTOR = { section: "UIHandling", feature: "EntityLinking" };
 
-import appmodel from "./entity-linking.appmodel.json" with { type: "json" };
+function matchesOverview(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "UIHandling" &&
+		descriptor.feature === "EntityLinking" &&
+		!descriptor.detail
+	);
+}
 
-const EntityLinkingModule: SampleAppModule = {
+function matchesDetail(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "UIHandling" &&
+		descriptor.feature === "EntityLinking" &&
+		!!descriptor.detail
+	);
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "ui_handling.entity-linking",
+		scenes: [
+			{
+				name: "EntityLinking.Overview",
+				matches: matchesOverview,
+				sceneChange: {
+					onEnter: [{ type: "DYNAMIC_ADD_VIEW", component: Overview, region: "/CONTENT" }]
+				}
+			},
+			{
+				name: "EntityLinking.Detail",
+				matches: matchesDetail,
+				sceneChange: {
+					onEnter: [{ type: "DYNAMIC_ADD_VIEW", component: Detail, region: "/CONTENT" }]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "ui_handling.entity-linking",
+			label: {
+				key: "ui_handling.entity-linking",
+				defaults: { en: "Deep (Entity) Linking", de: "Deep (Entity) Linking" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const EntityLinkingModule: DynamicConfiguration = {
 	id: "ui_handling.entity-linking",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
+	flows: dynamicFlows,
+	menus: selectMenus
 };
 
-export default EntityLinkingModule;
-
-function Overview(props: View): JSX.Element {
+function Overview(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 
 	const descriptor = useSelector(
@@ -98,7 +173,7 @@ function Overview(props: View): JSX.Element {
 	);
 }
 
-function Detail(props: View): JSX.Element {
+function Detail(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 
 	return (
@@ -125,12 +200,3 @@ function Detail(props: View): JSX.Element {
 		</ActionContentbox>
 	);
 }
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-const Views: { [name: string]: View.ViewComponent } = {
-	"EntityLinking.Overview": Overview,
-	"EntityLinking.Detail": Detail
-};

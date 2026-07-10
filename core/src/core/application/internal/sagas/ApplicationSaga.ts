@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,17 +23,15 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { AnyAction } from "redux";
-// TODO: A12C-3195, SagaIterator to SagaGenerator
-// eslint-disable-next-line no-restricted-imports
-import type { SagaIterator } from "redux-saga";
+import type { Action } from "redux";
+import type { SagaGenerator } from "typed-redux-saga";
 
 import type { Activity } from "../../../activity/index.js";
 import type { DataHandler } from "../../../data/internal/DataHandler.js";
@@ -46,10 +44,8 @@ export interface ApplicationSaga {
 	 * @param sagas
 	 * An array of Descriptors of handlers (usually implemented as sagas),
 	 * to which the executing might be delegated
-	 *
-	 * @returns A SagaIterator
 	 */
-	watchDispatchSaga(sagas: ApplicationSaga.Descriptor[]): SagaIterator<void>;
+	watchDispatchSaga(sagas: ApplicationSaga.Descriptor[]): SagaGenerator<void>;
 }
 
 /**
@@ -85,15 +81,13 @@ export namespace ApplicationSaga {
 		 *
 		 * @returns true, if the handler is responsible for the combination of activity and action, and false if not
 		 */
-		canHandle(ad: Activity.Descriptor, action: AnyAction): boolean;
+		canHandle(ad: Activity.Descriptor, action: Action): boolean;
 
 		/**
 		 * A function to be executed, when the handler applies. Usually implemented as saga
 		 *
 		 * @param action The dispatched action
-		 *
-		 * @returns A SagaIterator
 		 */
-		handle(action: AnyAction): SagaIterator<void>;
+		handle(action: Action): SagaGenerator<void>;
 	}
 }

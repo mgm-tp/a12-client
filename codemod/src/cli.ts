@@ -9,7 +9,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -24,7 +24,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,17 +35,12 @@ import { createCodemodCLI } from "@com.mgmtp.a12.devtools/codemod";
 
 import pkg from "../package.json" with { type: "json" };
 
-import { migrateContainerApiRecipe } from "./recipes/migrateContainerApi.js";
-import { preferTopLevelImportsRecipe } from "./recipes/preferTopLevel.js";
-import { rewriteImportEqualDeclarationsRecipe } from "./recipes/rewriteImportEqualDeclarations.js";
+import { migrateAnyActionTypeRecipe } from "./recipes/migrateAnyActionType.js";
+import { migrateTypescriptFsaImports } from "./recipes/migrateTypescriptFsa.js";
 
 createCodemodCLI({
 	name: pkg.name,
 	description: "Codemod tooling for assisting migrations of A12 Client",
-	version: pkg.version,
-	recipes: [
-		preferTopLevelImportsRecipe,
-		migrateContainerApiRecipe,
-		rewriteImportEqualDeclarationsRecipe
-	]
+	recipes: [migrateTypescriptFsaImports, migrateAnyActionTypeRecipe],
+	version: pkg.version
 });

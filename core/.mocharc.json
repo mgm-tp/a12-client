@@ -1,7 +1,7 @@
 {
   "require": [
     "source-map-support/register",
-    "./lib/test/setup.js"
+    "./lib/test/setup.mjs"
   ],
   "timeout": 10000,
   "ui": "bdd",

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,31 +23,29 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Module } from "@com.mgmtp.a12.client/client-core";
+import type { SampleAppModule } from "../../utils/SampleAppModule.js";
 
-import DataEditorModule from "./dataEditor/index.js";
-import DataWithoutModelModule from "./dataWithoutModel/index.js";
-import DirtyHandlingModule from "./dirtyHandling/index.js";
-import HeterogeneityModule from "./heterogeneity/index.js";
+import { DataEditorModule } from "./dataEditor/index.js";
+import { DataWithoutModelModule } from "./dataWithoutModel/index.js";
+import { DirtyHandlingModule } from "./dirtyHandling/index.js";
+import { HeterogeneityDetailedModule } from "./heterogeneity/index.js";
 import { MultipleDataHoldersModule } from "./multiple-data-holders/index.js";
-import NoModelInstanceModule from "./noModelInstance/no-model-instance.js";
+import { NoModelInstanceModule } from "./noModelInstance/no-model-instance.js";
 import { DataSagaHandlingModule } from "./sagas/index.js";
 
-const DataHandlingModules: Module[] = [
+export const DataHandlingModules: SampleAppModule[] = [
 	DataEditorModule,
 	NoModelInstanceModule,
 	DataWithoutModelModule,
 	DirtyHandlingModule,
-	HeterogeneityModule,
+	HeterogeneityDetailedModule,
 	MultipleDataHoldersModule,
 	DataSagaHandlingModule
 ];
-
-export default DataHandlingModules;

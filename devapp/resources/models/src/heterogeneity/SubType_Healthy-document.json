@@ -2,7 +2,7 @@
   "header": {
     "id": "SubType_Healthy-document",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.3.0",
     "locales": [
       {
         "code": "en"
@@ -37,7 +37,6 @@
     ],
     "modelReferences": [
       {
-        "alias": "Supertype_Food-document",
         "modelType": "document",
         "purpose": "include",
         "reference": "Supertype_Food-document"
@@ -123,7 +122,9 @@
                 "name": "Food",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "Supertype_Food-document"
+                  "includeConfig": {
+                    "reference": "Supertype_Food-document"
+                  }
                 }
               },
               {

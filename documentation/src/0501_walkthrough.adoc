@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -47,7 +47,7 @@ Activities relate to UI only through indirection with the so-called *Activity/Sc
 . The *activity* is created. It contains, among other things:
 * The *Activity Descriptor* (a key/value map with the two pre-defined keys "model" and "instance").
 ** The Activity Descriptor is the most relevant part; it denotes the intention of its activity and is then used to select an Application Model <</basics/application-model/scenes,scene>> that changes the UI.
-* data (which might be missing at this point and loaded later from server – by DataLoaders – or from a parent activity – by a DataEditor)
+* data (which might be missing at this point and loaded later from server - by DataLoaders - or from a parent activity - by a DataEditor)
 * Various tracking information like loading state, saving state, processing state, whether the activity is locked or dirty, and also error information.
 . The activity triggers now two actions: data loading (yellow area in the diagram) and UI updates (the blue and green rest in the diagram).
 * The data loading is handled by so-called data-loading sagas, which is a loop that watches for new activities without loaded data. These sagas are registered during application startup. The default sagas delegate the loading (and saving later on) to registered DataLoaders (load/save from server) and DataEditors (read/write from data of a parent activity). The selection is done by inspecting the Activity Descriptor.

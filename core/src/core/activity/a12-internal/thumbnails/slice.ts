@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -33,7 +33,7 @@
 import type {
 	LoadThumbnailUrlsJsonRpc2,
 	ThumbnailUrl
-} from "@com.mgmtp.a12.dataservices/dataservices-access/lib/Attachment/attachment.js";
+} from "@com.mgmtp.a12.dataservices/dataservices-access";
 
 import type { Modifier } from "../../../lenses.js";
 import type { Activity } from "../../internal/activity.js";
@@ -67,14 +67,14 @@ export function updateThumbnailSlice(
 }
 
 /**
+ * @a12internal
+ *
  * The nested structure of the server response is not needed for the slice and
  * is simplified here.
  *
  * The server maps documentId -> attachmentId -> thumbnailUrl objects
  *
  * For lookup during rendering, we only need attachmentId -> actual thumbnail url string
- *
- * @a12internal
  *
  * **NOTE: Only provided for usage in other A12 products. Because of this,
  * breaking changes to this API can happen at any point!**

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -38,19 +38,21 @@ import type { JSX } from "react";
 import { useCallback, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
-import { NEW_INSTANCE_IDENTIFIER, ModelSelectors } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
+import { ModelSelectors, NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
 import {
 	defaultVariantSelectionMapper,
 	VariantSelection
 } from "@com.mgmtp.a12.client/client-core/heterogeneity";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { ModalOverlay } from "@com.mgmtp.a12.widgets/widgets-core/lib/modal-overlay/main/modal-overlay.view.js";
-import type { BaseColumnType } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/column.api.js";
+import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
+import {
+	Button,
+	ActionContentbox,
+	ContentBoxElements,
+	Icon,
+	ModalOverlay,
+	type BaseColumnType
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { SimpleOverviewProps } from "../../../mocks/SimpleOverview/view.js";
 import { SimpleOverview } from "../../../mocks/SimpleOverview/view.js";
@@ -60,7 +62,7 @@ import type { Food } from "./types.js";
 
 const { ActionBarGroupArea, ActionBarGroup } = ContentBoxElements;
 
-export function HeterogeneityOverview(props: View): JSX.Element {
+export function HeterogeneityOverview(props: ViewNGProps): JSX.Element {
 	/** In case an abstract type is selected, it is held here */
 	const [abstractModelSelected, setAbstractModelSelected] = useState(
 		undefined as string | undefined
@@ -169,7 +171,7 @@ const Columns: BaseColumnType<{ root: Food }>[] = [
 	}
 ];
 
-interface VariantSelectionModalProps extends View {
+interface VariantSelectionModalProps extends ViewNGProps {
 	readonly baseType: string;
 	onVariantSelected(variant: string): void;
 	onCancel(): void;

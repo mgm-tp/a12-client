@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -39,39 +39,28 @@ import type { Store } from "redux";
 import { ThemeProvider } from "styled-components";
 
 import { render, within, type RenderResult } from "@com.mgmtp.a12.devtools/react";
-import { DataRoles } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/data-roles.js";
-import { defaultTheme } from "@com.mgmtp.a12.widgets/widgets-core/lib/theme/default/default-theme.js";
+import { DataRoles, getBaseTheme } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ErrorBoundary } from "../../../../core/frame/internal/components/error-boundary/ErrorBoundary.js";
 import type { View } from "../../../../core/view/index.js";
 import { createStoreForTest } from "../../../unit/core/frame/utils.js";
 
-import { describeAppFrameLayoutTests } from "./layouts/ApplicationFrameLayout.js";
-import { describeDashboardLayoutTests } from "./layouts/DashboardLayout.js";
-import { describeMasterDetailRegionLayoutTests } from "./layouts/MasterDetailRegionLayout.js";
-import { describeNullRegionLayoutTests } from "./layouts/NullRegionLayout.js";
-import { describeStackRegionLayoutTests } from "./layouts/StackRegionLayout.js";
+import { describeAppFrameLayoutTests } from "./layouts/applicationFrameLayout.test.js";
+import { describeDashboardLayoutTests } from "./layouts/dashboardLayout.test.js";
+import { describeMasterDetailRegionLayoutTests } from "./layouts/masterDetailRegionLayout.test.js";
+import { describeNullRegionLayoutTests } from "./layouts/nullRegionLayout.test.js";
+import { describeStackRegionLayoutTests } from "./layouts/stackRegionLayout.test.js";
 
 describe("core.frame.FrameViews", () => {
-	describe("ApplicationFrameLayout", () => {
-		describeAppFrameLayoutTests();
-	});
+	describe("ApplicationFrameLayout", describeAppFrameLayoutTests);
 
-	describe("DashboardLayout", () => {
-		describeDashboardLayoutTests();
-	});
+	describe("DashboardLayout", describeDashboardLayoutTests);
 
-	describe("MasterDetailRegionLayout", () => {
-		describeMasterDetailRegionLayoutTests();
-	});
+	describe("MasterDetailRegionLayout", describeMasterDetailRegionLayoutTests);
 
-	describe("NullRegionLayout", () => {
-		describeNullRegionLayoutTests();
-	});
+	describe("NullRegionLayout", describeNullRegionLayoutTests);
 
-	describe("StackRegionLayout", () => {
-		describeStackRegionLayoutTests();
-	});
+	describe("StackRegionLayout", describeStackRegionLayoutTests);
 
 	describe("ErrorBoundary", () => {
 		beforeEach(() => {
@@ -158,7 +147,7 @@ describe("core.frame.FrameViews", () => {
 			}
 
 			return render(
-				<ThemeProvider theme={defaultTheme}>
+				<ThemeProvider theme={getBaseTheme()}>
 					<Provider store={store}>
 						<ErrorBoundary {...props}>
 							<RaiseError />

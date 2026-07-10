@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,33 +32,208 @@
 
 import type { JSX } from "react";
 import { useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
-import { type ApplicationModel, Model, ModelSelectors } from "@com.mgmtp.a12.client/client-core";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { Icon } from "@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.view.js";
-import { Status } from "@com.mgmtp.a12.widgets/widgets-core/lib/status/main/status.view.js";
-import type { BaseColumnType } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/column.api.js";
-import { Table } from "@com.mgmtp.a12.widgets/widgets-core/lib/table/new-api/table.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu,
+	ViewNGProps
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions,
+	DynamicGenericCaseMenu,
+	Model,
+	ModelSelectors
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActionContentbox,
+	ContentBoxElements,
+	Icon,
+	Status,
+	type BaseColumnType,
+	Table
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-import type { SampleAppModule } from "../../utils/SampleAppModule.js";
+const CONCEPT_DESCRIPTOR = { section: "UIHandling", feature: "CaseConcept" };
+const MODEL_LOADING_DESCRIPTOR = { section: "UIHandling", feature: "CaseModelLoading" };
 
-import appmodel from "./case-concept.appmodel.json" with { type: "json" };
+function matchesCaseConcept(descriptor: Activity.Descriptor): boolean {
+	return descriptor.section === "UIHandling" && descriptor.feature === "CaseConcept";
+}
 
-const CaseConceptModule: SampleAppModule = {
+function matchesCaseModelLoading(descriptor: Activity.Descriptor): boolean {
+	return descriptor.section === "UIHandling" && descriptor.feature === "CaseModelLoading";
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "ui_handling.case.concept",
+		scenes: [
+			{
+				name: "CaseConcept",
+				matches: matchesCaseConcept,
+				defaultCase: "TableCase",
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DynamicGenericCaseMenu,
+							region: "/SIDEBAR"
+						}
+					]
+				},
+				cases: [
+					{
+						name: "TableCase",
+						label: {
+							key: "ui_handling.case-concept.TableCase",
+							defaults: { en: "Table View", de: "Tabellen-View" }
+						},
+						sceneChange: {
+							onEnter: [
+								{
+									type: "DYNAMIC_ADD_VIEW",
+									component: TableCase,
+									region: "/CONTENT"
+								}
+							]
+						}
+					},
+					{
+						name: "ChartCase",
+						label: {
+							key: "ui_handling.case-concept.ChartCase",
+							defaults: { en: "Chart View", de: "Diagramm-View" }
+						},
+						sceneChange: {
+							onEnter: [
+								{
+									type: "DYNAMIC_ADD_VIEW",
+									component: ChartCase,
+									region: "/CONTENT"
+								}
+							]
+						}
+					}
+				]
+			}
+		]
+	},
+	{
+		name: "ui_handling.case.model-loading",
+		scenes: [
+			{
+				name: "CaseModelLoading",
+				matches: matchesCaseModelLoading,
+				defaultCase: "DefaultCaseModel",
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DynamicGenericCaseMenu,
+							region: "/SIDEBAR"
+						}
+					]
+				},
+				cases: [
+					{
+						name: "DefaultCaseModel",
+						label: {
+							key: "ui_handling.case-concept.DefaultCaseModel",
+							defaults: { en: "default case model", de: "Standardcasemodell" }
+						},
+						sceneChange: {
+							onEnter: [
+								{
+									type: "DYNAMIC_ADD_VIEW",
+									component: ModelDefaultCase,
+									region: "/CONTENT",
+									models: [{ modelType: "document", name: "DefaultCaseExampleModel" }]
+								}
+							]
+						}
+					},
+					{
+						name: "Model",
+						label: {
+							key: "ui_handling.case-concept.Model",
+							defaults: { en: "second case model", de: "Modell im zweiten Case" }
+						},
+						sceneChange: {
+							onEnter: [
+								{
+									type: "DYNAMIC_ADD_VIEW",
+									component: ModelSecondCase,
+									region: "/CONTENT",
+									models: [{ modelType: "document", name: "SecondCaseExampleModel" }]
+								}
+							]
+						}
+					}
+				]
+			}
+		]
+	}
+];
+
+function onConceptClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: CONCEPT_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function onModelLoadingClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: MODEL_LOADING_DESCRIPTOR,
+				loadingState: "missing"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const conceptActivities = ActivitySelectors.activitiesByDescriptor(CONCEPT_DESCRIPTOR)(state);
+	const modelLoadingActivities =
+		ActivitySelectors.activitiesByDescriptor(MODEL_LOADING_DESCRIPTOR)(state);
+	return [
+		{
+			id: "ui_handling.case-concept.concept",
+			label: {
+				key: "ui_handling.case-concept.concept",
+				defaults: { en: "Concept", de: "Konzept" }
+			},
+			action: onConceptClick,
+			selected: conceptActivities.at(0) !== undefined
+		},
+		{
+			id: "ui_handling.case-concept.model-loading",
+			label: {
+				key: "ui_handling.case-concept.model-loading",
+				defaults: { en: "Model Loading", de: "Nachladen von Modellen" }
+			},
+			action: onModelLoadingClick,
+			selected: modelLoadingActivities.at(0) !== undefined
+		}
+	];
+}
+
+export const CaseConceptModule: DynamicConfiguration = {
 	id: "ui_handling.case-concept",
-	model: () => appmodel as ApplicationModel,
-	views: () => name => Views[name]
-};
-
-export default CaseConceptModule;
-
-const Views: { [name: string]: View.ViewComponent } = {
-	"CaseConcept.TableCase": TableCase,
-	"CaseConcept.ChartCase": ChartCase,
-	"CaseModelLoading.ModelDefaultCase": ModelDefaultCase,
-	"CaseModelLoading.ModelSecondCase": ModelSecondCase
+	flows: dynamicFlows,
+	menus: selectMenus
 };
 
 const COLUMNS: BaseColumnType<number>[] = [
@@ -72,7 +247,7 @@ const COLUMNS: BaseColumnType<number>[] = [
 	}
 ];
 
-function TableCase(props: View): JSX.Element {
+function TableCase(props: ViewNGProps): JSX.Element {
 	return (
 		<ActionContentbox
 			listenToNavigationContext
@@ -109,7 +284,7 @@ const SECOND_CASE_EXAMPLE_MODEL_NAME = "SecondCaseExampleModel";
 
 const MIN_HEIGHT = { minHeight: "180px" };
 
-function ModelDefaultCase(props: View): JSX.Element {
+function ModelDefaultCase(props: ViewNGProps): JSX.Element {
 	return (
 		<ActionContentbox
 			headingElements={
@@ -151,7 +326,7 @@ function ModelDefaultCase(props: View): JSX.Element {
 	);
 }
 
-function ModelSecondCase(props: View): JSX.Element {
+function ModelSecondCase(props: ViewNGProps): JSX.Element {
 	return (
 		<ActionContentbox
 			headingElements={

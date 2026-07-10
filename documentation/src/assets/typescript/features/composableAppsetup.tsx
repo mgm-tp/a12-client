@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -56,8 +56,8 @@ import { withDirtyHandling } from "@com.mgmtp.a12.client/client-core/dirtyHandli
 import { withLocalization } from "@com.mgmtp.a12.client/client-core/localization";
 import { withPlatformModelLoader } from "@com.mgmtp.a12.client/client-core/modelLoader";
 import { withNotifications } from "@com.mgmtp.a12.client/client-core/notification";
-import type { LocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
-import { localizableFromLocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import type { LocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization";
+import { localizableFromLocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localization";
 
 declare function withFormEngine(_: A12ApplicationConfig): A12ApplicationConfig;
 declare function withTreeEngine(_: A12ApplicationConfig): A12ApplicationConfig;
@@ -98,7 +98,7 @@ const finalConfig = combineFeatures(
 	// Model Loading
 	combineFeatures(withModel(appModel), withPlatformModelLoader),
 	// Client Extensions
-	combineFeatures(withDirtyHandling, withLocalization),
+	combineFeatures(withLocalization, withDirtyHandling, withNotifications),
 	// Custom Setup
 	combineFeatures(addView("MyView", CustomView), addWrapper(CustomContext))
 )(initialConfig);
@@ -106,17 +106,17 @@ const finalConfig = combineFeatures(
 const { store, initialActions, Component } = createA12ApplicationSetup(finalConfig);
 
 await initialActions();
-const root = createRoot(document.getElementById("root")!);
+const root = createRoot(document.getElementById("root") as HTMLDivElement);
 root.render(<Provider store={store}>{Component}</Provider>);
 // end::composableAppsetup[]
 
 // tag::clientExtensions[]
 combineFeatures(
+	withLocalization,
 	withAppModelAdapter,
 	withDataServicesConfiguration,
 	withDeepLinking,
 	withDirtyHandling,
-	withLocalization,
 	withPlatformModelLoader,
 	withNotifications
 );

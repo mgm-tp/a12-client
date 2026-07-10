@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,15 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Reducer } from "redux";
-import type { AnyAction } from "typescript-fsa";
+import type { Action, Reducer } from "redux";
 
 import { ApplicationActions } from "./actions.js";
 
@@ -46,36 +45,35 @@ const defaultApplication: ApplicationState = {
 	registeredModules: []
 };
 
+const application: Reducer = (state: ApplicationState = defaultApplication, action: Action) => {
+	if (ApplicationActions.setBusy.match(action)) {
+		return state.busy !== action.payload
+			? {
+					...state,
+					busy: action.payload
+				}
+			: state;
+	} else if (ApplicationActions.addModuleIds.match(action)) {
+		return {
+			...state,
+			registeredModules: state.registeredModules.concat(...action.payload)
+		};
+	} else if (ApplicationActions.removeModuleIds.match(action)) {
+		return {
+			...state,
+			registeredModules: state.registeredModules.filter(id => !action.payload.includes(id))
+		};
+	}
+
+	return state;
+};
+
 /**
  * The application level reducers
  */
-export namespace ApplicationReducers {
+export const ApplicationReducers = {
 	/**
 	 * This reducer reduces the application state
 	 */
-	export const application: Reducer = (
-		state: ApplicationState = defaultApplication,
-		action: AnyAction
-	) => {
-		if (ApplicationActions.setBusy.match(action)) {
-			return state.busy !== action.payload
-				? {
-						...state,
-						busy: action.payload
-					}
-				: state;
-		} else if (ApplicationActions.addModuleIds.match(action)) {
-			return {
-				...state,
-				registeredModules: state.registeredModules.concat(...action.payload)
-			};
-		} else if (ApplicationActions.removeModuleIds.match(action)) {
-			return {
-				...state,
-				registeredModules: state.registeredModules.filter(id => !action.payload.includes(id))
-			};
-		}
-
-		return state;
-	};
-}
+	application
+};

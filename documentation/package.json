@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-dev-documentation-src",
-  "version": "16.3.0-SNAPSHOT",
+  "version": "17.0.0",
   "description": "AsciiDoc documentation for @com.mgmtp.a12.client/client-core",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -10,7 +10,10 @@
     "build": "node scripts/convert.ts",
     "compile": "tsc",
     "spellcheck": "cspell .",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
+    "lint:fix": "node --run lint -- --fix",
+    "lint:onlyErrors": "node --run lint -- --quiet"
   },
   "files": [
     "src"
@@ -18,29 +21,32 @@
   "devDependencies": {
     "@com.mgmtp.a12.base/base-model-api": "catalog:a12",
     "@com.mgmtp.a12.client/client-core": "workspace:*",
+    "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat": "catalog:a12",
     "@com.mgmtp.a12.dataservices/dataservices-access": "catalog:a12",
     "@com.mgmtp.a12.devtools/tsconfig": "catalog:a12",
     "@com.mgmtp.a12.kernel/kernel-core-runtime-api-ts": "catalog:a12",
     "@com.mgmtp.a12.kernel/kernel-md-facade": "catalog:a12",
     "@com.mgmtp.a12.utils/utils-connector": "catalog:a12",
-    "@com.mgmtp.a12.utils/utils-localization-react": "catalog:a12",
     "@com.mgmtp.a12.utils/utils-localization": "catalog:a12",
+    "@com.mgmtp.a12.utils/utils-localization-react": "catalog:a12",
     "@com.mgmtp.a12.utils/utils-logging": "catalog:a12",
     "@com.mgmtp.a12.widgets/widgets-core": "catalog:a12",
+    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
+    "@redux-devtools/extension": "catalog:",
     "@types/mocha": "catalog:",
-    "@types/react-dom": "catalog:",
-    "@types/react-redux": "catalog:",
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "asciidoctor-highlight.js": "catalog:",
     "asciidoctor": "catalog:",
     "cspell": "catalog:",
+    "eslint": "catalog:",
     "highlight.js": "catalog:",
     "react-dnd": "catalog:",
-    "redux-saga": "catalog:",
+    "react-redux": "catalog:",
     "redux": "catalog:",
+    "redux-saga": "catalog:",
     "rimraf": "catalog:",
     "typed-redux-saga": "catalog:",
-    "typescript-fsa": "catalog:",
     "typescript": "catalog:"
   }
 }

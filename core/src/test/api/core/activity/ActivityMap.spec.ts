@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,6 +34,7 @@ import { deepStrictEqual, strictEqual, throws } from "node:assert/strict";
 import { mock } from "node:test";
 
 import { Activity, ActivityMap } from "../../../../core/activity/index.js";
+import { checkValidity } from "../../../../core/activity/internal/activityMap.js";
 import { createActivity, createDataHolder } from "../../../utils/activity.js";
 
 import { LIST_MOCK_ACTIVITIES, setupActivityMap } from "./util.js";
@@ -111,21 +112,6 @@ describe("core.activity", () => {
 								strictEqual(activityMap[activityId]!.activationTimestamp, expectedTimestamp);
 							});
 						});
-
-						it("checks the validity of the new ActivityMap", () => {
-							const spy = mock.method(ActivityMap, "checkValidity");
-
-							ActivityMap.applyActivityChange(
-								setupActivityMap(LIST_MOCK_ACTIVITIES),
-								activityId,
-								activity => ({
-									...activity,
-									activationTimestamp: 999
-								})
-							);
-
-							strictEqual(spy.mock.callCount(), 1);
-						});
 					});
 
 					describe("and a change function returning undefined", () => {
@@ -138,18 +124,6 @@ describe("core.activity", () => {
 
 							strictEqual(Object.keys(activityMap).length, LIST_MOCK_ACTIVITIES.length - 1);
 							strictEqual(activityMap[activityId], undefined);
-						});
-
-						it("checks the validity of the new ActivityMap", () => {
-							const spy = mock.method(ActivityMap, "checkValidity");
-
-							ActivityMap.applyActivityChange(
-								setupActivityMap(LIST_MOCK_ACTIVITIES),
-								activityId,
-								activity => undefined
-							);
-
-							strictEqual(spy.mock.callCount(), 1);
 						});
 					});
 
@@ -184,6 +158,21 @@ describe("core.activity", () => {
 						strictEqual(activityMap[nonExistingActivityId], undefined);
 					});
 				});
+
+				it("checks the validity of the new ActivityMap", () => {
+					const activityMap = setupActivityMap(LIST_MOCK_ACTIVITIES);
+
+					throws(
+						() =>
+							ActivityMap.applyActivityChange(activityMap, "1", a => ({
+								...a,
+								initiatingActivityId: a.id // creating a direct cycle
+							})),
+						{
+							message: new RegExp(`Activity 1 has a cyclic dependency`)
+						}
+					);
+				});
 			});
 		});
 
@@ -191,7 +180,7 @@ describe("core.activity", () => {
 			it("returns given activityMap unchanged if it's empty", () => {
 				const activityMap = setupActivityMap([]);
 
-				deepStrictEqual(ActivityMap.checkValidity(activityMap), activityMap);
+				deepStrictEqual(checkValidity(activityMap), activityMap);
 			});
 
 			it("returns given activityMap unchanged if it contains only top-level activities", () => {
@@ -201,7 +190,7 @@ describe("core.activity", () => {
 					createActivity({ id: "topLevel3" })
 				]);
 
-				deepStrictEqual(ActivityMap.checkValidity(activityMap), activityMap);
+				deepStrictEqual(checkValidity(activityMap), activityMap);
 			});
 
 			it("returns given activityMap unchanged if it does not contain any cycles or invalid references", () => {
@@ -221,14 +210,14 @@ describe("core.activity", () => {
 					})
 				]);
 
-				deepStrictEqual(ActivityMap.checkValidity(activityMap), activityMap);
+				deepStrictEqual(checkValidity(activityMap), activityMap);
 			});
 
 			it("throws an error if given activityMap contains an activity with a non-existing ancestor activity", () => {
 				const activity = createActivity({ id: "1", initiatingActivityId: "doesNotExist" });
 				const activityMap = setupActivityMap([activity]);
 
-				throws(() => ActivityMap.checkValidity(activityMap), {
+				throws(() => checkValidity(activityMap), {
 					message: `Initiating activity ${activity.initiatingActivityId} of activity ${activity.id} is missing.`
 				});
 			});
@@ -241,7 +230,7 @@ describe("core.activity", () => {
 				});
 				const activityMap = setupActivityMap([activity]);
 
-				throws(() => ActivityMap.checkValidity(activityMap), {
+				throws(() => checkValidity(activityMap), {
 					message: `DataSource activity ${datasourceActivityId} for a dataholder in activity ${activity.id} is missing.`
 				});
 			});
@@ -253,7 +242,7 @@ describe("core.activity", () => {
 				});
 				const activityMap = setupActivityMap([activity]);
 
-				throws(() => ActivityMap.checkValidity(activityMap), {
+				throws(() => checkValidity(activityMap), {
 					message: new RegExp(`Activity ${activity.id} has a cyclic dependency`)
 				});
 			});
@@ -266,7 +255,7 @@ describe("core.activity", () => {
 				];
 				const activityMap = setupActivityMap(activities);
 
-				throws(() => ActivityMap.checkValidity(activityMap), {
+				throws(() => checkValidity(activityMap), {
 					message: new RegExp(`Activity ${activities[0].id} has a cyclic dependency`)
 				});
 			});

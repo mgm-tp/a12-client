@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -32,7 +32,8 @@
 
 import type { Middleware, Reducer, Store } from "redux";
 
-import type { Locale } from "@com.mgmtp.a12.utils/utils-localization/lib/main/index.js";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import type { Locale } from "@com.mgmtp.a12.utils/utils-localization";
 
 import type { ActivityMap } from "../../core/activity/internal/activityMap.js";
 import {
@@ -74,7 +75,8 @@ export interface Config {
 	readonly dataHandlers?: DataHandler[];
 }
 
-const SET_INITIAL_STATE_ACTION_TYPE = "SET_INITIAL_STATE";
+const factory = actionCreatorFactory("Test");
+const setInitialState = factory<Partial<ClientState>>("SET_INITIAL_STATE");
 
 export function createApplicationSetup({
 	withDirtyHandling,
@@ -97,7 +99,7 @@ export function createApplicationSetup({
 
 	const rootReducer: (defaultReducer: Reducer<object>) => Reducer<object> =
 		defaultReducer => (state, action) => {
-			return action.type === SET_INITIAL_STATE_ACTION_TYPE
+			return setInitialState.match(action)
 				? { ...state, ...action.payload }
 				: defaultReducer(state, action);
 		};
@@ -112,9 +114,7 @@ export function createApplicationSetup({
 		dataReducers: [],
 		rootReducer,
 		locale,
-		setupActions: initialState
-			? [{ type: SET_INITIAL_STATE_ACTION_TYPE, payload: initialState }]
-			: undefined
+		setupActions: initialState ? [setInitialState(initialState)] : undefined
 	});
 
 	return {

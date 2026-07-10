@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,23 +23,21 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { Action, Dispatch, Middleware, MiddlewareAPI, Reducer, Store } from "redux";
+import type { Middleware, Reducer, Store } from "redux";
 import { compose } from "redux";
-// TODO: A12C-3195, SagaIterator to SagaGenerator
-// eslint-disable-next-line no-restricted-imports
-import type { EventChannel, SagaIterator, Task } from "redux-saga";
+import type { EventChannel, Task } from "redux-saga";
 import { eventChannel } from "redux-saga";
 import type { SagaGenerator } from "typed-redux-saga";
 import { cancel, fork, select, take } from "typed-redux-saga";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/lib/factory.js";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import type { DataEditor } from "../../../data/internal/DataEditor.js";
 import type { DataProvider } from "../../../data/internal/DataProvider.js";
@@ -60,18 +58,18 @@ const logger = LoggerFactory.getLogger("core/application");
  * @internal
  * @ignore
  *
- * The ModuleExtensions namespace provides Module Extension Points to integrate
+ * Provides Module Extension Points to integrate
  * reducers, sagas, middleware, data providers, and models into the Client setup.
  *
  * A ModuleRegistry singleton is created and provided, the different extensions use
  * this instance to implement the module integration.
  */
-export namespace ModuleExtensions {
+export const ModuleExtensions = {
 	/**
 	 * Creates a Reducer which delegates the action to all modules reducers.
 	 * A modified state is handed over to the next module reducer.
 	 */
-	export function createModulesReducer(appReducer: Reducer): Reducer {
+	createModulesReducer(appReducer: Reducer): Reducer {
 		const modulesReducer: Reducer = (state, action) => {
 			const modules = getModuleRegistryInstance().getAllModules();
 
@@ -93,15 +91,15 @@ export namespace ModuleExtensions {
 		};
 
 		return (state, action) => appReducer(modulesReducer(state, action), action);
-	}
+	},
 
 	/**
 	 * Creates a redux middleware which chains all module middlewares using redux compose.
 	 */
-	export function createModulesMiddleware(): Middleware {
-		return (api: MiddlewareAPI) => {
-			return (next: Dispatch) => {
-				return (action: Action) => {
+	createModulesMiddleware(): Middleware {
+		return api => {
+			return next => {
+				return action => {
 					const allMiddlewares: Middleware[] = [];
 					for (const mod of getModuleRegistryInstance().getAllModules()) {
 						if (mod.middlewares) {
@@ -109,19 +107,19 @@ export namespace ModuleExtensions {
 						}
 					}
 					const chain = allMiddlewares.map(middleware => middleware(api));
-					return compose<Dispatch>(...chain)(next)(action);
+					return compose<(action: unknown) => unknown>(...chain)(next)(action);
 				};
 			};
 		};
-	}
+	},
 
 	/**
 	 * Creates a redux saga which forks sagas for each module.
 	 * The saga holds a map of the module sagas and reacts on
 	 * module add and remove events to fork or cancel module sagas.
 	 */
-	export function createModulesSaga(): () => SagaGenerator<void> {
-		function* _startModule(sagas: ReadonlyArray<() => SagaIterator<void>>): SagaIterator<void> {
+	createModulesSaga(): () => SagaGenerator<void> {
+		function* _startModule(sagas: ReadonlyArray<() => SagaGenerator<void>>): SagaGenerator<void> {
 			for (const saga of sagas) {
 				yield* fork(saga);
 			}
@@ -159,27 +157,14 @@ export namespace ModuleExtensions {
 				}
 			}
 		};
-	}
-
-	/**
-	 * Helper function to concat the models of all modules
-	 */
-	function getApplicationModels(state: object): ApplicationModel[] {
-		const models: ApplicationModel[] = [];
-		for (const mod of getModuleRegistryInstance().getAllModules()) {
-			if (mod.model) {
-				models.push(mod.model(state));
-			}
-		}
-		return models;
-	}
+	},
 
 	/**
 	 * Subscribes a Listener closure to module registration events and dispatches
 	 * Actions to add or remove parts of the model. Throws an Error if an active
 	 * module is going to be removed
 	 */
-	export function createModelListener(store: Store<object>): void {
+	createModelListener(store: Store<object>): void {
 		const modulesAppModels = getApplicationModels(store.getState());
 		if (modulesAppModels.length > 0) {
 			logger.log(
@@ -202,12 +187,12 @@ export namespace ModuleExtensions {
 				);
 			}
 		});
-	}
+	},
 
 	/**
 	 * Get all DataProvider implemented in modules.
 	 */
-	export function getDataProviders(state: object): DataProvider[] {
+	getDataProviders(state: object): DataProvider[] {
 		const dataProviders: DataProvider[] = [];
 		const dataEditors: DataEditor[] = [];
 		const modules = getModuleRegistryInstance().getAllModules();
@@ -226,13 +211,13 @@ export namespace ModuleExtensions {
 		dataProviders.push(moduleDataProvider);
 
 		return dataProviders;
-	}
+	},
 
 	/**
 	 * Subscribes to module registration events to set the currently registered modules
 	 * into redux state.
 	 */
-	export function createModuleListener(store: Store): void {
+	createModuleListener(store: Store): void {
 		const existingModules = getModuleRegistryInstance().getAllModules();
 
 		store.dispatch(ApplicationActions.addModuleIds(existingModules.map(m => m.id)));
@@ -244,4 +229,17 @@ export namespace ModuleExtensions {
 			store.dispatch(ApplicationActions[method]([event.module.id]));
 		});
 	}
+};
+
+/**
+ * Helper function to concat the models of all modules
+ */
+function getApplicationModels(state: object): ApplicationModel[] {
+	const models: ApplicationModel[] = [];
+	for (const mod of getModuleRegistryInstance().getAllModules()) {
+		if (mod.model) {
+			models.push(mod.model(state));
+		}
+	}
+	return models;
 }

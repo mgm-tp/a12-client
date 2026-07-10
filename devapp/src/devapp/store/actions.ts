@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,48 +23,43 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { actionCreatorFactory } from "typescript-fsa";
-
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { ActivityActions } from "@com.mgmtp.a12.client/client-core";
+
+import { isRecord } from "../utils/types.js";
 
 const factory = actionCreatorFactory("DevApp");
 
 /**
  * Application level actions
  */
-export namespace DevAppActions {
-	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-	export const initialization = factory.async<void, void>("INITIALIZATION");
 
-	/**
-	 * Set of action to demonstrate the reset application feature
-	 */
-	export namespace ResetApplication {
-		export const resetRequested = factory("RESET_APPLICATION_REQUESTED");
-		export const resetApplication = factory("RESET_APPLICATION");
-	}
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+export const initialization = factory.async<void, void>("INITIALIZATION");
 
-	export const clearDeepLink = factory("CLEAR_DEEP_LINK");
+export const resetRequested = factory("RESET_APPLICATION_REQUESTED");
+export const resetApplication = factory("RESET_APPLICATION");
 
-	export const triggerStoreUpdate = factory("TRIGGER_STORE_UPDATE");
+export const clearDeepLink = factory("CLEAR_DEEP_LINK");
 
-	export interface SetCasePayload extends ActivityActions.ActivityActionPayload {
-		caze: string;
-	}
-	export const setCase = factory<SetCasePayload>("SET_CASE");
+export const triggerStoreUpdate = factory("TRIGGER_STORE_UPDATE");
 
-	export interface CounterData {
-		count: number;
-	}
+export interface SetCasePayload extends ActivityActions.ActivityActionPayload {
+	readonly caze: string;
+}
+export const setCase = factory<SetCasePayload>("SET_CASE");
 
-	export function isCounterData(data: {} = {}): data is CounterData {
-		return "count" in data && typeof data.count === "number";
-	}
+export interface CounterData {
+	readonly count: number;
+}
+
+export function isCounterData(data: unknown): data is CounterData {
+	return isRecord(data) && "count" in data && typeof data.count === "number";
 }

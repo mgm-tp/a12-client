@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,44 +23,149 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
+import type { Dispatch } from "redux";
 
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
 import { DataEditorConsumer } from "./components/DataEditorConsumer.js";
-import DataEditorFeature from "./components/DataEditorFeature.js";
+import { DataEditorFeature } from "./components/DataEditorFeature.js";
 import { DataEditorSource } from "./components/DataEditorSource.js";
 import { DataEditorSourceOverview } from "./components/DataEditorSourceOverview.js";
 import { bookDataEditor } from "./data/BookDataEditor.js";
-import appModel from "./data_editor.appmodel.json" with { type: "json" };
 
-const DataEditorModule: SampleAppModule = {
+const INITIAL_DESCRIPTOR = { section: "DataHandling", feature: "DataEditor" };
+
+function matchesDataEditor(descriptor: Activity.Descriptor): boolean {
+	return descriptor.section === "DataHandling" && descriptor.feature === "DataEditor";
+}
+
+function matchesOverview(descriptor: Activity.Descriptor): boolean {
+	return descriptor.model === "BookAuthor-document" && !descriptor.instance;
+}
+
+function matchesSource(descriptor: Activity.Descriptor): boolean {
+	return !!descriptor.instance;
+}
+
+function matchesConsumer(descriptor: Activity.Descriptor): boolean {
+	return descriptor.model === "Book" && !!descriptor.instance;
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "DataHandling",
+		scenes: [
+			{
+				name: "DataEditor",
+				matches: matchesDataEditor,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DataEditorFeature,
+							region: "/CONTENT"
+						}
+					]
+				}
+			},
+			{
+				name: "DataEditor - Overview",
+				matches: matchesOverview,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DataEditorSourceOverview,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail" },
+							models: [{ modelType: "document", name: "BookAuthor-document" }]
+						}
+					]
+				}
+			},
+			{
+				name: "DataEditor - Source",
+				priorScene: "DataEditor - Overview",
+				matches: matchesSource,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DataEditorSource,
+							region: "/CONTENT",
+							constraints: { type: "MasterDetail" },
+							models: [{ modelType: "document", name: "BookAuthor-document" }]
+						}
+					]
+				}
+			},
+			{
+				name: "DataEditor - Consumer",
+				priorScene: "DataEditor - Source",
+				matches: matchesConsumer,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DataEditorConsumer,
+							region: "/MODAL",
+							constraints: { type: "MasterDetail" }
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "data_handling.data-editor",
+			label: {
+				key: "data_handling.data-editor",
+				defaults: { en: "Data Editor", de: "Data Editor" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const DataEditorModule: DynamicConfiguration = {
 	id: "data_handling.data-editor",
-	model: () => appModel as ApplicationModel,
-	views: () => viewProvider,
+	flows: dynamicFlows,
+	menus: selectMenus,
 	dataEditors: [bookDataEditor]
-};
-
-export default DataEditorModule;
-
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
-}
-
-interface ViewMap {
-	[name: string]: View.ViewComponent;
-}
-
-const Views: ViewMap = {
-	DataEditorSourceOverview,
-	DataEditorSource,
-	DataEditorConsumer,
-	DataEditorFeature
 };

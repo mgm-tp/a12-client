@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,7 +35,7 @@ import { select } from "typed-redux-saga";
 
 import { ActivitySelectors, NEW_INSTANCE_IDENTIFIER } from "@com.mgmtp.a12.client/client-core";
 
-import { DocumentListData } from "../../../mocks/SimpleOverview/data.js";
+import { isDocumentListData } from "../../../mocks/SimpleOverview/data.js";
 import { assert } from "../../../utils/types.js";
 
 export function generateComponentDivId(activityId: string): string {
@@ -68,13 +68,14 @@ export function* focus(activityId: string, instance?: string): SagaGenerator<voi
 			const button = viewComponent.querySelector<HTMLElement>("[data-role='button']");
 			assert(button);
 			button.focus();
-		} else if (DocumentListData.isInstance(data)) {
-			const index = data.documents.findIndex(d => d?.id === instance);
-			const row = viewComponent.querySelectorAll<HTMLElement>(`[data-role='table-body-row']`)[
-				index
-			];
-			if (row) {
-				row.focus();
+		} else if (isDocumentListData(data)) {
+			const index = data.documents.findIndex(d => d.id === instance);
+			const listOfRows = viewComponent.querySelectorAll<HTMLElement>(
+				`[data-role='table-body-row']`
+			);
+			const isRowContainedInElement = listOfRows.length > index;
+			if (isRowContainedInElement) {
+				listOfRows.item(index).focus();
 			} else {
 				/*
 				 * The row may not exist on the current page, e.g. when creating a new document in mock mode

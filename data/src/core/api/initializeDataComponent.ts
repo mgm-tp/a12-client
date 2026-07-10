@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,12 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
+
+import type { GeneratedCodeRtConfig } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import type {
 	ValidationData,
@@ -47,11 +49,14 @@ import { DocumentPath } from "./path/documentPath.js";
 /**
  * @returns a filled {@link DgSlice} & {@link DgChangeLogSlice} object
  */
-export function initializeDataComponent(
-	docs: DgDocument[],
-	links: DgLinkInternal[] = [],
-	entryPoint?: string
-): DgSlice & DgChangeLogSlice & ValidationSlice {
+export function initializeDataComponent(options: {
+	documents: DgDocument[];
+	links?: DgLinkInternal[];
+	entryPoint?: string;
+	kernelOptions?: GeneratedCodeRtConfig;
+}): DgSlice & DgChangeLogSlice & ValidationSlice {
+	const { documents: docs, links = [], entryPoint, kernelOptions } = options;
+
 	//TODO: In the future the functionality to map the links to the data structure needs to be moved from the CDM project to here
 	if (links.length !== 0) {
 		throw new Error(
@@ -63,8 +68,10 @@ export function initializeDataComponent(
 		throw new Error("Cannot set an entry point reference without the document to refer to.");
 	}
 
-	const { docs: computedDgDocs, validationData: initialValidationData } =
-		performInitialComputation(docs);
+	const { docs: computedDgDocs, validationData: initialValidationData } = performInitialComputation(
+		docs,
+		kernelOptions
+	);
 
 	return {
 		documentGraph: {
@@ -97,7 +104,10 @@ export function initializeDataComponent(
 	};
 }
 
-function performInitialComputation(docs: DgDocument[]): {
+function performInitialComputation(
+	docs: DgDocument[],
+	kernelOptions?: GeneratedCodeRtConfig
+): {
 	docs: DgDocument[];
 	validationData: ValidationData;
 } {
@@ -110,7 +120,8 @@ function performInitialComputation(docs: DgDocument[]): {
 			const { computationResult, computedDocument } = computeDocument({
 				dm: doc.documentModel,
 				fm: doc.formModel,
-				document: doc.document
+				document: doc.document,
+				kernelOptions
 			});
 
 			const errorValuesFromComputation: ValidationEntry["errorValues"] = Object.fromEntries(

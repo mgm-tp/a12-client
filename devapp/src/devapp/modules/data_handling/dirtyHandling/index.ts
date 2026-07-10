@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,29 +23,94 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ApplicationModel } from "@com.mgmtp.a12.client/client-core";
+import type { Dispatch } from "redux";
 
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
-import appmodel from "./dirtyHandling.appmodel.json" with { type: "json" };
-import viewProvider from "./dirtyHandling.js";
+import { DirtyHandling } from "./dirtyHandling.js";
 import { dirtyHandlingFeatureSaga } from "./dirtyHandlingFeatureSaga.js";
 import { dataReducers } from "./reducers.js";
 import { initializeDataHolders, startDirtyHandlingExampleSaga } from "./sagas.js";
 
-const DirtyHandlingModule: SampleAppModule = {
+const INITIAL_DESCRIPTOR = { section: "DataHandling", feature: "DirtyHandling" };
+
+function matchesDirtyHandling(descriptor: Activity.Descriptor): boolean {
+	return (
+		descriptor.section === "DataHandling" &&
+		descriptor.feature === "DirtyHandling" &&
+		!descriptor.detail
+	);
+}
+
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "data_handling.dirty-handling",
+		scenes: [
+			{
+				name: "DirtyHandling",
+				matches: matchesDirtyHandling,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: DirtyHandling,
+							region: "/CONTENT"
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "data_handling.dirty-handling",
+			label: {
+				key: "data_handling.dirty-handling",
+				defaults: { en: "Dirty Handling", de: "Dirty Handling" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const DirtyHandlingModule: DynamicConfiguration = {
 	id: "data_handling.dirty-handling",
-	model: () => appmodel as ApplicationModel,
 	dataReducers: () => dataReducers,
 	sagas: () => [dirtyHandlingFeatureSaga, initializeDataHolders, startDirtyHandlingExampleSaga],
-	views: () => viewProvider
+	flows: dynamicFlows,
+	menus: selectMenus
 };
-
-export default DirtyHandlingModule;

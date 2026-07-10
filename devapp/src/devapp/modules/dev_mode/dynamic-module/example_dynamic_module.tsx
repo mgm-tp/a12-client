@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -31,12 +31,22 @@
  */
 
 import type { JSX } from "react";
+import type { Dispatch } from "redux";
 
-import type { Module, ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements as CBE } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
+import { ActionContentbox, ContentBoxElements as CBE } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import AppModel from "./example-dynamic-module.appmodel.json" with { type: "json" };
+const INITIAL_DESCRIPTOR = { feature: "ExampleDynamicModule" };
 
 function ExampleDynamicModuleView(): JSX.Element {
 	return (
@@ -46,12 +56,61 @@ function ExampleDynamicModuleView(): JSX.Element {
 	);
 }
 
-export const EXAMPLE_DYNAMIC_MODULE: Module = {
-	id: "dev-mode.example_dynamic_module",
-	model: () => AppModel as ApplicationModel,
-	views: () => name => components[name]
-};
+function matchesExample(d: Activity.Descriptor): boolean {
+	return d.feature === "ExampleDynamicModule";
+}
 
-const components: { [name: string]: View.ViewComponent | undefined } = {
-	ExampleDynamicModuleView
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "example_dynamic_module",
+		scenes: [
+			{
+				name: "example_dynamic_module",
+				matches: matchesExample,
+				sceneChange: {
+					onEnter: [
+						{ type: "DYNAMIC_CLEAR_REGION", region: "/CONTENT" },
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: ExampleDynamicModuleView,
+							region: "/CONTENT"
+						}
+					]
+				}
+			}
+		]
+	}
+];
+
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
+
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "example_dynamic_module",
+			label: {
+				key: "example_dynamic_module",
+				defaults: { en: "Example Dynamic Module", de: "Beispiel für Dynamisches Modul" }
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const EXAMPLE_DYNAMIC_MODULE: DynamicConfiguration = {
+	id: "dev-mode.example_dynamic_module",
+	flows: dynamicFlows,
+	menus: selectMenus
 };

@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,50 +23,84 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { JSX } from "react";
-import { useContext } from "react";
+import type { Dispatch } from "redux";
 
-import type { ApplicationModel, View } from "@com.mgmtp.a12.client/client-core";
-import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react/lib/main/index.js";
-
-import type { SampleAppModule } from "../../../utils/SampleAppModule.js";
+import type {
+	Activity,
+	DynamicConfiguration,
+	DynamicFlow,
+	DynamicMenu
+} from "@com.mgmtp.a12.client/client-core";
+import {
+	ActivityActions,
+	ActivitySelectors,
+	ApplicationActions
+} from "@com.mgmtp.a12.client/client-core";
 
 import { VersionInfo } from "./dependencies.js";
-import appmodel from "./versionInformation.appmodel.json" with { type: "json" };
 
-declare const __VERSION__: string | undefined;
-const version = typeof __VERSION__ !== "undefined" ? __VERSION__ : "missing __VERSION__";
+const INITIAL_DESCRIPTOR = { section: "about" };
 
-const VersionInfoModule: SampleAppModule = {
-	id: "about.versionInfo",
-	model: () => appmodel as ApplicationModel,
-	views: () => viewProvider
-};
+const dynamicFlows: DynamicFlow[] = [
+	{
+		name: "about.versionInfo",
+		scenes: [
+			{
+				name: "about.versionInfo",
+				matches: matchesVersionInfo,
+				sceneChange: {
+					onEnter: [
+						{
+							type: "DYNAMIC_ADD_VIEW",
+							component: VersionInfo,
+							region: "/CONTENT"
+						}
+					]
+				}
+			}
+		]
+	}
+];
 
-function viewProvider(componentName: string): View.ViewComponent | undefined {
-	return Views[componentName];
+function matchesVersionInfo(d: Activity.Descriptor): boolean {
+	return d.section === INITIAL_DESCRIPTOR.section;
 }
 
-const Views: { [name: string]: View.ViewComponent } = {
-	VersionInfoComponent
-};
-
-function VersionInfoComponent(props: View): JSX.Element {
-	const localizer = useContext(LocalizerContext).localizer;
-	return (
-		<VersionInfo
-			version={version}
-			currentVersionLabel={localizer({ key: "version.info.currentVersion.label" }) ?? ""}
-			ariaLevel={props.ariaLevel}
-		/>
+function onMenuClick(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: INITIAL_DESCRIPTOR,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
 	);
 }
 
-export default VersionInfoModule;
+function selectMenus(state: object): DynamicMenu[] {
+	const activities = ActivitySelectors.activitiesByDescriptor(INITIAL_DESCRIPTOR)(state);
+	return [
+		{
+			id: "about.versionInfo",
+			label: {
+				key: "version.versionInfo"
+			},
+			action: onMenuClick,
+			selected: activities.at(0) !== undefined
+		}
+	];
+}
+
+export const VersionInfoModule: DynamicConfiguration = {
+	id: "about.versionInfo",
+	flows: dynamicFlows,
+	menus: selectMenus
+};

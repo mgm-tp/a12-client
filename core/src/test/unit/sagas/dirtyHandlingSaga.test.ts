@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,18 +23,20 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { deepStrictEqual, notDeepStrictEqual, strictEqual } from "node:assert/strict";
+import { deepStrictEqual } from "node:assert/strict";
 
-import { expectSaga } from "redux-saga-test-plan";
-import { put } from "redux-saga/effects";
-import type { Action, AnyAction } from "typescript-fsa";
+import type { Action as ReduxAction } from "redux";
+import { expectSaga, type RunResult } from "redux-saga-test-plan";
+import { put, type PutEffect } from "redux-saga/effects";
+
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import type { Activity } from "../../../core/activity/index.js";
 import { ActivityActions } from "../../../core/activity/index.js";
@@ -43,13 +45,54 @@ import { dirtyHandlingSaga } from "../../../extensions/dirtyHandling/internal/di
 import { createGeneralStore } from "../../mocks/store/store.js";
 import { createActivity } from "../../utils/activity.js";
 
-function* dispatchHelper(saga: ApplicationSaga.Descriptor, action: Action<unknown>) {
+/**
+ * - Takes a saga descriptor (which has a handle method) and an action
+ * - Yields the result of saga.handle(action) - delegating to the saga's handler
+ */
+function* delegateToSaga(saga: ApplicationSaga.Descriptor, action: Action<unknown>) {
 	yield saga.handle(action);
+}
+
+function toPutEffect(action: Action<unknown>): PutEffect<Action<unknown>> {
+	return put(action);
+}
+
+function assertPutActions(expectedActions: Action<unknown>[]) {
+	return (runResult: RunResult) => {
+		deepStrictEqual(runResult.effects.put, expectedActions.map(toPutEffect));
+	};
 }
 
 describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 	describe("dirtyHandlingSaga", () => {
 		describe("Given an activity A", () => {
+			describe("which is locked but not dirty", () => {
+				it("cancels A without showing confirmation dialog", async () => {
+					const cancelRequestedAction = ActivityActions.cancelRequested({
+						activityIds: ["A"]
+					});
+
+					const activityMock = createNewActivity({
+						id: "A",
+						activationTimestamp: 1000,
+						lock: {
+							id: "lock-id",
+							owner: "test",
+							details: { key: "loading" }
+						}
+					});
+					const expectedActions: Action<unknown>[] = [
+						ActivityActions.cancel({ activityId: "A" }),
+						ActivityActions.responseCancelRequested({ cancelled: true })
+					];
+
+					return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+						.withState(createStoreForTesting([activityMock]))
+						.run()
+						.then(assertPutActions(expectedActions));
+				});
+			});
+
 			describe("which is not dirty", () => {
 				it("cancels A", async () => {
 					const cancelRequestedAction = ActivityActions.cancelRequested({
@@ -60,25 +103,15 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 						id: "A",
 						activationTimestamp: 1000
 					});
-					const activities = [activityMock];
-					const expectedActions: Action<{}>[] = [
+					const expectedActions: Action<unknown>[] = [
 						ActivityActions.cancel({ activityId: "A" }),
 						ActivityActions.responseCancelRequested({ cancelled: true })
 					];
 
-					return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-						.withState(createStoreForTesting(activities))
+					return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+						.withState(createStoreForTesting([activityMock]))
 						.run()
-						.then(result => {
-							const { effects } = result;
-
-							notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-							strictEqual(effects.put.length, expectedActions.length);
-
-							for (let i = 0; i < expectedActions.length; i++) {
-								deepStrictEqual(effects.put[i], put(expectedActions[i]));
-							}
-						});
+						.then(assertPutActions(expectedActions));
 				});
 			});
 
@@ -103,8 +136,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 						dataHolders: [anyDataHolder]
 					});
 
-					const activities = [activityMock];
-					const expectedActions: Action<{}>[] = [
+					const expectedActions: Action<unknown>[] = [
 						ActivityActions.setCancelConfirmationRequired({
 							activityId: "A",
 							cancelConfirmationRequired: true
@@ -112,8 +144,9 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 						ActivityActions.cancel({ activityId: "A" }),
 						ActivityActions.responseCancelRequested({ cancelled: true })
 					];
-					return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-						.withState(createStoreForTesting(activities))
+
+					return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+						.withState(createStoreForTesting([activityMock]))
 						.dispatch(
 							ActivityActions.responseCancelConfirmation({
 								activityId: "A",
@@ -121,16 +154,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 							})
 						)
 						.run()
-						.then(result => {
-							const { effects } = result;
-
-							notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-							strictEqual(effects.put.length, expectedActions.length);
-
-							for (let i = 0; i < expectedActions.length; i++) {
-								deepStrictEqual(effects.put[i], put(expectedActions[i]));
-							}
-						});
+						.then(assertPutActions(expectedActions));
 				});
 
 				it("fires one setCancelConfirmationRequired action and does not cancel A if veto gets returned", async () => {
@@ -153,16 +177,16 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 						dataHolders: [anyDataHolder]
 					});
 
-					const activities = [activityMock];
-					const expectedActions: Action<{}>[] = [
+					const expectedActions: Action<unknown>[] = [
 						ActivityActions.setCancelConfirmationRequired({
 							activityId: "A",
 							cancelConfirmationRequired: true
 						}),
 						ActivityActions.responseCancelRequested({ cancelled: false })
 					];
-					return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-						.withState(createStoreForTesting(activities))
+
+					return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+						.withState(createStoreForTesting([activityMock]))
 						.dispatch(
 							ActivityActions.responseCancelConfirmation({
 								activityId: "A",
@@ -170,16 +194,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 							})
 						)
 						.run()
-						.then(result => {
-							const { effects } = result;
-
-							notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-							strictEqual(effects.put.length, expectedActions.length);
-
-							for (let i = 0; i < expectedActions.length; i++) {
-								deepStrictEqual(effects.put[i], put(expectedActions[i]));
-							}
-						});
+						.then(assertPutActions(expectedActions));
 				});
 			});
 
@@ -194,24 +209,15 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 						activationTimestamp: 1000,
 						dirtyStateOfActivityDataHolder: true
 					});
-					const activities = [activityMock];
 
-					const expectedActions: Action<{}>[] = [
+					const expectedActions: Action<unknown>[] = [
 						ActivityActions.responseCancelRequested({ cancelled: true })
 					];
 
-					return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-						.withState(createStoreForTesting(activities))
+					return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+						.withState(createStoreForTesting([activityMock]))
 						.run()
-						.then(result => {
-							const { effects } = result;
-
-							strictEqual(effects.put.length, expectedActions.length);
-
-							for (let i = 0; i < expectedActions.length; i++) {
-								deepStrictEqual(effects.put[i], put(expectedActions[i]));
-							}
-						});
+						.then(assertPutActions(expectedActions));
 				});
 			});
 		});
@@ -233,27 +239,17 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								id: "B",
 								activationTimestamp: 1000
 							});
-							const activities = [activityMockA, activityMockB];
 
-							const expectedActions: Action<{}>[] = [
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.cancel({ activityId: "A" }),
 								ActivityActions.cancel({ activityId: "B" }),
 								ActivityActions.responseCancelRequested({ cancelled: true })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 					});
 
@@ -273,8 +269,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								activationTimestamp: 1000,
 								dirtyStateOfActivityDataHolder: true
 							});
-							const activities = [activityMockA, activityMockB];
-							const expectedActions: Action<{}>[] = [
+
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.setCancelConfirmationRequired({
 									activityId: "A",
 									cancelConfirmationRequired: true
@@ -288,8 +284,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								ActivityActions.responseCancelRequested({ cancelled: true })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.dispatch(
 									ActivityActions.responseCancelConfirmation({
 										activityId: "A",
@@ -303,16 +299,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									})
 								)
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 
 						it("fires one setCancelConfirmationRequired for A and does then stop, when a veto for A is returned", async () => {
@@ -331,9 +318,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								activationTimestamp: 1000,
 								dirtyStateOfActivityDataHolder: true
 							});
-							const activities = [activityMockA, activityMockB];
 
-							const expectedActions: Action<{}>[] = [
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.setCancelConfirmationRequired({
 									activityId: "A",
 									cancelConfirmationRequired: true
@@ -341,8 +327,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								ActivityActions.responseCancelRequested({ cancelled: false })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.dispatch(
 									ActivityActions.responseCancelConfirmation({
 										activityId: "A",
@@ -350,16 +336,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									})
 								)
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 
 						it(
@@ -382,8 +359,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									cancelConfirmationRequired: true
 								});
 
-								const activities = [activityMockA, activityMockB];
-								const expectedActions: Action<{}>[] = [
+								const expectedActions: Action<unknown>[] = [
 									ActivityActions.setCancelConfirmationRequired({
 										activityId: "A",
 										cancelConfirmationRequired: true
@@ -396,8 +372,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									ActivityActions.responseCancelRequested({ cancelled: false })
 								];
 
-								return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-									.withState(createStoreForTesting(activities))
+								return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+									.withState(createStoreForTesting([activityMockA, activityMockB]))
 									.dispatch(
 										ActivityActions.responseCancelConfirmation({
 											activityId: "A",
@@ -411,16 +387,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 										})
 									)
 									.run()
-									.then(result => {
-										const { effects } = result;
-
-										notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-										strictEqual(effects.put.length, expectedActions.length);
-
-										for (let i = 0; i < expectedActions.length; i++) {
-											deepStrictEqual(effects.put[i], put(expectedActions[i]));
-										}
-									});
+									.then(assertPutActions(expectedActions));
 							}
 						);
 					});
@@ -444,25 +411,16 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								initiatingActivityId: "A",
 								activationTimestamp: 1500
 							});
-							const activities = [activityMockA, activityMockB];
-							const expectedActions: Action<{}>[] = [
+
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.cancel({ activityId: "A" }),
 								ActivityActions.responseCancelRequested({ cancelled: true })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 					});
 
@@ -482,8 +440,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								activationTimestamp: 1500,
 								dirtyStateOfActivityDataHolder: true
 							});
-							const activities = [activityMockA, activityMockB];
-							const expectedActions: Action<{}>[] = [
+
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.setCancelConfirmationRequired({
 									activityId: "A",
 									cancelConfirmationRequired: true
@@ -492,8 +450,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								ActivityActions.responseCancelRequested({ cancelled: true })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.dispatch(
 									ActivityActions.responseCancelConfirmation({
 										activityId: "A",
@@ -501,16 +459,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									})
 								)
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 
 						it("fires a setVeto action and does not cancel A and B if a veto is returned", async () => {
@@ -530,8 +479,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								activationTimestamp: 1500,
 								dirtyStateOfActivityDataHolder: true
 							});
-							const activities = [activityMockA, activityMockB];
-							const expectedActions: Action<{}>[] = [
+
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.setCancelConfirmationRequired({
 									activityId: "A",
 									cancelConfirmationRequired: true
@@ -539,8 +488,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								ActivityActions.responseCancelRequested({ cancelled: false })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withState(createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withState(createStoreForTesting([activityMockA, activityMockB]))
 								.dispatch(
 									ActivityActions.responseCancelConfirmation({
 										activityId: "A",
@@ -548,16 +497,7 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 									})
 								)
 								.run()
-								.then(result => {
-									const { effects } = result;
-
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 					});
 				});
@@ -578,24 +518,16 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 								initiatingActivityId: "A",
 								activationTimestamp: 1500
 							});
-							const activities = [activityMockA, activityMockB];
-							const expectedActions: Action<{}>[] = [
+
+							const expectedActions: Action<unknown>[] = [
 								ActivityActions.cancel({ activityId: "A" }),
 								ActivityActions.responseCancelRequested({ cancelled: true })
 							];
 
-							return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-								.withReducer(testReducer, createStoreForTesting(activities))
+							return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+								.withReducer(testReducer, createStoreForTesting([activityMockA, activityMockB]))
 								.run()
-								.then(result => {
-									const { effects } = result;
-									notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-									strictEqual(effects.put.length, expectedActions.length);
-
-									for (let i = 0; i < expectedActions.length; i++) {
-										deepStrictEqual(effects.put[i], put(expectedActions[i]));
-									}
-								});
+								.then(assertPutActions(expectedActions));
 						});
 					});
 				});
@@ -608,7 +540,6 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 					activityIds: ["A", "A1", "B", "C"]
 				});
 
-				// setup
 				const activityMockA = createNewActivity({
 					id: "A",
 					activationTimestamp: 1000
@@ -626,9 +557,8 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 					id: "C",
 					activationTimestamp: 200
 				});
-				const activities = [activityMockA, activityMockA1, activityMockB, activityMockC];
 
-				const expectedActions: Action<{}>[] = [
+				const expectedActions: Action<unknown>[] = [
 					ActivityActions.cancel({ activityId: "C" }),
 					ActivityActions.cancel({ activityId: "B" }),
 					ActivityActions.cancel({ activityId: "A" }),
@@ -636,19 +566,12 @@ describe("extensions.dirtyHandling.internal.dirtyHandling", () => {
 					ActivityActions.responseCancelRequested({ cancelled: true })
 				];
 
-				return expectSaga(dispatchHelper, dirtyHandlingSaga(), cancelRequestedAction)
-					.withState(createStoreForTesting(activities))
+				return expectSaga(delegateToSaga, dirtyHandlingSaga(), cancelRequestedAction)
+					.withState(
+						createStoreForTesting([activityMockA, activityMockA1, activityMockB, activityMockC])
+					)
 					.run()
-					.then(result => {
-						const { effects } = result;
-
-						notDeepStrictEqual(effects.put, undefined, "Put effects were expected");
-						strictEqual(effects.put.length, expectedActions.length);
-
-						for (let i = 0; i < expectedActions.length; i++) {
-							deepStrictEqual(effects.put[i], put(expectedActions[i]));
-						}
-					});
+					.then(assertPutActions(expectedActions));
 			});
 		});
 	});
@@ -661,6 +584,7 @@ function createNewActivity(props: {
 	dirtyStateOfActivityDataHolder?: boolean;
 	cancelConfirmationRequired?: boolean;
 	dataHolders?: Activity.DataHolder[];
+	lock?: Activity.Lock;
 }): Activity {
 	const {
 		id,
@@ -668,7 +592,8 @@ function createNewActivity(props: {
 		activationTimestamp,
 		dirtyStateOfActivityDataHolder,
 		cancelConfirmationRequired,
-		dataHolders
+		dataHolders,
+		lock
 	} = props;
 
 	const defaultActivityDataHolder = {
@@ -686,7 +611,8 @@ function createNewActivity(props: {
 		initiatingActivityId,
 		activationTimestamp: activationTimestamp ?? 0,
 		cancelConfirmationRequired,
-		dataHolders: [defaultActivityDataHolder, ...(dataHolders ?? [])]
+		dataHolders: [defaultActivityDataHolder, ...(dataHolders ?? [])],
+		lock
 	});
 }
 
@@ -702,7 +628,7 @@ function createStoreForTesting(activities: Activity[]): {} {
  * Reducer to delete all activities from the store, if there was
  * a cancel or cancelRequested action
  */
-function testReducer(state: any, action: AnyAction) {
+function testReducer(state: any, action: ReduxAction) {
 	if (
 		action.type === ActivityActions.cancel.type ||
 		action.type === ActivityActions.cancelRequested.type

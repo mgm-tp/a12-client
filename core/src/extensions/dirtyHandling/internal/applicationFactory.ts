@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -42,12 +42,12 @@ import type {
 	A12ApplicationConfig,
 	ApplicationWithConfiguredFeature,
 	RequireFeatures
-} from "../../../core/application/internal/factories/applicationConfig.js";
+} from "../../../core/index.js";
 
 import { DirtyHandlingFactories } from "./factories.js";
 import { DirtyHandlingViews } from "./views.js";
 
-declare module "../../../core/application/internal/factories/applicationConfig.js" {
+declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		dirtyHandling?: unknown;
 	}
@@ -63,6 +63,8 @@ export type ApplicationWithDirtyHandlingConfig = RequireFeatures<
 
 /**
  * @experimental
+ *
+ * NOTE: If your app requires localizations, provide `withLocalization` before this.
  */
 export const addDirtyHandlingWrapper = <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) =>
 	addWrapper<T>(DirtyHandlingViews.VetoDialog)(cfg);
@@ -78,13 +80,17 @@ export const addDirtyHandlingSagas = <T extends ApplicationWithDirtyHandlingConf
  */
 export const addDirtyConfirmationOnLeave = <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) =>
 	addInitialAction<T>(store => {
+		if (typeof window === "undefined") {
+			return;
+		}
+
 		/*
 		 * Listen to the window.onbeforeunload event to trigger a dialog
-		 * if there are dirty or locked activities when the application gets closed.
+		 * if there are dirty activities when the application gets closed.
 		 */
 		window.onbeforeunload = () => {
-			// Show the dialog if there are dirty or locked activities.
-			const dirtySubTree = ActivitySelectors.allDirtyOrLockedActivities()(store.getState());
+			// Show the dialog if there are dirty activities.
+			const dirtySubTree = ActivitySelectors.allDirtyActivities()(store.getState());
 			if (dirtySubTree.length > 0) {
 				return "Changes you made may not be saved.";
 			} else {
@@ -95,6 +101,11 @@ export const addDirtyConfirmationOnLeave = <T extends ApplicationWithDirtyHandli
 
 /**
  * @experimental
+ *
+ * Enables support for dirty handling. Adds a default veto dialog, which gets shown when
+ * the users wants to leave the page (`onbeforeunload`) or if an activity gets cancelled.
+ *
+ * NOTE: If your app requires localizations, provide `withLocalization` before this.
  */
 export const withDirtyHandling = <T extends ApplicationWithDirtyHandlingConfig>(
 	cfg: T

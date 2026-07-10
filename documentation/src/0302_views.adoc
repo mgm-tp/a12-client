@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,7 +35,7 @@ LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 [#/basics/views/arranging-uis]
 == Arranging UIs
 
-The Application Model is an A12 UI Model for defining the “macroscopic” UI aspects of applications based on link:/docs/PLASMA/plasma-concept-documentation/index.html[Plasma for Business Applications]. This includes
+The Application Model is an A12 UI Model for defining the "macroscopic" UI aspects of applications based on link:/docs/PLASMA/plasma-concept-documentation/index.html[Plasma for Business Applications]. This includes
 
 * main menu
 * regions
@@ -67,7 +67,7 @@ Match conditions define when the scene applies. They always refer to the <</basi
 [#/basics/views/directives]
 === Directives
 
-If the scene applies, the respective scene is “entered” and the enter directives are executed. If the scene no longer applies, the respective “leave” directives are executed.
+If the scene applies, the respective scene is "entered" and the enter directives are executed. If the scene no longer applies, the respective "leave" directives are executed.
 
 The available directives are
 
@@ -189,7 +189,7 @@ If we break this down, we can assign views for the example above to the *sidebar
 
 ==== Thinking in View Directives
 
-You might wonder why we focus on the sequence of delta changes when navigating between the views and not just specify how each view should look. The reason is that activities and view navigation actually express these delta changes by using *directives*: "VIEW_ADD" (add view named X to region Y) and "REGION_CLEAR" (clear region Y, i.e., remove all previously assigned views). We will learn much more about this in the section about the Application Model.
+You might wonder why we focus on the sequence of delta changes when navigating between the views and not just specify how each view should look. The reason is that activities and view navigation actually express these delta changes by using *directives*: "VIEW_ADD" (add view named X to region Y) and "REGION_CLEAR" (clear region Y, i.e., remove all previously assigned views). We will learn much more about this in the section about the <</basics/application-model,Application Model>>.
 
 ==== Summary
 

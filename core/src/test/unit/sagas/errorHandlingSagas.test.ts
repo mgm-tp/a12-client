@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -35,9 +35,9 @@ import { mock } from "node:test";
 
 import { expectSaga } from "redux-saga-test-plan";
 import { put } from "redux-saga/effects";
-import type { Action, Failure } from "typescript-fsa";
 
-import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging/index.js";
+import type { Action, Failure } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { ActivityActions } from "../../../core/activity/index.js";
 import type { ApplicationSaga } from "../../../core/application/index.js";
@@ -107,7 +107,7 @@ describe("core.application.internal.sagas.errorHandling", () => {
 
 							const errorLogArgument1 = args[0];
 							strictEqual(typeof errorLogArgument1, "string");
-							strictEqual(errorLogArgument1.includes(errorPayload.activityId), true);
+							strictEqual((errorLogArgument1 as string).includes(errorPayload.activityId), true);
 
 							const errorLogArgument2 = args[1];
 							strictEqual(errorLogArgument2, errorPayload.error);

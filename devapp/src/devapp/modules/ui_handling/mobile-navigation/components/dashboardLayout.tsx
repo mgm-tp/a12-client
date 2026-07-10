@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -34,18 +34,20 @@ import type { JSX } from "react";
 import { useContext } from "react";
 import { useDispatch } from "react-redux";
 
-import type { View } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivityActions, FrameViews } from "@com.mgmtp.a12.client/client-core";
-import { Button } from "@com.mgmtp.a12.widgets/widgets-core/lib/button/main/button.view.js";
-import { addPrefix } from "@com.mgmtp.a12.widgets/widgets-core/lib/common/main/utils.js";
-import { ActionContentbox } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/action-contentbox/action-contentbox.view.js";
-import { ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core/lib/contentbox/main/template/contentbox.tpl.view.js";
-import { LayoutGrid } from "@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.view.js";
+import {
+	Button,
+	addPrefix,
+	ActionContentbox,
+	ContentBoxElements,
+	LayoutGrid
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { DescriptionPanel } from "./descriptionPanel.js";
 import { ShowDeviceInformation, SidebarContent } from "./subComponents.js";
 
-export function StartDashboard(props: View): JSX.Element {
+export function StartDashboard(props: ViewNGProps): JSX.Element {
 	const dispatch = useDispatch();
 	return (
 		<ActionContentbox
@@ -171,45 +173,32 @@ export function MobileNavigationDashboardSidebar(): JSX.Element {
 	);
 }
 
-export function DashboardView(props: View): JSX.Element {
-	function getDescription(): JSX.Element {
+export function createDashboardView(title: string): (props: ViewNGProps) => JSX.Element {
+	return function DashboardViewWithTitle(): JSX.Element {
 		return (
-			<div>
-				The dashboard shows all views below each other in mobile mode.
-				<p>
-					Because there is a sidebar which is not shown at the moment a back-button is shown, which
-					expands the sidebar.
-				</p>
-				<p>
-					The back-button is shown in a navigation bar, due to the fact that the layout shows
-					multiple views.
-				</p>
-			</div>
+			<ActionContentbox
+				padding="12px"
+				listenToNavigationContext
+				headingElements={<ContentBoxElements.Title key="title" text={title} />}
+			>
+				{title === "Tile 1" ? getDescription() : "Dummy content"}
+			</ActionContentbox>
 		);
-	}
-
-	const title =
-		props.constraints && isDashboardViewConstraint(props.constraints)
-			? props.constraints.title
-			: "Dummy title";
-
-	return (
-		<ActionContentbox
-			padding="12px"
-			listenToNavigationContext
-			headingElements={<ContentBoxElements.Title key="title" text={title} />}
-		>
-			{title === "Tile 1" ? getDescription() : "Dummy content"}
-		</ActionContentbox>
-	);
+	};
 }
 
-function isDashboardViewConstraint(settings: object): settings is { title: string } {
-	const { title } = settings as { title: string };
-
-	if (typeof title === "string") {
-		return true;
-	}
-
-	return false;
+function getDescription(): JSX.Element {
+	return (
+		<div>
+			The dashboard shows all views below each other in mobile mode.
+			<p>
+				Because there is a sidebar which is not shown at the moment a back-button is shown, which
+				expands the sidebar.
+			</p>
+			<p>
+				The back-button is shown in a navigation bar, due to the fact that the layout shows multiple
+				views.
+			</p>
+		</div>
+	);
 }
