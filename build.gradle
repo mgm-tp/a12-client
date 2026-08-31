@@ -1,6 +1,5 @@
 buildscript {
     dependencies {
-        classpath libs.groovy.yaml
         classpath libs.build.utilities
     }
 }
@@ -8,6 +7,7 @@ buildscript {
 plugins {
     alias(libs.plugins.spotless)
     alias(libs.plugins.version.catalog.update)
+    alias(libs.plugins.integration)
 }
 
 import com.mgmtp.a12.devtools.gradle.plugins.buildutils.Helper
@@ -34,6 +34,22 @@ allprojects {
     version = globalVersion
 
     tasks.register("deploy") {}
+
+    // TODO A12-19152: remove once dataservices ships a release pinning jsonrpc4j 2.0.0.
+    // The dataservices 39.0.x BOM constrains com.mgmtp.a12.jsonrpc4j:jsonrpc4j to the
+    // pre-release 2.0.0-dev.0, which was removed from artifactory on 2026-08-01, so any
+    // build with a cold cache fails to resolve. 2.0.0 is the published release of the
+    // same code and declares identical dependencies.
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.mgmtp.a12.jsonrpc4j'
+                && details.requested.name == 'jsonrpc4j'
+                && details.requested.version == '2.0.0-dev.0') {
+                details.useVersion '2.0.0'
+                details.because 'A12-19152: 2.0.0-dev.0 is not published; 2.0.0 is the released equivalent'
+            }
+        }
+    }
 }
 
 if (file('publish/build.gradle').exists()) {
@@ -42,8 +58,7 @@ if (file('publish/build.gradle').exists()) {
 
 spotless {
     format 'asciidoc', {
-        target '**/*.adoc'
-        targetExclude("**/node_modules/**", "**/lib/**", "**/build/**")
+        target fileTree('documentation/src') { include '**/*.adoc' }
         licenseHeaderFile(rootProject.file('license_header.txt'), '^[=\\[]')
         // transform C-style header to asciidoc block comments
         replaceRegex 'Convert C-style block start to asciidoc block comment start', '^/\\*', '////'

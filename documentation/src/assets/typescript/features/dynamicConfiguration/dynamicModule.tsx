@@ -49,10 +49,9 @@ declare function memoize<T extends (...args: never[]) => unknown>(fn: T): T;
 const DESCRIPTOR = { feature: "dashboard" };
 
 // Memoize component factories to ensure referential stability
-const createMemoizedView = memoize(
-	(variant: string): ViewNGComponent =>
-		(props: ViewNGProps) => <DashboardView {...props} variant={variant} />
-);
+const createMemoizedView = memoize((variant: string): ViewNGComponent => (props: ViewNGProps) => (
+	<DashboardView {...props} variant={variant} />
+));
 
 const createMemoizedMatcher = memoize(
 	(variant: string): DynamicMatchCondition =>

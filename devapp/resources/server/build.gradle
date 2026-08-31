@@ -49,10 +49,18 @@ bootJar {
     }
 
     includeEmptyDirs = false
+}
 
-    from('../../dist') {
-        include '**'
-        into '/BOOT-INF/classes/META-INF/resources/app'
+// `runJar` (local dev boot) serves the frontend separately via `rsbuild dev`, so bundling `dist`
+// into the jar would be dead weight there; a standalone/prod jar build still needs it embedded.
+gradle.taskGraph.whenReady { taskGraph ->
+    if (!taskGraph.allTasks.any { it.name == 'runJar' }) {
+        bootJar {
+            from('../../dist') {
+                include '**'
+                into '/BOOT-INF/classes/META-INF/resources/app'
+            }
+        }
     }
 }
 

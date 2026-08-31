@@ -87,9 +87,7 @@ const PersonConfiguration: DynamicConfiguration = {
 									type: "DYNAMIC_ADD_VIEW",
 									region: "/CONTENT",
 									component: PersonOverview,
-									models: [
-										/* ... */
-									]
+									models: [/* ... */]
 								}
 							]
 						}

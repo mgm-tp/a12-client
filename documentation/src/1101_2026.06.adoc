@@ -37,7 +37,7 @@ LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 Codemod recipes exist for some of the breaking changes. To use them, first install or update the codemod with your preferred package manager, e.g. with `pnpm`:
 [source,bash]
 ----
-pnpm install -g @com.mgmtp.a12.client/client-codemod
+pnpm install -g @com.mgmtp.a12.client/client-codemod@17
 ----
 
 Then run the specific recipe:
@@ -46,7 +46,7 @@ Then run the specific recipe:
 client-codemod <recipe> <path to directory with tsconfig.json>
 
 // or as a single command
-pnpx @com.mgmtp.a12.client/client-codemod <recipe> <path to directory with tsconfig.json>
+pnpm dlx @com.mgmtp.a12.client/client-codemod@17 <recipe> <path to directory with tsconfig.json>
 ----
 
 === Integration of Dependencies
@@ -167,10 +167,7 @@ The package now uses the `exports` field instead of `main`/`types`. This should 
 Required:: Yes.
 Migration::
 +
-[source,bash]
-----
-client-codemod preferTopLevel <path to directory with tsconfig.json>
-----
+Codemod available in link:/docs/2025.06/ext4/client/client-documentation-bundle#_deep_import_paths_of_a12_client_npm_packages[2025.06-ext4,role=external].
 Result::
 +
 [source,js]

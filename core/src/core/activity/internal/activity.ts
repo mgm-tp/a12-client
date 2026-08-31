@@ -111,11 +111,7 @@ export namespace Activity {
 	 * The type of error can be one of the predefined ones or any kind of error that extends the {@link Error.Base} type.
 	 */
 	export type Error<T extends Error.Base = never> =
-		| Error.InternalClient
-		| Error.Validation
-		| Error.PageNotFound
-		| Error.Saving
-		| T;
+		Error.InternalClient | Error.Validation | Error.PageNotFound | Error.Saving | T;
 
 	export namespace Error {
 		/**

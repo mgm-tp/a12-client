@@ -2,7 +2,7 @@
   "header": {
     "id": "Supertype_Food-document",
     "modelType": "document",
-    "modelVersion": "29.3.0",
+    "modelVersion": "29.4.0",
     "locales": [
       {
         "code": "en"

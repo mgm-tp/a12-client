@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-application-model-migration",
-  "version": "17.0.0",
+  "version": "17.0.1",
   "description": "ApplicationModel migration CLI tool",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -40,7 +40,7 @@
     "@com.mgmtp.a12.utils/utils-localization": "catalog:a12"
   },
   "peerDependencies": {
-    "@com.mgmtp.a12.migrationtool/migrationtool-core": "catalog:a12ranges"
+    "@com.mgmtp.a12.migrationtool/migrationtool-core": "catalog:a12"
   },
   "files": [
     "lib",

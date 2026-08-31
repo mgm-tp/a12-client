@@ -186,13 +186,11 @@ A flow is a way to group together coupled UI interaction steps, we denote _scene
 
 Flows are not directly instantiated and have no direct tie to activities. However, scenes are associated with activities through scene matches. And so we have a notion of _starting a flow_ by the fact that an activity will match a first scene in flow. More on this topic in the following section.
 
-=== Multiple Flows (Outlook)
+=== Multiple Flows
 
-Flows are currently limited by the fact, that you can only run one flow at time: if you click an entry in the main menu, you start off a new flow, and a possible ongoing flow is stopped by cancelling the activities. However, this limitation will be lifted in future releases and then multiple flows can be "started" in parallel. This plays nicely together with the fact that activities form not only a sequence (w.r.t. to the "initiated by" link), but trees and even forests. A forest here means that Client supports running multiple top-level activities that each can have tree-like sub activities.
+The built-in main menu component enforces single-flow behavior: clicking a menu entry first cancels the current top-level activity and its entire activity subtree, then starts the flow of the selected entry.
 
-Here's an illustration of the idea of multiple flows spawned by multiple top-level activities:
-
-image::assets/images/model/multiple-flows.svg[forrest]
+Multiple top-level activities — and therefore multiple flows — can exist in parallel, but only if each flow's activity subtree triggers directives that operate on _separate, non-overlapping regions_. Having multiple flows compete for the same region is not supported and leads to issues.
 
 [#/basics/application-model/scenes]
 == Scenes

@@ -21,7 +21,7 @@ plugins {
 }
 
 prepareModels {
-    generateValidationCodeInConverter = true
+    generateValidationCode = true
 }
 
 tasks.named('jar') {

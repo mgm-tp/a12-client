@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-devapp",
-  "version": "17.0.0",
+  "version": "17.0.1",
   "description": "Client Devapp",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -18,7 +18,7 @@
     "start": "rsbuild dev --env-mode mock -c rsbuild/rsbuild.config.ts",
     "start:platform": "concurrently --kill-others pnpm:start:platform:app pnpm:start:platform:server",
     "start:platform:app": "rsbuild dev --env-mode platform -c rsbuild/rsbuild.config.ts",
-    "start:platform:server": "gradle -p ./resources/server --console=plain clean runJar",
+    "start:platform:server": "gradle -p ./resources/server --console=plain runJar",
     "watch": "tsc --watch",
     "mocha:dev": "mocha --forbid-only=false",
     "analyze": "rsbuild build --env-mode analyze -c rsbuild/rsbuild.config.ts",

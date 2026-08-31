@@ -50,8 +50,7 @@ const logger = LoggerFactory.getLogger("extensions/steps");
 interface ConsoleSteps {
 	runAll(pauseTimeInSeconds: number): void;
 	readonly [key: string]:
-		| { run(pauseTimeInSeconds: number): void }
-		| ((pauseTimeInSeconds: number) => void);
+		{ run(pauseTimeInSeconds: number): void } | ((pauseTimeInSeconds: number) => void);
 }
 
 export function setupSteps(store: Store<object>, stateHistory: StateHistory): void {

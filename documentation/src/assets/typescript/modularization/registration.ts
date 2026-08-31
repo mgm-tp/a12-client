@@ -82,9 +82,7 @@ const model: ApplicationModel = {
 			subRegions: [{ name: "CONTENT", layout: { name: "MasterDetail" } }]
 		},
 		defaultRegion: ["CONTENT"],
-		modules: [
-			/* Add your flows and scenes here */
-		]
+		modules: [/* Add your flows and scenes here */]
 	}
 };
 
