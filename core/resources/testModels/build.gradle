@@ -1,15 +1,14 @@
 buildscript {
     dependencies {
-        classpath platform(a12Libs.dataservices.bom)
-
-        classpath a12Libs.kernel.md.model
-        classpath a12Libs.kernel.md.facade
-        classpath a12Libs.kernel.migration
+        classpath platform(libs.dataservices.bom)
+        classpath libs.kernel.md.model
+        classpath libs.kernel.md.facade
+        classpath libs.kernel.migration
     }
 }
 
 plugins {
-    alias(a12Libs.plugins.prepare.models)
+    alias(libs.plugins.prepare.models)
 }
 
 tasks.register('cleanTestModels', Delete) {

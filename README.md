@@ -18,7 +18,8 @@ Refer to https://geta12.com/#/docs to get started with A12 development
 ---
 
 ## License
-Parts of the A12 platform are made available under a **dual license**.  
+
+Parts of the A12 platform are made available under a **dual license**.
 Please check the [LICENSE](./LICENSE) file for details.
 
 ---
@@ -54,10 +55,12 @@ The following tasks can be executed in the repository root or in individual fold
 
 The following tools are mandatory in order to build this repository.
 
-| Tool   | Version |
-| ------ | ------: |
-| [Node] | `^24`   |
-| [pnpm] | `^11`   |
+| Tool     | Version |
+| -------- | ------: |
+| [Node]   |   `^24` |
+| [pnpm]   |   `^11` |
+| [JDK]    |   `^25` |
+| [Gradle] |    `^9` |
 
 #### Install Dependencies
 
@@ -126,3 +129,5 @@ By default, it runs with a mocked backend.
 
 [Node]: https://nodejs.org/en/docs/
 [pnpm]: https://pnpm.io/motivation
+[JDK]: https://www.oracle.com/technetwork/java/javase/overview/index.html
+[Gradle]: https://docs.gradle.org/

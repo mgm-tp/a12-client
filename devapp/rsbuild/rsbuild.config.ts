@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,12 +23,14 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
+
+import { env as processEnv } from "node:process";
 
 import { defineConfig, rspack, type ProxyConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
@@ -64,7 +66,7 @@ function setupProxy(envMode: string): ProxyConfig | undefined {
 export default defineConfig(({ envMode, env }) => {
 	// for deployments we always use mock mode
 	const profile = env === "production" ? "mock" : (envMode ?? "mock");
-	const version = `${packageJson.version} [${profile.toUpperCase()}]`;
+	const version = `${processEnv.RELEASE_VERSION ?? packageJson.version} [${profile.toUpperCase()}]`;
 	const isStandaloneBuild =
 		!packageJson.dependencies["@com.mgmtp.a12.client/client-core"].includes("workspace");
 
@@ -80,7 +82,7 @@ export default defineConfig(({ envMode, env }) => {
 			entry: { index: `./src/devapp/${profile}.devapp.tsx` },
 			define: {
 				__VERSION__: JSON.stringify(version),
-				__SHORT_VERSION__: JSON.stringify(packageJson.version),
+				__SHORT_VERSION__: JSON.stringify(processEnv.RELEASE_VERSION ?? packageJson.version),
 				__DEPENDENCY_TREE_ROOT__: JSON.stringify(createDependencyTreeRoot(isStandaloneBuild)),
 				SC_DISABLE_SPEEDY: false,
 				__A12_MODEL_VERSIONS__: JSON.stringify(collectA12ModelVersions()),

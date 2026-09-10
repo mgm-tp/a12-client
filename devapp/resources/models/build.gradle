@@ -1,7 +1,4 @@
 buildscript {
-    // Adds the dataservices BOM to buildscript classpath to resolve A12 dependency versions
-    apply from: project.file('../buildscript-platforms.gradle')
-
     configurations.classpath {
         // both dataservices and kernel provide groovy 3.x (org.codehaus.groovy) dependencies, while we want groovy 4.x (org.apache.groovy)
         resolutionStrategy.capabilitiesResolution.withCapability('org.codehaus.groovy:groovy') {
@@ -10,15 +7,16 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.mgmtp.a12.dataservices:dataservices-core-tooling"
-        classpath "com.mgmtp.a12.kernel:kernel-md-model"
-        classpath "com.mgmtp.a12.kernel:kernel-md-facade"
-        classpath "com.mgmtp.a12.kernel:kernel-tool-model-migration"
+        classpath platform(libs.dataservices.bom)
+        classpath libs.dataservices.core.tooling
+        classpath libs.kernel.md.model
+        classpath libs.kernel.md.facade
+        classpath libs.kernel.migration
     }
 }
 
 plugins {
-    alias(a12Libs.plugins.prepare.models)
+    alias(libs.plugins.prepare.models)
 }
 
 tasks.named('jar') {

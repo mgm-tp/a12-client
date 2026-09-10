@@ -8,7 +8,7 @@ Dual License
 This source file is part of the mgm A12 Platform and available under
 a choice of two different licenses:
 
-1. Open-Source License – EUPL v1.2
+1. Open-Source License - EUPL v1.2
    You may redistribute and/or modify this file under the terms of the
    European Union Public License, version 1.2 - see https://eupl.eu/.
 
@@ -23,7 +23,7 @@ You must select and comply with exactly one of the above license options.
 
 Warranty Disclaimer (applies to either option)
 ----------------------------------------------
-THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
 WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -49,7 +49,7 @@ The ability to use the old-style ("long") imports will be removed in the next br
 To migrate, first install or update the codemod with your preferred package manager, e.g. with `pnpm`:
 [source,bash]
 ----
-pnpm install -g @com.mgmtp.a12.client/client-codemod
+pnpm install -g @com.mgmtp.a12.client/client-codemod@16
 ----
 
 Then run the specific recipe:
@@ -58,7 +58,7 @@ Then run the specific recipe:
 client-codemod preferTopLevel <path to directory with tsconfig.json>
 
 // or as a single command
-pnpm dlx @com.mgmtp.a12.client/client-codemod preferTopLevel <path to directory with tsconfig.json>
+pnpm dlx @com.mgmtp.a12.client/client-codemod@16 preferTopLevel <path to directory with tsconfig.json>
 ----
 
 For further details, run the codemod with the `--help` flag.

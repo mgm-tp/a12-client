@@ -8,7 +8,7 @@
  * This source file is part of the mgm A12 Platform and available under
  * a choice of two different licenses:
  *
- * 1. Open-Source License – EUPL v1.2
+ * 1. Open-Source License - EUPL v1.2
  *    You may redistribute and/or modify this file under the terms of the
  *    European Union Public License, version 1.2 - see https://eupl.eu/.
  *
@@ -23,7 +23,7 @@
  *
  * Warranty Disclaimer (applies to either option)
  * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED “AS IS” AND WITHOUT WARRANTY OF ANY KIND,
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
  * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
@@ -103,7 +103,7 @@ const CORE_RESTRICTED_IMPORT_PATTERNS = [
 const ignores = [
 	"**/.gradle",
 	"**/.vscode",
-	"**/assets",
+	"**/assets/images",
 	"**/build",
 	"**/dist",
 	"**/lib",
@@ -202,7 +202,7 @@ export default defineConfig(
 	},
 	{
 		name: "root/typedReduxSaga",
-		files: ["core/src/**/*", "devapp/src/**/*", "documentation/src/main/typescript**/*"],
+		files: ["core/src/**/*", "devapp/src/**/*", "documentation/src/assets/typescript/**/*"],
 		ignores: ["core/src/test/**/*", "devapp/src/test/**/*"],
 		rules: {
 			"@jambit/typed-redux-saga/delegate-effects": "error",
@@ -253,7 +253,7 @@ export default defineConfig(
 	},
 	{
 		name: "documentation/specific",
-		files: ["documentation/src/main/typescript/**/*"],
+		files: ["documentation/src/assets/typescript/**/*"],
 		rules: {
 			"@typescript-eslint/no-non-null-assertion": "warn",
 			"@typescript-eslint/no-unused-vars": "off"

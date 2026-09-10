@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/root",
-  "version": "16.3.0-SNAPSHOT",
+  "version": "16.2.2",
   "a12ReleaseLine": "2025.06",
   "description": "Client Workspaces Root",
   "author": "mgm technology partners",
@@ -43,7 +43,8 @@
     "prettier": "catalog:",
     "react": "catalog:",
     "semver": "catalog:",
+    "smol-toml": "catalog:",
     "yaml": "catalog:"
   },
-  "packageManager": "pnpm@11.1.2"
+  "packageManager": "pnpm@11.17.0"
 }

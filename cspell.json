@@ -30,7 +30,8 @@
 		"**/.gitignore",
 		"**/.dockerignore",
 		"documentation/scripts/convert.ts",
-		"documentation/scripts/asciidoctor.d.ts"
+		"documentation/scripts/asciidoctor.d.ts",
+		"gradle/*.versions.toml"
 	],
 	"words": [
 		"mgmtp",

@@ -1,9 +1,6 @@
 buildscript {
-    // Adds the dataservices BOM to buildscript classpath to resolve Spring Boot plugin version
-    // Provides dataServicesVersion for use in the dependencies block
-    apply from: project.file('../buildscript-platforms.gradle')
-
     dependencies {
+        classpath platform(libs.dataservices.bom)
         classpath 'org.springframework.boot:spring-boot-gradle-plugin'
     }
 }
@@ -16,8 +13,8 @@ plugins {
 apply plugin: 'org.springframework.boot'
 
 dependencies {
-    implementation platform("com.mgmtp.a12.dataservices:dataservices-parent:$dataServicesVersion")
-    implementation "com.mgmtp.a12.dataservices:dataservices-server-app"
+    implementation platform(libs.dataservices.bom)
+    implementation libs.dataservices.server.app
 }
 
 layout.buildDirectory = layout.projectDirectory.dir('../../target/server')

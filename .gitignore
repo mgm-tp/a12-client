@@ -11,7 +11,7 @@ yarn.lock
 build
 target
 .gradle
-/gradle
+/gradle/wrapper
 /gradlew
 /gradlew.bat
 

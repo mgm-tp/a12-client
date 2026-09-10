@@ -28,8 +28,7 @@ import type { Header } from '@com.mgmtp.a12.base/base-model-api/lib/main/header/
 import type { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/button/main/header-trigger/header-trigger.api.js';
 import type { IconProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/icon/main/icon.api.js';
 import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade/lib/main/js/api.js';
-import { JSX } from 'react/jsx-runtime';
-import { JSX as JSX_2 } from 'react';
+import { JSX } from 'react';
 import type { LabelProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/input/base/template/base.tpl.api.js';
 import type { LayoutGridProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/layout/layout-grid/main/layout-grid.api.js';
 import type { ListItemProps } from '@com.mgmtp.a12.widgets/widgets-core/lib/list/main/list.api.js';
@@ -975,7 +974,7 @@ export interface CurrentActivityLocationManager {
 // Warning: (ae-forgotten-export) The symbol "DashboardLayoutComponentPropsNG" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsNG): JSX_2.Element | null;
+export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsNG): JSX.Element | null;
 
 // @public (undocumented)
 export namespace DashboardLayoutComponentNG {
@@ -1162,7 +1161,7 @@ export interface DynamicFlow {
 }
 
 // @public
-export function DynamicGenericCaseMenu(props: ViewNGProps): JSX_2.Element;
+export function DynamicGenericCaseMenu(props: ViewNGProps): JSX.Element;
 
 // @public (undocumented)
 export namespace DynamicGenericCaseMenu {
@@ -1440,7 +1439,7 @@ export namespace LocaleReducers {
 // Warning: (ae-forgotten-export) The symbol "LocaleSelectProps" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function LocaleSelect(props: LocaleSelectProps): JSX_2.Element;
+export function LocaleSelect(props: LocaleSelectProps): JSX.Element;
 
 // @public
 export namespace LocaleSelectors {
@@ -1464,7 +1463,7 @@ export interface MasterDetailLayoutPropsNG extends LayoutPropsNG {
 export const MasterDetailRegionLayoutNG: LayoutNG<MasterDetailLayoutPropsNG>;
 
 // @public
-export function ModalRegionUiNG(props: ModalRegionUiNGProps): JSX_2.Element | null;
+export function ModalRegionUiNG(props: ModalRegionUiNGProps): JSX.Element | null;
 
 // @public (undocumented)
 export namespace ModalRegionUiNG {
@@ -1899,7 +1898,7 @@ export interface SupportedModelVersions {
 }
 
 // @public
-export function VariantSelection(props: VariantSelectionProps): JSX_2.Element;
+export function VariantSelection(props: VariantSelectionProps): JSX.Element;
 
 // @public (undocumented)
 export namespace VariantSelection {

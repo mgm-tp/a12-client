@@ -1,0 +1,35 @@
+# Run gradle versionCatalogUpdate --interactive to update this file
+[versions]
+dataservices = "38.4.5"
+build-utilities = "0.7.0"
+integration = "0.1.10"
+prepare-models = "0.6.0"
+# Gradle plugins (third-party)
+docker = "9.4.0"
+spotless = "8.3.0"
+version-catalog-update = "1.1.0"
+# Third-party libraries
+groovy-yaml = "4.0.28"
+
+[libraries]
+# --- A12 build tooling ---
+build-utilities = { module = "com.mgmtp.a12.devtools.plugins:build-utilities", version.ref = "build-utilities" }
+# --- A12 data services BOM (centralized version management) ---
+dataservices-bom = { module = "com.mgmtp.a12.dataservices:dataservices-parent", version.ref = "dataservices" }
+# --- A12 libraries (versions provided by the dataservices BOM) ---
+dataservices-core-tooling = { module = "com.mgmtp.a12.dataservices:dataservices-core-tooling" }
+dataservices-modelgraph = { module = "com.mgmtp.a12.dataservices:dataservices-modelgraph-fs-impl" }
+dataservices-server-app = { module = "com.mgmtp.a12.dataservices:dataservices-server-app" }
+kernel-md-model = { module = "com.mgmtp.a12.kernel:kernel-md-model" }
+kernel-md-facade = { module = "com.mgmtp.a12.kernel:kernel-md-facade" }
+kernel-migration = { module = "com.mgmtp.a12.kernel:kernel-tool-model-migration" }
+# --- Other ---
+docker-plugin = { module = "com.bmuschko:gradle-docker-plugin", version.ref = "docker" }
+groovy-yaml = { module = "org.apache.groovy:groovy-yaml", version.ref = "groovy-yaml" }
+
+[plugins]
+docker = { id = "com.bmuschko.docker-remote-api", version.ref = "docker" }
+integration = { id = "com.mgmtp.a12.devtools.plugins.integration", version.ref = "integration" }
+prepare-models = { id = "com.mgmtp.a12.devtools.plugins.prepare-models", version.ref = "prepare-models" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
