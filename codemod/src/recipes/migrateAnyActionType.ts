@@ -66,7 +66,11 @@ function findAnyActionImports(file: SourceFile): ImportSpecifier[] {
 		.getImportDeclarations()
 		.filter(importDeclaration => {
 			const moduleSpecifier = importDeclaration.getModuleSpecifierValue();
-			return moduleSpecifier === TYPESCRIPT_FSA || TYPESCRIPT_FSA_REDUX_COMPAT || REDUX;
+			return (
+				moduleSpecifier === TYPESCRIPT_FSA ||
+				moduleSpecifier === TYPESCRIPT_FSA_REDUX_COMPAT ||
+				moduleSpecifier === REDUX
+			);
 		})
 		.flatMap(importDeclaration => importDeclaration.getNamedImports())
 		.filter(importSpecifier => importSpecifier.getName() === "AnyAction");
@@ -100,7 +104,7 @@ function ensureReduxActionImport(file: SourceFile): string {
 		return existingReduxActionImport.getAliasNode()?.getText() ?? "Action";
 	}
 
-	const actionTypeName = hasImportedName(file, "Action") ? "ReduxAction" : "Action";
+	const actionTypeName = hasLocalName(file, "Action") ? "ReduxAction" : "Action";
 	if (!reduxImportDeclaration) {
 		file.addImportDeclaration({
 			moduleSpecifier: REDUX,
@@ -125,20 +129,12 @@ function findReduxImportDeclaration(file: SourceFile): ImportDeclaration | undef
 		.find(importDeclaration => importDeclaration.getModuleSpecifierValue() === REDUX);
 }
 
-function hasImportedName(file: SourceFile, localName: string): boolean {
-	return file.getImportDeclarations().some(importDeclaration => {
-		const hasNamedImport = importDeclaration.getNamedImports().some(importSpecifier => {
-			const currentLocalName =
-				importSpecifier.getAliasNode()?.getText() ?? importSpecifier.getName();
-
-			return currentLocalName === localName;
-		});
-
-		const hasDefaultImport = importDeclaration.getDefaultImport()?.getText() === localName;
-		const hasNamespaceImport = importDeclaration.getNamespaceImport()?.getText() === localName;
-
-		return hasNamedImport || hasDefaultImport || hasNamespaceImport;
-	});
+/**
+ * Checks whether the given name is already bound in the file's module scope, no matter if by an
+ * import or by a local declaration (type alias, interface, class, variable, ...).
+ */
+function hasLocalName(file: SourceFile, localName: string): boolean {
+	return file.getLocal(localName) !== undefined;
 }
 
 function addNamedImport(

@@ -31,7 +31,6 @@
  */
 
 import "./whyDidYouRender/index.js";
-
 import { renderDevApp, triggerDialogForDirtyOrLockedActivities } from "./commonDevappSetup.js";
 import { registerModeSwitchEventHandlers } from "./config/development.js";
 import { createLegacyAppSetup } from "./legacySetup/createLegacyAppSetup.js";

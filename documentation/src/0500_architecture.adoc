@@ -30,6 +30,28 @@ NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
 LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 ////
 
+[#architecture-details]
 = Architecture
 
 This chapter gives an insight into the A12 Client Architecture.
+
+[#principles]
+== Principles
+
+The following diagram shows the principal structuring of the Client into modules and their responsibilities in the architecture.
+
+image::assets/images/overview/key-concepts.svg[key-concepts]
+
+The Client modules fall in one of these categories:
+
+* State Management
+* Application Model
+* Store
+* Supporting Sagas
+* Data I/O
+* Data Hub with the DataLoaders/DataEditors
+* DataProvider Principles
+* Presentation
+* Abstract UI Structures
+* Views
+* Business Logic

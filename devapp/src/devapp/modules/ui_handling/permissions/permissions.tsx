@@ -30,13 +30,13 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type {
 	ActivityActions,
 	ActivityReducers,
 	DynamicMatchCondition
 } from "@com.mgmtp.a12.client/client-core";
 import { Activity, ActivitySelectors } from "@com.mgmtp.a12.client/client-core";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 export const permissionExampleDescriptor = {
 	section: "UIHandling",

@@ -48,11 +48,11 @@ import { mergeInto } from "./dg.js";
  * Will be overwritten by server.
  */
 const LINK_DOC_PLACEHOLDER: Model.DocumentAndValidationModel = {
-	/* eslint-disable @typescript-eslint/no-non-null-assertion */
+	/* oxlint-disable typescript/no-non-null-assertion */
 	content: undefined!,
 	header: undefined!,
 	generatedCodeAccessor: undefined!
-	/* eslint-enable @typescript-eslint/no-non-null-assertion */
+	/* oxlint-enable typescript/no-non-null-assertion */
 };
 
 const LINKDOC_DOC_REF_SUFFIX = "____link_doc";
@@ -172,7 +172,7 @@ export function removeLink(
 	}
 
 	// Update links.linkIdsByDocId
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	// oxlint-disable-next-line typescript/no-non-null-assertion
 	const docIds: DocRef[] = linkRef.linkDescriptor.entities.map(e => e.docRef!);
 	const linkIdsByDocId = { ...dg.links.linkIdsByDocId };
 	docIds.forEach(docId => {
@@ -182,13 +182,13 @@ export function removeLink(
 
 	// Update links.byId
 	const byId = { ...dg.links.byId };
-	/* eslint-disable @typescript-eslint/no-dynamic-delete */
+	/* oxlint-disable typescript/no-dynamic-delete */
 	delete byId[linkRef.id];
 
 	// Update documents.byDocRef
 	const byDocRef = { ...dg.documents.byDocRef };
 	if (linkDocRef) {
-		/* eslint-disable @typescript-eslint/no-dynamic-delete */
+		/* oxlint-disable typescript/no-dynamic-delete */
 		delete byDocRef[linkDocRef];
 	}
 

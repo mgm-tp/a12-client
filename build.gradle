@@ -23,7 +23,8 @@ import java.nio.file.Paths
 
 /** Define a proper version in build */
 String globalVersion = Helper.getVersion(
-    file('package.json'),
+    providers,
+    layout.projectDirectory.file('package.json'),
     project.findProperty('version') as String,
     project.findProperty('use') as String
 )
@@ -68,14 +69,16 @@ spotless {
 }
 
 tasks.register('configurePnpm', LeadingBuildTask) {
+    final String requiredPnpmVersion = pnpmVersion
+    final Path installDir = Paths.get("${rootDir}/.npm")
+
     doLast {
         if (System.getenv('CI')) {
-            println "Installing $pnpmVersion"
+            println "Installing $requiredPnpmVersion"
 
-            Path installDir = Paths.get("${rootDir}/.npm")
             Files.createDirectories(installDir)
 
-            execCommandLine 'npm', 'install', '-g', '--prefix', installDir.toString(), pnpmVersion
+            execCommandLine 'npm', 'install', '-g', '--prefix', installDir.toString(), requiredPnpmVersion
         } else {
             def os = System.getProperty('os.name').toLowerCase()
             def pnpmCommand = os.contains('win') ? 'where pnpm' : 'which pnpm'
@@ -84,7 +87,7 @@ tasks.register('configurePnpm', LeadingBuildTask) {
             if (result) {
                 println "pnpm is available at: $result"
             } else {
-                throw new GradleException("pnpm is not installed on your system. Please install with 'npm install -g $pnpmVersion'")
+                throw new GradleException("pnpm is not installed on your system. Please install with 'npm install -g $requiredPnpmVersion'")
             }
         }
     }
@@ -94,19 +97,23 @@ String getPnpmVersion() {
     return (new JsonSlurper().parse(file("package.json"))["packageManager"] as String).split("\\+")[0]
 }
 
-tasks.register('installDependencies', LeadingBuildTask) {
+tasks.register('pnpmInstall', LeadingBuildTask) {
     dependsOn tasks.named('configurePnpm')
     mustRunAfter tasks.named('setVersion')
     doLast { execCommandLine 'pnpm', 'install' }
 }
 
 tasks.register('verify', LeadingBuildTask) {
-    dependsOn tasks.named('installDependencies')
+    dependsOn tasks.named('pnpmInstall')
+    // the type-aware rules read sibling declarations out of `lib`, which `_assemble`
+    // produces; without them cross-package types resolve to `error` and the
+    // `no-unsafe-*` family reports findings that are not there
+    mustRunAfter tasks.named('_assemble')
     doLast { execCommandLine 'node', '--run', 'verify' }
 }
 
 tasks.register('_clean', LeadingBuildTask) {
-    dependsOn tasks.named('installDependencies')
+    dependsOn tasks.named('pnpmInstall')
     doLast { execCommandLine 'node', '--run', 'clean' }
 }
 
@@ -115,10 +122,12 @@ tasks.named('clean') {
 }
 
 tasks.register('_assemble', LeadingBuildTask) {
-    dependsOn tasks.named('verify'),
+    dependsOn tasks.named('pnpmInstall'),
         project(':coreTestModels').tasks.named('assemble'),
         project(':devappModels').tasks.named('assemble')
-    doLast { execCommandLine 'node', '--run', 'build' }
+    // the devapp bundle bakes the version in at build time and package.json is not stamped
+    // until publish, so the value has to come from gradle
+    doLast { execCommandLine(['node', '--run', 'build']) { environment 'RELEASE_VERSION', globalVersion } }
 }
 
 tasks.named('assemble') {
@@ -126,18 +135,31 @@ tasks.named('assemble') {
 }
 
 tasks.register('_check', LeadingBuildTask) {
+    dependsOn tasks.named('pnpmInstall')
+    // The JS tests run from `lib` and read generated model fixtures from
+    // `core/target/models`, both produced by `_assemble`. Ordering only, so a bare
+    // `check` does not pull in a frontend build the way `dependsOn` would.
+    mustRunAfter tasks.named('_assemble'), tasks.named('verify')
+
     doLast {
+        // react-dom only ships `act` in its development bundle, and the integration
+        // job exports NODE_ENV=production, so the suite has to force `test` itself.
         execCommandLine(['node', '--run', 'test']) {
-            environment "NODE_ENV", "test"
+            environment 'NODE_ENV', 'test'
         }
     }
 }
 
 tasks.named('check') {
-    dependsOn tasks.named('_check')
+    dependsOn tasks.named('_check'), tasks.named('verify')
 }
 
+// review builds resolve to the plain -SNAPSHOT version, so stamping would rewrite all
+// workspace package.json files to what they already contain
+final boolean stampVersion = project.hasProperty('use')
+
 tasks.register('setVersion', PackageJsonModifierTask) {
+    onlyIf { stampVersion }
     packageDirs = new YamlSlurper().parse(file('./pnpm-workspace.yaml')).packages
         .collect({ file(it) }) + file('.')
     change = Helper.createSetVersion(version as String)

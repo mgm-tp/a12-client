@@ -49,6 +49,7 @@ import type { DgDocument } from "../../../internal/documentGraph.js";
 import { selectUiValueByPath } from "../../../redux/api/selectors.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
 
+import { messageDefaults } from "./mocks/mockMessage.js";
 import { setupStateWithDocuments } from "./mocks/mockState.js";
 
 describe("redux.api.selectors", () => {
@@ -209,6 +210,7 @@ describe("redux.api.selectors", () => {
 				error: {
 					value: expectedValue,
 					message: {
+						...messageDefaults,
 						entityInstance: [
 							{ elementName: "base", index: 1 },
 							{ elementName: "numberField001", index: 1 }

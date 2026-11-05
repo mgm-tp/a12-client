@@ -31,12 +31,20 @@
  */
 
 import type { JSX, PropsWithChildren } from "react";
+import { useDispatch } from "react-redux";
 
+import { ApplicationActions } from "@com.mgmtp.a12.client/client-core";
 import {
 	addPrefix,
 	ActionContentbox,
-	ContentBoxElements
+	ContentBoxElements,
+	ExternalLink,
+	Link
 } from "@com.mgmtp.a12.widgets/widgets-core";
+
+declare const __DOCS_AVAILABLE__: boolean;
+
+const docsAvailable = typeof __DOCS_AVAILABLE__ === "boolean" && __DOCS_AVAILABLE__;
 
 export function WelcomePageActionBox(
 	props: PropsWithChildren & { readonly title: string }
@@ -63,83 +71,79 @@ export function WelcomeTagline(props: PropsWithChildren): JSX.Element {
 	);
 }
 
-/**
- * Default welcome page for the legacy (pure AppModel) devapp entry point.
- *
- * This is shown at `/legacy.html` and uses classic `ApplicationFactories.createApplicationSetup`
- * with only classic Modules (no DynamicConfiguration). It showcases the legacy AppModel-based approach.
- */
-export function WelcomePage(): JSX.Element {
+/** Opens the sub activity with the details of the entry point's application setup. */
+function SetupDetailsLink(props: PropsWithChildren): JSX.Element {
+	const dispatch = useDispatch();
 	return (
-		<WelcomePageActionBox title="Welcome — Client DevApp (Legacy Entry Point)">
-			<p>
-				You are using the <strong>legacy (pure AppModel)</strong> devapp entry point.
-			</p>
+		<Link
+			useAsButton
+			onClick={() =>
+				dispatch(
+					ApplicationActions.startMainActivityRequested({
+						descriptor: { section: "setup-details" }
+					})
+				)
+			}
+		>
+			{props.children}
+		</Link>
+	);
+}
+
+function WelcomeContent(props: { readonly setup: "composable" | "legacy" }): JSX.Element {
+	return (
+		<WelcomePageActionBox title="Welcome">
+			{docsAvailable && (
+				<p>
+					Documentation: <ExternalLink href="./doc/manual/index.html">User Manual</ExternalLink> ·{" "}
+					<ExternalLink href="./doc/typedoc/index.html">Typedoc</ExternalLink>
+				</p>
+			)}
+
+			<p>This DevApp was built with the A12 Client</p>
 
 			<WelcomeTagline>
 				The focus of the A12 Client is to provide a model-driven, extensible client runtime.
 				<br />
-				It&apos;s main function is the orchestration of other UI components, especially A12 Engines.
+				Its main function is the orchestration of other UI components, especially A12 Engines.
 				<br />
 				It is based on the technologies TypeScript and React.
 			</WelcomeTagline>
 
 			<div>
+				<p>The application demonstrates features like:</p>
+				<ul>
+					<li>Model and Data Loading</li>
+					<li>Layouts (Application Frame, Master Detail, Dashboard, Stack, Null)</li>
+					<li>Regions</li>
+					<li>Deep Linking</li>
+					<li>Heterogeneity</li>
+					<li>Notifications</li>
+					<li>Permissions</li>
+					<li>Dirty Handling</li>
+					<li>Error Handling</li>
+				</ul>
+
 				<p>
-					<strong>Setup API:</strong> Prop-based factory with AppModel (
-					<code>ApplicationFactories.createApplicationSetup</code>)
-				</p>
-				<p>
-					<strong>Scene modeling:</strong> Classic AppModel with <code>app_model.json</code>{" "}
-					flows/scenes (no Dynamic Config)
+					These and more examples can be found in the main menu. It also showcases some Client
+					specific components like the LocaleSelect or the VetoDialog.
 				</p>
 
 				<p>
-					This entry point demonstrates the <strong>legacy AppModel-based</strong> approach
-					(pre-Dynamic Config). It uses:
+					This client application was built using the{" "}
+					<SetupDetailsLink>{props.setup} application setup</SetupDetailsLink>.
 				</p>
-				<ul>
-					<li>
-						Classic <code>Module</code> objects with <code>views</code> property
-					</li>
-					<li>
-						Application model defined in <code>app_model.json</code> (flows, scenes,
-						matchConditions, directives)
-					</li>
-					<li>
-						Menu items read directly from <code>ApplicationModel.modules[].menu</code>
-					</li>
-					<li>
-						Classic <code>DefaultRegionUi</code> rendering (not DynamicRegionUi)
-					</li>
-				</ul>
-
-				<p>The menu contains the following entries:</p>
-				<ul>
-					<li>
-						<strong>Master-Detail-Flow</strong> — demonstrates a master-detail navigation flow
-					</li>
-					<li>
-						<strong>About</strong> — contains sub-items:
-						<ul>
-							<li>
-								<strong>Contact</strong> — simple static content view
-							</li>
-							<li>
-								<strong>Version Information</strong> — displays application version details
-							</li>
-						</ul>
-					</li>
-				</ul>
-
-				<p>Other entry points:</p>
-				<ul>
-					<li>
-						<a href="./index.html">[Composable] Client DevApp</a> — composable API with Dynamic
-						Config
-					</li>
-				</ul>
 			</div>
 		</WelcomePageActionBox>
 	);
+}
+
+/** Welcome page for the composable devapp entry point, shown at `/index.html`. */
+export function ComposableWelcomePage(): JSX.Element {
+	return <WelcomeContent setup="composable" />;
+}
+
+/** Welcome page for the legacy (pure AppModel) devapp entry point, shown at `/legacy.html`. */
+export function WelcomePage(): JSX.Element {
+	return <WelcomeContent setup="legacy" />;
 }

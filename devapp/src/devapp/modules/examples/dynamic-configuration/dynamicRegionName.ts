@@ -30,41 +30,12 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { unlink } from "node:fs/promises";
-import { join } from "node:path";
-
 /**
- * @typedef {Object} Context
- * @property {(msg: string) => void} log
- */
-
-/**
- * see https://pnpm.io/pnpmfile
+ * Name of the dynamic region belonging to the given activity.
  *
- * Switching branches might introduce new lint errors (e.g. due to new deprecations).
- * If eslint already ran, the cache files are not invalidated -> new errors are not visible.
- *
- * To fix this, we just remove the cache files every time the lockfile is resolved.
+ * The activity id is part of the name since region names must be unique — every
+ * relevant activity of this example contributes its own region.
  */
-export const hooks = {
-	/**
-	 * @param {any} lockfile
-	 * @param {Context} context
-	 */
-	async afterAllResolved(lockfile, context) {
-		context.log("Removing .eslintcache files...");
-		await Promise.allSettled(
-			Object.keys(lockfile.importers ?? {}).map(importer => unlink(join(importer, ".eslintcache")))
-		);
-
-		// There is a pnpm setting for this, but it does not apply for our registry
-		// see https://github.com/pnpm/pnpm/pull/11509
-		for (const key in lockfile.packages) {
-			if (lockfile.packages[key].resolution?.tarball) {
-				delete lockfile.packages[key].resolution.tarball;
-			}
-		}
-
-		return lockfile;
-	}
-};
+export function dynamicRegionName(activityId: string): string {
+	return `DYNAMIC-${activityId}`;
+}

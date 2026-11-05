@@ -42,11 +42,12 @@ import type {
 	A12ApplicationConfig,
 	ApplicationWithConfiguredFeature,
 	RequireFeatures
-} from "../../../core/index.js";
+} from "../../../core/application/index.js";
 
 import { DirtyHandlingFactories } from "./factories.js";
 import { DirtyHandlingViews } from "./views.js";
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		dirtyHandling?: unknown;
@@ -67,19 +68,19 @@ export type ApplicationWithDirtyHandlingConfig = RequireFeatures<
  * NOTE: If your app requires localizations, provide `withLocalization` before this.
  */
 export const addDirtyHandlingWrapper = <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) =>
-	addWrapper<T>(DirtyHandlingViews.VetoDialog)(cfg);
+	addWrapper(DirtyHandlingViews.VetoDialog)(cfg);
 
 /**
  * @experimental
  */
 export const addDirtyHandlingSagas = <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) =>
-	addPlatformSagas<T>(...DirtyHandlingFactories.createSagas())(cfg);
+	addPlatformSagas(...DirtyHandlingFactories.createSagas())(cfg);
 
 /**
  * @experimental
  */
 export const addDirtyConfirmationOnLeave = <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) =>
-	addInitialAction<T>(store => {
+	addInitialAction(store => {
 		if (typeof window === "undefined") {
 			return;
 		}

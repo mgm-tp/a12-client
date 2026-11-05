@@ -49,6 +49,7 @@ import {
 	Typography
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
+import { dynamicRegionName } from "./dynamicRegionName.js";
 import { setCollapsedAction, uiSlice } from "./uiState.js";
 
 const { Section, Headline, Body } = Typography;
@@ -59,12 +60,7 @@ const StyledSection = styled(Section)<{ $color?: string }>`
 	background-color: ${props => props.$color ?? "white"};
 `;
 
-interface DynamicViewProps extends ViewNGProps {
-	readonly hideContentbox?: boolean;
-	readonly dynamicRegionRef?: RegionReferenceNG;
-}
-
-export function DynamicView(props: DynamicViewProps): JSX.Element {
+export function DynamicView(props: ViewNGProps): JSX.Element {
 	const activityId = props.activityId;
 
 	const dispatch = useDispatch();
@@ -93,20 +89,17 @@ export function DynamicView(props: DynamicViewProps): JSX.Element {
 		dispatch(setCollapsedAction({ activityId, collapsed }));
 	}, [dispatch, activityId, hideSubViews]);
 
-	const ViewContainer = props.hideContentbox ? ViewAsSection : ViewContentBox;
-
 	const numberOfParents = useSelector(
 		state => ActivitySelectors.initiatingPath(activityId)(state).length
 	);
+	const ViewContainer = numberOfParents > 0 ? ViewAsSection : ViewContentBox;
 	const color = numberOfParents % 2 === 0 ? "lightblue" : "lightpink";
 
 	return (
 		<ViewContainer onClose={cancelActivity} color={color}>
 			<Button label="start sub-activity" primary onClick={startSubActivity} />
 			<Button label={`${hideSubViews ? "Show" : "Hide"} sub views`} onClick={toggleHideSubViews} />
-			{!hideSubViews && props.dynamicRegionRef && (
-				<SubViews dynamicRegionRef={props.dynamicRegionRef} />
-			)}
+			{!hideSubViews && <SubViews dynamicRegionRef={dynamicRegionName(activityId)} />}
 		</ViewContainer>
 	);
 }

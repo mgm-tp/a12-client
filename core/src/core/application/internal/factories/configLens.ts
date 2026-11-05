@@ -30,10 +30,18 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import a12Config from "@com.mgmtp.a12.devtools/prettier-config";
+import { Lens } from "monocle-ts";
 
-/** @type {import("prettier").Config} */
-export default {
-	...a12Config,
-	printWidth: 100
-};
+import type { A12ApplicationConfig } from "./applicationConfig.js";
+
+/** Lens onto the `config` property of an {@link A12ApplicationConfig}. */
+export const configLens = <T extends A12ApplicationConfig>() => Lens.fromProp<T>()("config");
+
+/**
+ * Lens onto a single property of the application `config`. Shared by the config
+ * builders in `application` and the layout/region builders in `frame`.
+ */
+export const configPropLens =
+	<T extends A12ApplicationConfig>() =>
+	<K extends keyof T["config"]>(prop: K) =>
+		configLens<T>().compose(Lens.fromProp<T["config"]>()(prop));

@@ -1,4 +1,4 @@
-# A12 Client Devapp
+# A12 Client DevApp
 
 This is an application used for the development of the A12 Client library.
 

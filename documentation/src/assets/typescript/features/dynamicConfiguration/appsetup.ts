@@ -49,7 +49,7 @@ import { PersonConfiguration } from "./simpleModule.js";
 const modules: DynamicConfiguration[] = [PersonConfiguration];
 modules.forEach(m => ModuleRegistryProvider.getInstance().addModule(m));
 
-// 2. Build the composable appsetup with withDynamicConfig()
+// 2. Build the composable appsetup with withDynamicConfig
 const initialConfig: A12ApplicationConfig = {
 	config: {},
 	localization: {
@@ -59,7 +59,7 @@ const initialConfig: A12ApplicationConfig = {
 
 const finalConfig = combineFeatures(
 	withModel(APPLICATION_MODEL_PLACEHOLDER),
-	withDynamicConfig(),
+	withDynamicConfig,
 	withHTTPModelLoader,
 	withLocalization
 	// ...others

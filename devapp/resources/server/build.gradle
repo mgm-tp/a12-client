@@ -38,6 +38,10 @@ springBoot {
 bootJar {
     archiveBaseName = 'devapp'
 
+    // the `dist` bundled below is written by the root _assemble. `mustRunAfter` rather than
+    // `dependsOn` so a bare `runJar` still boots without building the frontend.
+    mustRunAfter rootProject.tasks.named('_assemble')
+
     from('../models/build/expanded') {
         include '**/*.json'
         into '/BOOT-INF/classes/com/mgmtp/a12/platform/business-models'
@@ -62,6 +66,12 @@ gradle.taskGraph.whenReady { taskGraph ->
             }
         }
     }
+}
+
+// the project name `devappServices` is not a valid OCI image reference, so the default
+// `imageName` cannot even be serialized into the configuration cache
+tasks.named('bootBuildImage') {
+    imageName = "client-devapp-services:$version"
 }
 
 tasks.register("runJar", JavaExec) {

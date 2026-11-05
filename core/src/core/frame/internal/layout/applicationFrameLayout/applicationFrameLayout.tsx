@@ -30,7 +30,7 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ComponentType, JSX, ReactElement, ReactNode } from "react";
+import type { ComponentType, JSX, ReactNode } from "react";
 import { useCallback, useContext, useMemo, useState } from "react";
 
 import {
@@ -40,106 +40,19 @@ import {
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { ClientWidgetMapContext } from "../../../../ClientWidgetMap.js";
-import type { ApplicationModel } from "../../../../model/index.js";
-import type { View } from "../../../../view/index.js";
 import { isOnSmallDevice } from "../../../../view/internal/size-context.js";
-import type { MainMenuProps } from "../../components/MainMenu.js";
 
-import type { Layout, LayoutProps } from "../LayoutProps.js";
+import type { Layout } from "../LayoutProps.js";
 import type { MainMenuContextProps } from "../MainMenuContext.js";
 import { MainMenuContext } from "../MainMenuContext.js";
 import { type RegionInformation } from "../mobile-navigation.js";
 
+import type { ApplicationFrameLayoutProps } from "./ApplicationFrameLayoutProps.js";
 import { PageTemplate } from "./pageTemplate.js";
 import { SidebarContextMemoWrapper, type SidebarContextProps } from "./sidebarContext.js";
 import { useApplicationFrameState } from "./useApplicationFrameState.js";
 import { useMobileNavigation } from "./useMobileNavigation.js";
 import { useSidebarExpansion } from "./useSidebarExpansion.js";
-
-export interface Region {
-	readonly views: View[];
-	readonly layout: ApplicationModel.Layout;
-}
-
-/** props to render an ApplicationFrameLayout React component */
-export interface ApplicationFrameLayoutProps extends LayoutProps {
-	readonly globalMessageBox?: ReactNode;
-
-	/** the URL to the image shown as logo in the application frame */
-	readonly logoURL?: string;
-
-	/** A custom component to be used for the logo */
-	readonly logo?: ReactNode;
-
-	/** A custom component to be used for the title */
-	readonly title?: ReactNode;
-
-	/**
-	 * This component is used for the main menu in the application header
-	 * instead of the default main menu, if it is provided.
-	 */
-	readonly mainMenuComponent?: ComponentType<MainMenuProps>;
-
-	/**
-	 * Additional items which should be shown in the application header
-	 */
-	readonly additionalHeaderItems?: ReadonlyArray<HeaderItemProps>;
-
-	/** Optional footer element for the application */
-	readonly footer?: ReactElement;
-
-	/**
-	 * Optional component that renders a title inside the navigation bar (mobile
-	 * only). The title receives the list of visible views, so that it can
-	 * decide what to use as title. Normally, the component should only render
-	 * a string.
-	 */
-	readonly navigationBarTitle?: ComponentType<NavigationBarTitleProps>;
-
-	/**
-	 * Flag to disable mobile navigation.
-	 * If mobile navigation is disabled:
-	 *  * no back-button will be rendered in the `subToolbar` or `contentToolbar`
-	 *    of the app frame
-	 *  * the header will not be hidden at any time
-	 *  * the toggle button for the sidebar will be shown
-	 */
-	readonly disableMobileNavigation?: boolean;
-
-	/**
-	 * A list of permission that are used to show user menu entries based on
-	 * the permissions from the application model.
-	 */
-	readonly permissions?: string[];
-
-	readonly settings?: ApplicationModel.ApplicationFrame.Settings;
-}
-
-export interface NavigationBarTitleProps {
-	readonly visibleViews: View[];
-}
-
-/**
- * Props for an header item which is added to the application frame header
- */
-export interface HeaderItemProps {
-	/** React component which should be shown */
-	readonly item: ReactNode;
-
-	/**
-	 * Orientation of the item which can be at the moment "leftSlots-right"
-	 * or "rightSlots-left".
-	 *
-	 * "leftSlots-right":
-	 * Item will be added on the left side after the logo image and the title.
-	 *
-	 * "rightSlots-left":
-	 * Item will be added on the right side before the version information and the user info.
-	 *
-	 * An extension of this type is not considered a breaking change.
-	 */
-	readonly orientation: "leftSlots-right" | "rightSlots-left";
-}
 
 /**
  * This layout uses the ApplicationFrame widget to create an application frame.

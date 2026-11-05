@@ -57,7 +57,7 @@ describe("@com.mgmtp.a12.client.devapp.features.multiple-data-holders", () => {
 
 			const dispatched: object[] = [];
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			function setupAndRunSaga(state: any = { activities: {} }): Promise<any> {
 				return runSaga(
 					{

@@ -34,6 +34,7 @@ import type { Module } from "@com.mgmtp.a12.client/client-core";
 
 import { ContactView } from "../modules/about/contact/page.js";
 import { VersionInfo } from "../modules/about/versionInformation/dependencies.js";
+import { LegacySetupDetails } from "../modules/landingPage/setupDetails.js";
 import { WelcomePage } from "../modules/landingPage/welcome.js";
 
 import { MasterDetailFlowDetailView } from "./views/masterDetailFlowDetailView.js";
@@ -52,6 +53,8 @@ export const LegacyModule: Module = {
 		switch (componentName) {
 			case "WelcomeView":
 				return WelcomePage;
+			case "SetupDetailsView":
+				return LegacySetupDetails;
 			case "MasterDetailFlowOverviewView":
 				return MasterDetailFlowOverviewView;
 			case "MasterDetailFlowDetailView":

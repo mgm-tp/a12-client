@@ -36,7 +36,7 @@ This page gives an overview of the key modules and elements of the Client. The f
 
 image::assets/images/walkthrough/client-architecture.svg[client-architecture]
 
-Read the above diagram like this: modules of the Client are in colored boxes. The box title briefly summarizes the responsibility of the module and also relevant technologies used. Go back to <</introduction/principles,Principles>> in the Introduction to see a collapsed diagram of Clients' modules.
+Read the above diagram like this: modules of the Client are in colored boxes. The box title briefly summarizes the responsibility of the module and also relevant technologies used. Go back to <<principles,Principles>> above to see a collapsed diagram of Clients' modules.
 
 == Activity / Scene / View Cascade
 

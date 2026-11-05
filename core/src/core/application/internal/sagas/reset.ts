@@ -38,7 +38,7 @@ import type { ActionCreator } from "@com.mgmtp.a12.client/typescript-fsa-redux-5
 import { StoreActions } from "../../../store/index.js";
 
 /** @internal */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export function* applicationReset(trigger: ActionCreator<any>[]): SagaGenerator<void> {
 	yield* takeEvery(trigger, handleApplicationReset);
 }

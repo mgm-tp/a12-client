@@ -37,6 +37,8 @@ import type { Message } from "@com.mgmtp.a12.kernel/kernel-md-facade";
 
 import { expandComputedFields } from "../../data-mutation/validation-computation/expandComputedFields.js";
 
+import { messageDefaults } from "../redux/api/mocks/mockMessage.js";
+
 describe("data-mutation.validation", () => {
 	describe("expandComputedFields", () => {
 		it("when given a list of messages without computed fields in the referenced fields, returns the given messages", () => {
@@ -160,6 +162,7 @@ function dm(): Model.DocumentAndValidationModel {
 
 function testError(): Message {
 	return {
+		...messageDefaults,
 		entityInstance: [
 			{ elementName: "foo", index: 1 },
 			{ elementName: "bar", index: 1 }

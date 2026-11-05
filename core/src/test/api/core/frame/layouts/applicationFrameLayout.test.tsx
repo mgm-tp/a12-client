@@ -53,7 +53,7 @@ import {
 import { type ClientWidgetMap } from "../../../../../core/ClientWidgetMap.js";
 import { FrameViews } from "../../../../../core/frame/index.js";
 import MainMenu from "../../../../../core/frame/internal/components/MainMenu.js";
-import type { ApplicationFrameLayoutProps } from "../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
+import type { ApplicationFrameLayoutProps } from "../../../../../core/frame/internal/layout/applicationFrameLayout/ApplicationFrameLayoutProps.js";
 import type {
 	LayoutProps,
 	LayoutProvider

@@ -41,7 +41,7 @@
  */
 
 export { LocaleActions } from "./internal/actions.js";
-export { RESOURCE_KEYS as LOCALE_RESOURCE_KEYS } from "./internal/languages/index.js";
+export { LOCALE_RESOURCE_KEYS } from "./internal/languages/index.js";
 export { LocaleReducers } from "./internal/reducers.js";
 export { LocaleSelectors } from "./internal/selectors.js";
 

@@ -276,7 +276,7 @@ function dynamicRegionInfoInternal(
 			views.unshift({
 				constraints: directive.constraints,
 				Component: directive.component,
-				props: { activityId: activity.id }
+				props: { ...directive.componentProps, activityId: activity.id }
 			});
 		}
 
@@ -305,6 +305,7 @@ export function dynamicAllViews(): Selector<ViewDescriptorNG[]> {
 			directive.type !== "DYNAMIC_CLEAR_REGION"
 				? {
 						props: {
+							...directive.componentProps,
 							activityId: directive.activityId
 						},
 						Component: directive.component,

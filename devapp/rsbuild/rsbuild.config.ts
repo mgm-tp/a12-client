@@ -30,7 +30,7 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import process from "node:process";
+import { env as processEnv } from "node:process";
 
 import { defineConfig, rspack, type ProxyConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
@@ -49,11 +49,11 @@ import { pluginModelWatcher } from "./pluginModelWatcher.ts";
  */
 const entries = {
 	index: { title: "Client DevApp" },
-	legacy: { title: "[Legacy] Client DevApp" }
+	legacy: { title: "Client DevApp (Legacy)" }
 };
 
 function setupProxy(): ProxyConfig {
-	const serverPort = process.env.SERVER_PORT ?? "9090";
+	const serverPort = processEnv.SERVER_PORT ?? "9090";
 	return {
 		"/api": {
 			target: `http://localhost:${serverPort}`,
@@ -79,9 +79,7 @@ function setupProxy(): ProxyConfig {
 // executed, not relative to this config file.
 export default defineConfig(({ envMode, env }) => {
 	const profile = env === "production" ? "mock" : (envMode ?? "mock");
-	const version = `${packageJson.version} [${(envMode ?? "mock").toUpperCase()}]`;
-	const isStandaloneBuild =
-		!packageJson.dependencies["@com.mgmtp.a12.client/client-core"].includes("workspace");
+	const version = `${processEnv.RELEASE_VERSION ?? packageJson.version} [${(envMode ?? "mock").toUpperCase()}]`;
 
 	return {
 		server: {
@@ -89,8 +87,10 @@ export default defineConfig(({ envMode, env }) => {
 			publicDir: [{ name: "resources/html" }, { name: "target/models", watch: true }],
 			proxy: profile === "platform" ? setupProxy() : undefined
 		},
-		// watching for changes in the client library during development in the client repo
-		dev: { watchFiles: [{ paths: ["../core/lib"] }] },
+		dev: {
+			// watching for changes in the client library during development in the client repo
+			watchFiles: [{ paths: ["../core/lib"] }]
+		},
 		source: {
 			preEntry: "@com.mgmtp.a12.widgets/widgets-core/styles/basic.css",
 			entry: {
@@ -99,11 +99,12 @@ export default defineConfig(({ envMode, env }) => {
 			},
 			define: {
 				__VERSION__: JSON.stringify(version),
-				__SHORT_VERSION__: JSON.stringify(packageJson.version),
-				__DEPENDENCY_TREE_ROOT__: JSON.stringify(createDependencyTreeRoot(isStandaloneBuild)),
+				__SHORT_VERSION__: JSON.stringify(processEnv.RELEASE_VERSION ?? packageJson.version),
+				__DEPENDENCY_TREE_ROOT__: JSON.stringify(createDependencyTreeRoot()),
 				SC_DISABLE_SPEEDY: false,
 				__A12_MODEL_VERSIONS__: JSON.stringify(collectA12ModelVersions()),
-				__PROFILE__: JSON.stringify(profile)
+				__PROFILE__: JSON.stringify(profile),
+				__DOCS_AVAILABLE__: JSON.stringify(env === "production")
 			}
 		},
 		resolve: {

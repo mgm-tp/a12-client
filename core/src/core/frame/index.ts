@@ -39,6 +39,9 @@
  *
  * @packageDocumentation
  */
+export { createA12ApplicationSetup } from "./internal/applicationSetup.js";
+export { addLayout, addRegion, modifyLayout } from "./internal/layoutConfig.js";
+export type { LayoutModification } from "./internal/layoutConfig.js";
 export {
 	LOCALE_SELECT_RESOURCE_KEYS,
 	LocaleSelect,
@@ -49,6 +52,7 @@ export { RESOURCE_KEYS as FRAME_RESOURCE_KEYS } from "./internal/languages/index
 export { FrameViews } from "./internal/views.js";
 
 export type {
+	ContributedLayoutProps,
 	LayoutNG,
 	LayoutPropsNG,
 	RegionReferenceNG,

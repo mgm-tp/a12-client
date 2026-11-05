@@ -121,7 +121,7 @@ class DataHolderTracker {
 			this.state[activityId] = this.state[activityId].filter(x => !deepEqual(x, descriptor));
 
 			if (this.state[activityId].length === 0) {
-				// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+				// oxlint-disable-next-line typescript/no-dynamic-delete
 				delete this.state[activityId];
 			}
 		}

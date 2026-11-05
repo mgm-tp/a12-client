@@ -36,8 +36,8 @@ import { all, call, put, select, take, takeEvery } from "typed-redux-saga";
 import type { ModelGraph } from "@com.mgmtp.a12.dataservices/dataservices-access";
 import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
-import { ApplicationModel } from "../../../model/internal/ApplicationModel.js";
 import { ModelActions } from "../../../model/internal/actions.js";
+import { ApplicationModel } from "../../../model/internal/ApplicationModel.js";
 
 import type { Module } from "../factories/module.js";
 import { ModuleRegistryProvider } from "../factories/moduleRegistryProvider.js";

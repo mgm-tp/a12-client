@@ -66,7 +66,7 @@ export function handleChangeValue(
 			//   both actions are combined into a single valueChanged action
 			//  this action must contain value (as user input string), and also locale, converter & data formats
 
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			// oxlint-disable-next-line typescript/no-non-null-assertion
 			const parseError = parseResult.error!;
 			// reset field value, perform computations and validation
 			const changeResult = changeValue(

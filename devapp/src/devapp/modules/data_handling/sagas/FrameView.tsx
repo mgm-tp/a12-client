@@ -33,9 +33,9 @@
 import { type JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivityActions, DynamicRegionUi } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import {
 	Button,
 	ActionContentbox,

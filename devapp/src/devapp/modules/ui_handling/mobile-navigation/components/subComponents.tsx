@@ -43,6 +43,11 @@ import {
 
 import { isOnSmallDevice } from "../../../../utils/isOnSmallDevice.js";
 
+export interface TitledViewProps {
+	// the directive passes the title in; optional because only the core props are guaranteed
+	readonly title?: string;
+}
+
 export function SidebarContent(props: {
 	readonly title?: string;
 	readonly content: ReactElement;

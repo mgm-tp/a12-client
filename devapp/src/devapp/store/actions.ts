@@ -30,8 +30,8 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { ActivityActions } from "@com.mgmtp.a12.client/client-core";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { isRecord } from "../utils/types.js";
 
@@ -41,7 +41,7 @@ const factory = actionCreatorFactory("DevApp");
  * Application level actions
  */
 
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+// oxlint-disable-next-line typescript/no-invalid-void-type
 export const initialization = factory.async<void, void>("INITIALIZATION");
 
 export const resetRequested = factory("RESET_APPLICATION_REQUESTED");

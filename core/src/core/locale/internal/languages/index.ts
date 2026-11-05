@@ -34,13 +34,13 @@ import type { LocalizationTreeMap } from "@com.mgmtp.a12.utils/utils-localizatio
 
 import { de } from "./de.js";
 import { en } from "./en.js";
-import type { RESOURCE_KEYS } from "./keys.js";
+import type { LOCALE_RESOURCE_KEYS } from "./keys.js";
 
 export * from "./keys.js";
 
 export const DEFAULT_TRANSLATIONS: DefaultTranslations = { en, de };
 
 interface DefaultTranslations extends LocalizationTreeMap {
-	en: typeof RESOURCE_KEYS;
-	de: typeof RESOURCE_KEYS;
+	en: typeof LOCALE_RESOURCE_KEYS;
+	de: typeof LOCALE_RESOURCE_KEYS;
 }

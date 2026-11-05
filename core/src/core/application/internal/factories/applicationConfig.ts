@@ -40,33 +40,92 @@
 import type { ComponentType, PropsWithChildren } from "react";
 import type { Store } from "redux";
 
-import type {
-	LayoutProvider,
-	RegionUiProvider
-} from "../../../frame/internal/layout/LayoutProps.js";
-import type { FrameViews } from "../../../frame/internal/views.js";
 import type { ApplicationModel } from "../../../model/internal/ApplicationModel.js";
 import type { View } from "../../../view/internal/view.js";
 
+import type { GenericModelLoaderOptions } from "./genericModelLoaderOptions.js";
+
 import type { ApplicationFactories } from "./index.js";
 
-type OptionalProvider<Provider extends (...args: never[]) => unknown> = (
+/**
+ * @experimental
+ *
+ * A provider that may decline to answer. Returning `undefined` means "no opinion",
+ * so the application falls back to the next provider and finally to the `frame`
+ * default.
+ */
+export type OptionalProvider<Provider extends (...args: never[]) => unknown> = (
 	...args: Parameters<Provider>
 ) => ReturnType<Provider> | undefined;
 
-export type ProviderConfig = {
-	views?: OptionalProvider<View.Provider>;
-	viewModifications?: (name: string) => ((v: View.ViewComponent) => View.ViewComponent) | undefined;
-	layouts?: OptionalProvider<LayoutProvider>;
-	layoutModifications?: (name: string) => ((l: FrameViews.Layout) => FrameViews.Layout) | undefined;
-	regions?: OptionalProvider<RegionUiProvider>;
-	progressIndicators?: OptionalProvider<View.ProgressComponentProvider>;
-	errorBoundaries?: OptionalProvider<View.ErrorBoundaryProvider>;
+/**
+ * @experimental
+ *
+ * A registered view modification, applied once (at app build time) to the base view registered under
+ * `name` via {@link ProviderConfig.views} (set with `addView`, or a built-in default).
+ */
+export type ViewModification = {
+	readonly name: string;
+	readonly modify: (view: View.ViewComponent) => View.ViewComponent;
 };
 
-type UIConfig = ProviderConfig & {
+/**
+ * @experimental
+ *
+ * Provider hooks the application consults when it renders a region: which
+ * component to use for a view, layout or region, and what to show while a view
+ * loads or fails. Every hook is optional; whatever is not provided (or returns
+ * `undefined`) falls back to the `frame` default.
+ *
+ * Layout and region providers (`layouts`, `layoutModifications`, `regions`) are
+ * contributed by the `frame` layer via module augmentation, keeping `application`
+ * free of any `frame` dependency. Register entries with the matching builders
+ * (`addView`, `addLayout`, `addRegion`, ...) rather than assigning the fields
+ * directly, so multiple registrations chain instead of overwriting each other.
+ */
+export interface ProviderConfig {
+	/** Views registered by name. Folded with `viewModifications` once, at build time. */
+	views?: Readonly<Record<string, View.ViewComponent>>;
+
+	/**
+	 * Modifications applied once, at build time, to the base view registered under each `name`
+	 * (via `addView` or a built-in default). Multiple modifications for the same name are applied
+	 * in order of registration.
+	 */
+	viewModifications?: readonly ViewModification[];
+
+	/** Resolves a region and view name to the component shown while that view loads. */
+	progressIndicators?: OptionalProvider<View.ProgressComponentProvider>;
+
+	/** Resolves a region and view name to the error boundary wrapping that view. */
+	errorBoundaries?: OptionalProvider<View.ErrorBoundaryProvider>;
+}
+
+/**
+ * @experimental
+ *
+ * The UI half of an application's configuration: which providers render it, and
+ * where it is rooted.
+ */
+export type UIConfig = ProviderConfig & {
+	/**
+	 * The region the application renders at its root. Defaults to the empty
+	 * reference, i.e. the application model's root region.
+	 */
 	rootRegionRef?: ApplicationModel.Region.Reference;
+
+	/**
+	 * Renders the root region from a registered DynamicConfiguration instead of
+	 * from the application model. When set, the configured application model and
+	 * the provider hooks above are ignored — set it with `withDynamicConfig`.
+	 */
 	dynamicConfig?: boolean;
+
+	/**
+	 * Wraps the whole application, for context providers that must sit above the
+	 * root region. Use `addWrapper` to add one without dropping wrappers that
+	 * other features already registered.
+	 */
 	WrapperComponent?: ComponentType<PropsWithChildren>;
 };
 
@@ -77,7 +136,10 @@ export type BaseConfig = Omit<ApplicationFactories.Config, "model" | "modelLoade
 	Partial<Pick<ApplicationFactories.Config, "model" | "modelLoader">> &
 	UIConfig;
 
-type BaseConfigWithModelLoader<T extends BaseConfig> = Omit<T, "modelLoader"> & {
+/**
+ * @experimental
+ */
+export type BaseConfigWithModelLoader<T extends BaseConfig> = Omit<T, "modelLoader"> & {
 	modelLoader: ApplicationFactories.Config["modelLoader"];
 };
 
@@ -88,7 +150,10 @@ export type ApplicationWithConfiguredModelLoader<T extends A12ApplicationConfig>
 	config: BaseConfigWithModelLoader<T["config"]>;
 };
 
-type BaseConfigWithModel<T extends BaseConfig> = Omit<T, "model"> & {
+/**
+ * @experimental
+ */
+export type BaseConfigWithModel<T extends BaseConfig> = Omit<T, "model"> & {
 	model: ApplicationFactories.Config["model"];
 };
 
@@ -96,10 +161,16 @@ type BaseConfigWithModel<T extends BaseConfig> = Omit<T, "model"> & {
  * @experimental
  */
 export type ApplicationWithConfiguredModel<T extends A12ApplicationConfig> = T & {
-	config: BaseConfigWithModel<T["config"]>;
+	config: Omit<T["config"], "model"> & { model: ApplicationFactories.Config["model"] };
 };
 
-interface ClientConfig<C extends BaseConfig = BaseConfig> {
+/**
+ * @experimental
+ *
+ * The parts of an {@link A12ApplicationConfig} that are not features. {@link RequireFeatures}
+ * excludes these keys, so anything added here is exempt from feature guarding.
+ */
+export interface ClientConfig<C extends BaseConfig = BaseConfig> {
 	config: C;
 	initialActions?: (store: Store) => Promise<void>;
 	configured?: {};
@@ -109,7 +180,23 @@ interface ClientConfig<C extends BaseConfig = BaseConfig> {
  * @experimental
  */
 export interface A12ApplicationConfig<C extends BaseConfig = BaseConfig> extends ClientConfig<C> {
-	// intentionally empty, expanded via module augmentation
+	/**
+	 * Names the `withModel` feature for {@link RequireFeatures}. Carries no options - the
+	 * application model is passed to `withModel` directly.
+	 */
+	model?: unknown;
+
+	/**
+	 * Model loading options, consumed by the model loader features of the modelLoader extension.
+	 * Also names the model loader feature for {@link RequireFeatures}.
+	 */
+	modelLoader?: GenericModelLoaderOptions;
+
+	/**
+	 * Names the `withDynamicConfig` feature for {@link RequireFeatures}. Carries no options - the
+	 * flag the feature sets lives in {@link ProviderConfig | the setup config}.
+	 */
+	dynamicConfig?: unknown;
 }
 
 /**
@@ -129,3 +216,30 @@ export type RequireFeatures<
 > = T & {
 	configured?: { [feature: string]: true } & F;
 };
+
+/**
+ * @experimental
+ *
+ * A config the `withModel` feature may still be installed on.
+ */
+export type ApplicationWithModelConfig = RequireFeatures<A12ApplicationConfig, { model?: never }>;
+
+/**
+ * @experimental
+ *
+ * A config a model loader feature may still be installed on.
+ */
+export type ApplicationWithModelLoaderConfig = RequireFeatures<
+	A12ApplicationConfig,
+	{ modelLoader?: never }
+>;
+
+/**
+ * @experimental
+ *
+ * A config the `withDynamicConfig` feature may still be installed on.
+ */
+export type ApplicationWithDynamicConfigConfig = RequireFeatures<
+	A12ApplicationConfig,
+	{ dynamicConfig?: never }
+>;

@@ -35,31 +35,41 @@ import { useDispatch, useSelector } from "react-redux";
 
 import type { LayoutPropsNG, Selector, ViewNG } from "@com.mgmtp.a12.client/client-core";
 import {
-	type SliderMark,
-	Slider,
 	type LayoutGridProps,
-	LayoutGrid
+	type SliderMark,
+	LayoutGrid,
+	Slider
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { UIState } from "./uiState.js";
 import { defaultState, setColumnsAction, uiSlice } from "./uiState.js";
 
 interface DynamicLayoutProps extends LayoutPropsNG {
-	readonly activityId: string;
+	// optional in the type (the core only guarantees LayoutPropsNG),
+	// but always injected via componentProps in this example
+	readonly activityId?: string;
 }
 
+/**
+ * Layout of the dynamic regions of this example.
+ *
+ * It receives the id of the activity it belongs to via the layout's `componentProps`.
+ * This keeps the component independent of any activity-specific closure, so a single
+ * module-level component can serve all regions.
+ */
 export function DynamicLayoutComponent(props: DynamicLayoutProps): JSX.Element {
+	const { activityId = "" } = props;
+
 	return (
 		<>
-			<ColsSlider activityId={props.activityId} />
-			<DynamicGrid activityId={props.activityId} views={props.views} />
+			<ColsSlider activityId={activityId} />
+			<DynamicGrid activityId={activityId} views={props.views} />
 		</>
 	);
 }
 
-function uiSliceOrDefault(activityId?: string): Selector<UIState> {
-	return state =>
-		activityId ? (uiSlice.selector(activityId)(state) ?? defaultState) : defaultState;
+function uiSliceOrDefault(activityId: string): Selector<UIState> {
+	return state => uiSlice.selector(activityId)(state) ?? defaultState;
 }
 
 function ColsSlider(props: { activityId: string }) {
@@ -130,7 +140,7 @@ function sliceIntoChunks<T>(arr: T[], size: number) {
 			curChunk = new Array<T>();
 			result.push(curChunk);
 		}
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		// oxlint-disable-next-line typescript/no-non-null-assertion
 		curChunk!.push(arr[i]);
 	}
 	return result;

@@ -36,14 +36,6 @@ import { install } from "source-map-support";
 // default behavior is "auto", which would detect a browser (due to JSDOM)
 install({ environment: "node" });
 
-/**
- * This is necessary, because Widgets are using in their
- * isVisibleOnScreen method document.elementFromPoint, which is not
- * implemented in JsDom.
- */
-document.elementFromPoint = () => document.body;
-window.Element.prototype.contains = () => true;
-
 // Due to newer version of react-resize-detector using native ResizeObserver that is not available in jsdom
 global.ResizeObserver = class ResizeObserver {
 	observe() {}

@@ -33,20 +33,11 @@
 // side effect imports need to come before everything else
 import "./environment.js";
 import "./whyDidYouRender.js";
-
 import { mock } from "node:test";
 
 import { assertNoUnnecessaryRenderings } from "@com.mgmtp.a12.devtools/why-did-you-render";
 import { Settings } from "@com.mgmtp.a12.utils/utils-logging";
 import { ResponsiveHandler } from "@com.mgmtp.a12.widgets/widgets-core";
-
-// This file uses .mts so it compiles to .mjs. Mocha uses import() directly for
-// .mjs files, bypassing Node 24's require(esm) path which fails on transitive
-// top-level await in dependencies (e.g. Lexical, which we pull in via Widgets).
-
-// Note: On Jenkins this works without .mjs because NODE_ENV="production"
-// causes Node to resolve Lexical's "production" export (without top-level await)
-// before its "node" export (which has a ternary with top-level await).
 
 // install root hooks, see https://mochajs.org/#root-hook-plugins
 export const mochaHooks = {

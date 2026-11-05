@@ -68,14 +68,12 @@ const dynamicFlows: DynamicFlow[] = [
 						{
 							type: "DYNAMIC_ADD_VIEW",
 							component: ViewsConceptEmpty,
-							region: "/CONTENT",
-							constraints: { type: "MasterDetail" }
+							region: "/CONTENT"
 						},
 						{
 							type: "DYNAMIC_ADD_VIEW",
 							component: ViewsConceptTemplate,
-							region: "/CONTENT",
-							constraints: { type: "MasterDetail" }
+							region: "/CONTENT"
 						},
 						{
 							type: "DYNAMIC_ADD_VIEW",

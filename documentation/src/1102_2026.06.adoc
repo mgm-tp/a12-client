@@ -146,6 +146,61 @@ export function CustomResizableMasterDetailLayout(
 }
 ----
 
+=== Removal of Widget Customization Via ProgressIndicatorComponent Property
+
+Following its deprecation in A12 Client 16.1.0, the `ProgressIndicatorComponent` property of `ViewViews.ProgressIndicator` no longer has an effect.
+The `ProgressIndicator` Widget rendered by the component is now taken from the <</advanced/widgets, ClientWidgetMap>>.
+
+The property itself is still present on `ViewViews.ProgressIndicatorProps` and will be removed with A12 2027.06.
+
+Required:: Depending on whether you used the `ProgressIndicatorComponent` property.
+Migration:: Manual, no codemod available.
+Result::
++
+Before, when customizing the ProgressIndicator widget:
++
+[source,typescript]
+----
+function ProgressComponent(props: View.ProgressComponentProvider.PropsType) {
+	const busy = useSelector(ActivitySelectors.busy(props.activityId));
+
+	return (
+		<ViewViews.ProgressIndicator
+			progress={busy ? "loading" : "none"}
+			ProgressIndicatorComponent={CustomProgressIndicator}
+		>
+			{props.children}
+		</ViewViews.ProgressIndicator>
+	);
+}
+----
+
+Now, wrap the component with the `ClientWidgetMapContext` instead and pass your custom widget there:
+
+[source,typescript]
+----
+import { useContext } from "react";
+import { ClientWidgetMapContext } from "@com.mgmtp.a12.client/client-core";
+
+function ProgressComponent(props: View.ProgressComponentProvider.PropsType) {
+	const busy = useSelector(ActivitySelectors.busy(props.activityId));
+	const DefaultClientWidgetMap = useContext(ClientWidgetMapContext);
+
+	const customWidgetMap = {
+		...DefaultClientWidgetMap,
+		ProgressIndicator: CustomProgressIndicator
+	};
+
+	return (
+		<ClientWidgetMapContext.Provider value={customWidgetMap}>
+			<ViewViews.ProgressIndicator progress={busy ? "loading" : "none"}>
+				{props.children}
+			</ViewViews.ProgressIndicator>
+		</ClientWidgetMapContext.Provider>
+	);
+}
+----
+
 === Updating to ES2025
 
 The javascript output of the npm artifacts was updated from `ES2024` to `ES2025` to be able to use latest language features. When using supported browsers, there is no change necessary. If support for older browsers is required, make sure to include necessary polyfills.
@@ -157,7 +212,7 @@ Result:: Depending on your bundler setup, consult its documentation on how to in
 === Removal of Deep Import Paths
 
 Deep import paths from `@com.mgmtp.a12.client/client-core` and `@com.mgmtp.a12.client/client-data` (e.g., `@com.mgmtp.a12.client/client-core/lib/core/application/index.js`) have been removed.
-All exports must now be imported directly from the package root. For detailed migration instructions, see the link:/docs/2025.06/ext4/client/client-documentation-bundle#_deep_import_paths_of_a12_client_npm_packages[deprecation,role=external] note.
+All exports must now be imported directly from the package root. For detailed migration instructions, see the link:/docs/2025.06/ext4/client/client-documentation-bundle/index.html#_deep_import_paths_of_a12_client_npm_packages[deprecation,role=external] note.
 
 [NOTE]
 ====
@@ -167,7 +222,7 @@ The package now uses the `exports` field instead of `main`/`types`. This should 
 Required:: Yes.
 Migration::
 +
-Codemod available in link:/docs/2025.06/ext4/client/client-documentation-bundle#_deep_import_paths_of_a12_client_npm_packages[2025.06-ext4,role=external].
+Codemod available in link:/docs/2025.06/ext4/client/client-documentation-bundle/index.html#_deep_import_paths_of_a12_client_npm_packages[2025.06-ext4,role=external].
 Result::
 +
 [source,js]
@@ -266,6 +321,29 @@ Run the `migrateAnyActionType` codemod to migrate all usages of `AnyAction` to `
 ----
 client-codemod migrateAnyActionType <path to directory with tsconfig.json>
 ----
+
+[NOTE]
+====
+This migration is deliberate about what it leaves behind. `Action` carries only `type`, so
+after running the codemod every read of `action.payload` — or of any other non-`type`
+property — will fail to compile:
+
+[source]
+----
+Property 'payload' does not exist on type 'Action'.
+----
+
+These errors are the point: each one marks a site that needs a type guard. Work through them
+using the pattern shown in the "Potentially fix Reducers" section below, narrowing with
+`actionCreator.match(action)` before reading `payload`. Note that `isAction()` from `redux`
+narrows an `unknown` value to `Action`, which is enough to reach `action.type` (see
+"Potentially fix Middlewares") but *not* `payload`.
+
+If you would rather have property access type-check as `unknown` and defer narrowing, use
+`UnknownAction` instead of `Action`. The codemod always writes `Action`, so this is a manual
+edit. Be aware it moves the error away from the property access to wherever the value is
+used, which makes the sites needing attention harder to find.
+====
 
 ==== Define Type of `State` in `useSelector`
 

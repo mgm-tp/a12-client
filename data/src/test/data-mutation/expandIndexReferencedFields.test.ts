@@ -36,6 +36,8 @@ import type { DocumentModel, Message } from "@com.mgmtp.a12.kernel/kernel-md-fac
 
 import { expandIndexReferencedFields } from "../../data-mutation/validation-computation/expandIndexReferencedFields.js";
 
+import { messageDefaults } from "../redux/api/mocks/mockMessage.js";
+
 describe("data-mutation.validation", () => {
 	describe("expandIndexReferencedFields", () => {
 		it("when given a message without any index 0 in the referenced fields, returns the unchanged message", () => {
@@ -68,6 +70,7 @@ describe("data-mutation.validation", () => {
 
 function testError(withReferencedFields?: true): Message {
 	return {
+		...messageDefaults,
 		entityInstance: [
 			{ elementName: "foo", index: 1 },
 			{ elementName: "bar", index: 1 }

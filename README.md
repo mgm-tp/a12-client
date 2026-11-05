@@ -49,7 +49,9 @@ Mind to provide the peer dependencies.
 
 ### How to Build and Run
 
-The following tasks can be executed in the repository root or in individual folders to build specific sub-projects.
+This repository uses [Gradle] as the leading build tool. The following tasks can be
+executed in the repository root or in individual folders to build specific
+sub-projects. In the repository root, gradle tasks include TypeScript projects.
 
 #### Prerequisites
 
@@ -58,7 +60,7 @@ The following tools are mandatory in order to build this repository.
 | Tool     | Version |
 | -------- | ------: |
 | [Node]   |   `^24` |
-| [pnpm]   |   `^11` |
+| [pnpm]   |   `^12` |
 | [JDK]    |   `^25` |
 | [Gradle] |    `^9` |
 
@@ -71,25 +73,25 @@ pnpm install
 #### How to Build
 
 ```sh
-pnpm compile
+gradle assemble
 ```
 
 #### How to Test
 
 ```sh
-pnpm test
+gradle check
 ```
 
 #### Cleaning Build Artifacts
 
 ```sh
-pnpm clean
+gradle clean
 ```
 
 #### Code Quality
 
 ```sh
-pnpm verify
+gradle verify
 ```
 
 #### How to Run

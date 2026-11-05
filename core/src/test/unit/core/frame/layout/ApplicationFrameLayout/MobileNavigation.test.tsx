@@ -40,21 +40,21 @@ import { act, useContext } from "react";
 
 import { query } from "@com.mgmtp.a12.devtools/react";
 import {
+	ApplicationFrame,
 	Button,
+	ContentBoxElements,
 	DataRoles,
 	NavigationContentboxContext,
-	ContentBoxElements,
-	ApplicationFrame,
 	SizeContext
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import type { ClientWidgetMap } from "../../../../../../core/ClientWidgetMap.js";
 import { FrameFactories } from "../../../../../../core/frame/index.js";
+import ApplicationFrameLayout from "../../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
 import type {
 	ApplicationFrameLayoutProps,
 	NavigationBarTitleProps
-} from "../../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
-import ApplicationFrameLayout from "../../../../../../core/frame/internal/layout/applicationFrameLayout/applicationFrameLayout.js";
+} from "../../../../../../core/frame/internal/layout/applicationFrameLayout/ApplicationFrameLayoutProps.js";
 import type { LayoutProvider } from "../../../../../../core/frame/internal/layout/LayoutProps.js";
 import { MobileNavigationAction } from "../../../../../../core/frame/internal/layout/mobile-navigation.js";
 import { ApplicationModel } from "../../../../../../core/model/index.js";

@@ -1,7 +1,7 @@
 {
   "name": "@com.mgmtp.a12.client/client-devapp",
-  "version": "17.0.1",
-  "description": "Client Devapp",
+  "version": "17.1.0",
+  "description": "Client DevApp",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
   "private": true,
@@ -23,9 +23,9 @@
     "mocha:dev": "mocha --forbid-only=false",
     "analyze": "rsbuild build --env-mode analyze -c rsbuild/rsbuild.config.ts",
     "preview": "rsbuild preview -c rsbuild/rsbuild.config.ts",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
-    "lint:fix": "node --run lint -- --fix",
-    "lint:onlyErrors": "node --run lint -- --quiet"
+    "lint": "pnpm -w exec oxlint devapp",
+    "lint:fix": "pnpm -w exec oxlint --fix devapp",
+    "lint:onlyErrors": "pnpm -w exec oxlint --quiet devapp"
   },
   "dependencies": {
     "@com.mgmtp.a12.base/base-model-api": "catalog:a12",
@@ -57,7 +57,6 @@
   },
   "devDependencies": {
     "@com.mgmtp.a12.devtools/tsconfig": "catalog:a12",
-    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-react": "catalog:",
     "@rsdoctor/rspack-plugin": "catalog:",
@@ -67,7 +66,6 @@
     "@types/react-dom": "catalog:",
     "@types/semver": "catalog:",
     "concurrently": "catalog:",
-    "eslint": "catalog:",
     "jsdom": "catalog:",
     "mocha": "catalog:",
     "picocolors": "catalog:",

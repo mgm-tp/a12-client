@@ -30,15 +30,16 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type { A12ApplicationConfig, RequireFeatures } from "../../../core/application/index.js";
 import {
 	addCustomSagas,
 	combineFeatures,
 	setConfigured
 } from "../../../core/application/internal/factories/applicationFactory.js";
-import type { A12ApplicationConfig, RequireFeatures } from "../../../core/index.js";
 
 import { createSagas, createWelcomePageSaga, type Configuration } from "./factories.js";
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		deepLinking?: {
@@ -60,13 +61,13 @@ export type ApplicationWithDeepLinkingConfig = RequireFeatures<
  * @experimental
  */
 export const addWelcomePageSaga = <T extends ApplicationWithDeepLinkingConfig>(cfg: T) =>
-	addCustomSagas<T>(createWelcomePageSaga(cfg.deepLinking?.config))(cfg);
+	addCustomSagas(createWelcomePageSaga(cfg.deepLinking?.config))(cfg);
 
 /**
  * @experimental
  */
 export const addDeepLinkingSagas = <T extends ApplicationWithDeepLinkingConfig>(cfg: T) =>
-	addCustomSagas<T>(...createSagas(cfg.deepLinking?.config))(cfg);
+	addCustomSagas(...createSagas(cfg.deepLinking?.config))(cfg);
 
 /**
  * @experimental

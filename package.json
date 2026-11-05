@@ -1,13 +1,13 @@
 {
   "name": "@com.mgmtp.a12.client/root",
-  "version": "17.0.1",
+  "version": "17.1.0",
   "a12ReleaseLine": "2026.06",
   "description": "Client Workspaces Root",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
   "engines": {
     "node": "^24",
-    "pnpm": "^11"
+    "pnpm": "^12"
   },
   "private": true,
   "type": "module",
@@ -20,31 +20,26 @@
     "compile": "pnpm run -r compile",
     "watch": "pnpm run -r --parallel watch",
     "test": "pnpm run -r test",
-    "format": "prettier \"**/src/**/*.{ts,tsx}\" --check --experimental-cli --parallel-workers 2",
-    "format:fix": "prettier \"**/src/**/*.{ts,tsx}\" --write --experimental-cli --parallel-workers 2",
-    "lint:root": "eslint --flag unstable_native_nodejs_ts_config -c eslint.root.config.ts . --cache",
-    "lint": "pnpm run -r --sequential lint && node --run lint:root",
-    "lint:fix": "pnpm run -r --sequential lint:fix && node --run lint:root -- --fix",
-    "lint:onlyErrors": "pnpm run -r --sequential lint:onlyErrors && node --run lint:root -- --quiet",
-    "lint:inspect": "pnpm dlx @eslint/config-inspector",
+    "format": "oxfmt --check \"**/src/**/*.{ts,tsx}\"",
+    "format:fix": "oxfmt --write \"**/src/**/*.{ts,tsx}\"",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "lint:onlyErrors": "oxlint --quiet .",
     "spellcheck": "pnpm run -r --parallel spellcheck"
   },
   "devDependencies": {
-    "@com.mgmtp.a12.devtools/eslint-config": "catalog:a12",
-    "@com.mgmtp.a12.devtools/prettier-config": "catalog:a12",
-    "@eslint/compat": "catalog:",
+    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
+    "@tony.ganchev/eslint-plugin-header": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
-    "eslint": "catalog:",
-    "eslint-plugin-jsdoc": "catalog:",
-    "eslint-plugin-notice": "catalog:",
     "eslint-plugin-use-effect-no-deps": "catalog:",
     "eslint-plugin-workspaces": "catalog:",
-    "prettier": "catalog:",
-    "react": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "semver": "catalog:",
     "smol-toml": "catalog:",
     "yaml": "catalog:"
   },
-  "packageManager": "pnpm@11.17.0"
+  "packageManager": "pnpm@12.3.4"
 }

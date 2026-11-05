@@ -32,7 +32,7 @@ LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 
 = Breaking Change Management
 
-The client library follows the general link:/docs/overall/breaking_change_management[A12 breaking change interpretation], but has the following exceptions:
+The client library follows the general link:/docs/overall/breaking_change_management/index.html[A12 breaking change interpretation], but has the following exceptions:
 
 - Adding new keys to the localization resource key objects is not considered a breaking change.
 +

@@ -33,6 +33,7 @@
 import type { JSX, KeyboardEvent } from "react";
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
 import type { FrameViews } from "@com.mgmtp.a12.client/client-core";
 import { DynamicModelSelectors, type DynamicMenu } from "@com.mgmtp.a12.client/client-core";
@@ -109,14 +110,15 @@ function useMenuItems(onMenuItemClick: FrameViews.MainMenuProps["onMenuItemClick
 
 	return useMemo(() => {
 		const createMenuItem = (treeItem: DynamicMenu): MenuItem => {
+			const { action } = treeItem;
 			return {
 				id: treeItem.id,
 				label: localizer(treeItem.label),
 				selected: treeItem.selected,
-				onClick: treeItem.action
+				onClick: action
 					? () => {
 							onMenuItemClick();
-							treeItem.action?.(dispatch);
+							triggerMenuAction(action, dispatch);
 						}
 					: undefined,
 				items: treeItem.children?.map(createMenuItem)
@@ -124,6 +126,15 @@ function useMenuItems(onMenuItemClick: FrameViews.MainMenuProps["onMenuItemClick
 		};
 		return convertedMenu.map(createMenuItem);
 	}, [convertedMenu, dispatch, localizer, onMenuItemClick]);
+}
+
+function triggerMenuAction(action: NonNullable<DynamicMenu["action"]>, dispatch: Dispatch): void {
+	if (typeof action === "function") {
+		action(dispatch);
+		return;
+	}
+
+	dispatch(action);
 }
 
 function assertMenuEntryExists(before: DynamicMenu[], after: DynamicMenu[]) {

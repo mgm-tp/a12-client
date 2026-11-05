@@ -33,9 +33,9 @@
 import type { SagaGenerator } from "typed-redux-saga";
 import { put, takeLatest } from "typed-redux-saga";
 
+import { ActivityActions } from "@com.mgmtp.a12.client/client-core";
 import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
-import { ActivityActions } from "@com.mgmtp.a12.client/client-core";
 
 const actionCreator = actionCreatorFactory("Features");
 export const initiateCommitErrorHandlingSaga = actionCreator<{

@@ -57,7 +57,7 @@ import {
 import { SAMPLE_APPLICATION_TRANSLATIONS } from "../config/resources.js";
 import { CustomNotificationFrame } from "../modules/ui_handling/notifications/CustomNotificationFrame.js";
 
-import { legacyLayoutProvider } from "./layoutProvider.js";
+import { legacyLayoutProvider } from "./legacyLayoutProvider.js";
 
 const ROOT_REGION_REF: ApplicationModel.Region.Reference = [];
 

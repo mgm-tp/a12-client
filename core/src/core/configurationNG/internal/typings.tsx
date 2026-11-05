@@ -36,14 +36,14 @@
  * Every export from this file is considered experimental and subject to changes.
  */
 
-import type { Dispatch } from "redux";
+import type { Dispatch, UnknownAction } from "redux";
 
 import type { Localizable } from "@com.mgmtp.a12.utils/utils-localization";
 
 import type { Activity } from "../../activity/internal/activity.js";
 import type { LayoutNG, RegionReferenceNG } from "../../frame/internal/layoutNG/layoutPropsNG.js";
 import type { Model } from "../../model/internal/Model.js";
-import type { ViewNGComponent } from "../../view/internal/viewNG.js";
+import type { ContributedViewProps, ViewNGComponent } from "../../view/internal/viewNG.js";
 
 export interface DynamicMenu {
 	readonly id: string;
@@ -61,8 +61,17 @@ export interface DynamicMenu {
 	/**
 	 * The action that is triggered when the menu entry
 	 * is selected.
+	 *
+	 * Either a callback receiving `dispatch`, or a plain action object that is
+	 * dispatched directly. Prefer the action object when the action is built
+	 * inside a selector: as plain data it is deep-compared like all contributed
+	 * configuration, whereas a callback created inside a selector is a fresh
+	 * function reference on every state change.
+	 *
+	 * `UnknownAction` rather than `Action` because that is what `Dispatch`
+	 * accepts; an action built inline satisfies it via its index signature.
 	 */
-	readonly action?: (dispatch: Dispatch) => void;
+	readonly action?: ((dispatch: Dispatch) => void) | UnknownAction;
 
 	/**
 	 * Sub-entries of the menu.
@@ -180,6 +189,19 @@ export interface DynamicAddView extends BaseDirective {
 	 * The view component to render
 	 */
 	readonly component: ViewNGComponent;
+
+	/**
+	 * Additional props passed to the {@link DynamicAddView.component}.
+	 *
+	 * Must be plain, serializable data: it is deep-compared like all contributed
+	 * configuration, so values may be rebuilt on every selector run without causing
+	 * re-renders. This makes it the way to bind state-derived context to a view —
+	 * keep the component itself a module-level constant instead of creating a
+	 * closure inside the selector, which would remount the view on every state change.
+	 *
+	 * See {@link ContributedViewProps}.
+	 */
+	readonly componentProps?: ContributedViewProps;
 
 	/**
 	 * Contains configurable constraints for the layout that was chosen.

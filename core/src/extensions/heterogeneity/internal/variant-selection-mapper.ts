@@ -76,9 +76,9 @@ export interface VariantSelectionMapper {
  * - Siblings are sorted using their label.
  * - Abstract types yield a variant without documentModelId, effectively disabling it.
  *
- * Note: Due to the lack of a l10n of the label in the models, the Localizables only contain the model ID as default
- * value. This means, that no proper localized labels are provided out of the box, but you can localize them yourself in
- * a custom service.
+ * Note: The Localizables use the display labels of the Document Model as default value. If a model defines no display
+ * labels, the model ID is used instead. You can override the labels, or provide them for models without display
+ * labels, in a custom service.
  */
 export function defaultVariantSelectionMapper(
 	modelGraph: ModelGraph,

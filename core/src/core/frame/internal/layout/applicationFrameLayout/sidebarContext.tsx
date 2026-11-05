@@ -56,7 +56,7 @@ export interface SidebarContextMemoWrapperProps extends Container {
 export const SidebarContextMemoWrapper: ComponentType<SidebarContextMemoWrapperProps> = props => {
 	const cv = props.contextValue;
 	const deps = [cv?.subExpanded, cv?.setSubExpanded, cv?.subExpandedState, cv?.setSubExpandedState];
-	// eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps
+	// oxlint-disable-next-line react/use-memo, react/exhaustive-deps
 	const memoProps = useMemo(() => props.contextValue, deps);
 	return <SidebarContext.Provider value={memoProps}>{props.children}</SidebarContext.Provider>;
 };

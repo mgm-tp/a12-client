@@ -30,28 +30,21 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { defineConfig } from "eslint/config";
-
-import sharedConfig from "../eslint.config.ts";
-
-export default defineConfig(
-	...sharedConfig,
-	{
-		name: "appmodel-migration/projectService",
-		files: ["eslint.config.ts"],
-		languageOptions: {
-			parserOptions: {
-				projectService: {
-					allowDefaultProject: ["eslint.config.ts"]
-				}
-			}
+/**
+ * The config `validate:cycles` runs: the main rule set with the known
+ * configurationNG cycles silenced, so a build log carries the violations that
+ * fail it and nothing else.
+ *
+ * @type {import('dependency-cruiser').IConfiguration}
+ */
+export default {
+	extends: "./dependency-cruiser.js",
+	forbidden: [
+		{
+			name: "no-circular-configurationNG",
+			severity: "ignore",
+			from: {},
+			to: { circular: true, via: { path: "^src/core/configurationNG/" } }
 		}
-	},
-	{
-		name: "appmodel-migration/specific",
-		files: ["**/*.ts"],
-		rules: {
-			"@typescript-eslint/ban-ts-comment": "off"
-		}
-	}
-);
+	]
+};

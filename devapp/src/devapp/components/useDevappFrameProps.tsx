@@ -30,56 +30,36 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { JSX } from "react";
+import type { JSX, ReactElement } from "react";
 import { useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { styled } from "styled-components";
 
-import type {
-	ApplicationFrameLayoutPropsNG,
-	DynamicConfiguration,
-	LayoutNG,
-	LayoutPropsNG,
-	ViewNG
-} from "@com.mgmtp.a12.client/client-core";
 import {
 	Activity,
 	ActivityActions,
 	ActivitySelectors,
 	ApplicationActions,
-	ApplicationFrameLayoutNGComponent,
-	ClientWidgetMapContext,
-	DynamicModelSelectors,
 	FrameViews,
-	LOCALE_RESOURCE_KEYS,
-	MasterDetailRegionLayoutNG,
-	NullRegionLayoutNG,
-	StackRegionLayoutNG
+	LOCALE_RESOURCE_KEYS
 } from "@com.mgmtp.a12.client/client-core";
 import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import {
-	ApplicationFrame,
-	type ApplicationFrameProps,
 	Button,
 	ButtonGroupContainer,
 	GlobalMessageBox,
 	HintTooltip,
 	Icon,
-	MasterDetail,
-	type MasterDetailProps,
-	type ResizeOptions,
-	SizeContext,
-	type SizeDetectorProps
+	SizeContext
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import { Settings } from "../components/settings.js";
 import { isDevelopmentMode } from "../config/development.js";
 import type { SampleApplicationError } from "../modules/error_handling/errorHandling/errors.js";
 import { initialization, resetRequested, triggerStoreUpdate } from "../store/actions.js";
 import { isOnSmallDevice } from "../utils/isOnSmallDevice.js";
 import { VersionMenu } from "../version/views.js";
 
-import { MainMenu } from "./mainMenu.js";
+import { Settings } from "./settings.js";
 
 /** additional header button only visible in mobile mode to toggle the main menu */
 const mobileMenuToggleButton: FrameViews.HeaderItemProps = {
@@ -104,20 +84,16 @@ const LogoImage = styled.img`
 	height: 32px;
 `;
 
+const startWelcomeActivity = ApplicationActions.startMainActivityRequested({
+	descriptor: { section: "welcome" }
+});
+
 function Logo(): JSX.Element {
 	const dispatch = useDispatch();
-	const logoURL = `./images/a12_logo.svg`;
 
 	return (
-		<Link
-			onClick={() =>
-				dispatch(
-					ApplicationActions.startMainActivityRequested({ descriptor: { section: "welcome" } })
-				)
-			}
-			href="#"
-		>
-			<LogoImage src={logoURL} />
+		<Link onClick={() => dispatch(startWelcomeActivity)} href="#">
+			<LogoImage src="./images/a12_logo.svg" />
 		</Link>
 	);
 }
@@ -127,19 +103,14 @@ const logo = <Logo />;
 function Title(): JSX.Element {
 	const localizer = useContext(LocalizerContext).localizer;
 	const dispatch = useDispatch();
+
 	return (
-		<span
-			onClick={() =>
-				dispatch(
-					ApplicationActions.startMainActivityRequested({ descriptor: { section: "welcome" } })
-				)
-			}
-			style={{ cursor: "Pointer" }}
-		>
+		<span onClick={() => dispatch(startWelcomeActivity)} style={{ cursor: "Pointer" }}>
 			{localizer({ key: LOCALE_RESOURCE_KEYS.application.title })}
 		</span>
 	);
 }
+
 const title = <Title />;
 
 /** Example for additional header items */
@@ -164,6 +135,7 @@ const additionalHeaderItems: readonly FrameViews.HeaderItemProps[] = [
 
 function DevFooter(): JSX.Element {
 	const dispatch = useDispatch();
+
 	return (
 		<ButtonGroupContainer
 			rightSlotButtons={[
@@ -189,33 +161,42 @@ function DevFooter(): JSX.Element {
 
 const devFooter = <DevFooter />;
 
-const appFrameSubResizeOptions: ResizeOptions = {
-	minWidth: 200,
-	maxWidth: 800
+/** the devapp branding and chrome shared by both application frame layouts */
+export type DevappFrameProps = {
+	readonly globalMessageBox: ReactElement | undefined;
+	readonly logo: ReactElement;
+	readonly title: ReactElement;
+	readonly additionalHeaderItems: readonly FrameViews.HeaderItemProps[];
+	readonly footer: ReactElement | undefined;
 };
 
-const DevappApplicationFrameComponent = (props: ApplicationFrameProps) => {
-	return <ApplicationFrame {...props} subResizableOptions={appFrameSubResizeOptions} />;
-};
+export function useDevappFrameProps(): DevappFrameProps {
+	const smallDevice = isOnSmallDevice(useContext(SizeContext).currentSize);
+	const headerItems = useMemo(
+		() => [...(smallDevice ? [mobileMenuToggleButton] : []), ...additionalHeaderItems],
+		[smallDevice]
+	);
 
-/**
- * custom app frame that adds a global message box for errors, a logo and
- * version information and that allows resizing the sidebar
- */
-export function DevappApplicationFrameLayout(props: ApplicationFrameLayoutPropsNG): JSX.Element {
+	return {
+		globalMessageBox: useSubsystemErrorMessageBox(),
+		logo,
+		title,
+		additionalHeaderItems: headerItems,
+		footer: isDevelopmentMode() ? devFooter : undefined
+	};
+}
+
+function useSubsystemErrorMessageBox(): ReactElement | undefined {
 	const activityId = useSelector(state => ActivitySelectors.latestActivity()(state)?.id) ?? "";
 	const subsystemError = useSelector(
 		ActivitySelectors.activityPropById(activityId, a => {
 			const error = Activity.findDefaultDataHolder(a)?.error as SampleApplicationError | undefined;
-			return error && error.errorCode === "SAMPLE_SUBSYSTEM_NOT_AVAILABLE"
-				? error.subsystem
-				: undefined;
+			return error?.errorCode === "SAMPLE_SUBSYSTEM_NOT_AVAILABLE" ? error.subsystem : undefined;
 		})
 	);
-
 	const dispatch = useDispatch();
 
-	const globalMessageBox = subsystemError ? (
+	return subsystemError ? (
 		<GlobalMessageBox
 			variant="error"
 			content={`DevApp error: Subsystem "${subsystemError}" is not available`}
@@ -237,108 +218,4 @@ export function DevappApplicationFrameLayout(props: ApplicationFrameLayoutPropsN
 			]}
 		/>
 	) : undefined;
-
-	const smallDevice = isOnSmallDevice(useContext(SizeContext).currentSize);
-
-	const items = useMemo(
-		() => [...(smallDevice ? [mobileMenuToggleButton] : []), ...additionalHeaderItems],
-		[smallDevice]
-	);
-
-	// we would need to check for Dashboard as well here, but we don't have
-	// something to "match against"
-	const isNullLayout = useSelector(state => {
-		const layoutForContent = DynamicModelSelectors.dynamicRegion(
-			props.subRegionRefs?.find(ref => ref.endsWith("CONTENT")) ?? ""
-		)(state)?.layout;
-
-		return layoutForContent === NullRegionLayoutNG;
-	});
-
-	const DefaultClientWidgetMap = useContext(ClientWidgetMapContext);
-
-	const widgetMap = {
-		...DefaultClientWidgetMap,
-		ApplicationFrame: DevappApplicationFrameComponent
-	};
-
-	return (
-		<ClientWidgetMapContext.Provider value={widgetMap}>
-			<ApplicationFrameLayoutNGComponent
-				{...props}
-				globalMessageBox={globalMessageBox}
-				logo={logo}
-				title={title}
-				mainMenuComponent={MainMenu}
-				additionalHeaderItems={items}
-				footer={isDevelopmentMode() ? devFooter : undefined}
-				multipleViewsContent={isNullLayout}
-				getClearedAfterViewIndex={getClearedAfterViewIndex}
-			/>
-		</ClientWidgetMapContext.Provider>
-	);
 }
-
-function getClearedAfterViewIndex(layout: LayoutNG, views: ViewNG[]) {
-	return layout === MasterDetailRegionLayoutNG
-		? (size?: SizeDetectorProps.Size) => {
-				if (isOnSmallDevice(size) && views.length > 1) {
-					return views.length - 2;
-				}
-
-				return undefined;
-			}
-		: undefined;
-}
-
-const mdFirstViewResizableOptions: MasterDetailProps["firstViewResizableOptions"] = {
-	minWidth: "5%",
-	maxWidth: "95%"
-};
-
-function ResizableMasterDetail(props: MasterDetailProps): JSX.Element {
-	return <MasterDetail {...props} firstViewResizableOptions={mdFirstViewResizableOptions} />;
-}
-
-function DevappMasterDetailRegionLayout(props: LayoutPropsNG): JSX.Element {
-	const DefaultClientWidgetMap = useContext(ClientWidgetMapContext);
-
-	const customMasterDetailLayoutWidgetMap = {
-		...DefaultClientWidgetMap,
-		MasterDetail: ResizableMasterDetail
-	};
-
-	return (
-		<ClientWidgetMapContext.Provider value={customMasterDetailLayoutWidgetMap}>
-			<MasterDetailRegionLayoutNG.component {...props} />
-		</ClientWidgetMapContext.Provider>
-	);
-}
-
-// We still want to have an Application Frame Layout with the three standard
-// subregions, but they should use the dynamic layout components.
-// Without this, the adapter module will still use the old layouts (that do not
-// know about dynamic configuration).
-export const NewLayoutsModule: DynamicConfiguration = {
-	id: "thisModuleProvidesTheNewLayoutComponents",
-	regions: [
-		{
-			name: "", // the root region has no name!
-			layout: { component: DevappApplicationFrameLayout },
-			subRegions: [
-				{
-					name: "CONTENT",
-					layout: { component: DevappMasterDetailRegionLayout }
-				},
-				{
-					name: "SIDEBAR",
-					layout: NullRegionLayoutNG
-				},
-				{
-					name: "MODAL",
-					layout: StackRegionLayoutNG
-				}
-			]
-		}
-	]
-};

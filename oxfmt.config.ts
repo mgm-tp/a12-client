@@ -29,40 +29,45 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
+import { defineConfig } from "oxfmt";
 
-// @ts-expect-error No types available
-import jambitTypedReduxSaga from "@jambit/eslint-plugin-typed-redux-saga";
-import { defineConfig } from "eslint/config";
+export default defineConfig({
+	useTabs: true,
+	tabWidth: 2,
+	trailingComma: "none",
+	arrowParens: "avoid",
+	printWidth: 100,
+	endOfLine: "lf",
+	insertFinalNewline: true,
+	sortPackageJson: false,
 
-import sharedConfig from "../eslint.config.ts";
-
-export default defineConfig(
-	...sharedConfig,
-	{
-		name: "documentation/projectService",
-		files: ["eslint.config.ts"],
-		languageOptions: {
-			parserOptions: {
-				projectService: {
-					allowDefaultProject: ["eslint.config.ts"]
-				}
-			}
-		}
+	/**
+	 * The `ancestors` group has to match `../../**`: oxfmt's globstar crosses `..`, so a custom
+	 * `../**` group would match every parent import instead of only the direct-parent tier.
+	 */
+	sortImports: {
+		groups: ["builtin", "external", "internal", "ancestors", "parent", "sibling", "index"],
+		customGroups: [{ groupName: "ancestors", elementNamePattern: ["../../**"] }],
+		newlinesBetween: true,
+		internalPattern: ["@com.mgmtp.a12"]
 	},
-	{
-		name: "documentation/specific",
-		files: ["src/main/typescript/**/*"],
-		plugins: {
-			"@jambit/typed-redux-saga": jambitTypedReduxSaga
-		},
-		rules: {
-			"@jambit/typed-redux-saga/delegate-effects": "error",
-			"@jambit/typed-redux-saga/use-typed-effects": "error",
-			"@typescript-eslint/no-non-null-assertion": "warn",
-			"@typescript-eslint/no-unnecessary-condition": "error",
-			"@typescript-eslint/no-unused-vars": "off",
-			"react-hooks/immutability": "error",
-			"react-hooks/refs": "error"
-		}
-	}
-);
+
+	/**
+	 * gitignore semantics: a bare name matches at any depth, a pattern with a slash is anchored.
+	 * `testData` holds codemod fixtures whose imports must keep the exact order the test expects,
+	 * and `*.api.md` is generated (and CRLF, unlike every source file).
+	 */
+	ignorePatterns: [
+		"*.api.md",
+		"THIRD_PARTY_NOTICES",
+		"licenses",
+		"assets",
+		"build",
+		"dist",
+		"lib",
+		"resources",
+		"target",
+		"testData",
+		"worktrees"
+	]
+});

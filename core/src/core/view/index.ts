@@ -39,4 +39,9 @@ export { ViewSelectors } from "./internal/selectors.js";
 export type { View } from "./internal/view.js";
 export { ViewViews } from "./internal/views.js";
 
-export type { ViewNG, ViewNGComponent, ViewNGProps } from "./internal/viewNG.js";
+export type {
+	ContributedViewProps,
+	ViewNG,
+	ViewNGComponent,
+	ViewNGProps
+} from "./internal/viewNG.js";

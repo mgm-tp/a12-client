@@ -33,12 +33,12 @@
 import type { ComponentType, Context } from "react";
 
 import type { MainMenuProps as InternalMainMenuProps } from "./components/MainMenu.js";
+import ApplicationFrameLayoutInternal from "./layout/applicationFrameLayout/applicationFrameLayout.js";
 import type {
 	ApplicationFrameLayoutProps as InternalFrameLayoutProps,
 	HeaderItemProps as InternalHeaderItemProps,
 	NavigationBarTitleProps as InternalNavigationBarTitleProps
-} from "./layout/applicationFrameLayout/applicationFrameLayout.js";
-import ApplicationFrameLayoutInternal from "./layout/applicationFrameLayout/applicationFrameLayout.js";
+} from "./layout/applicationFrameLayout/ApplicationFrameLayoutProps.js";
 import type { SidebarContextProps as SidebarContextPropsInternal } from "./layout/applicationFrameLayout/sidebarContext.js";
 import { SidebarContext as SidebarContextInternal } from "./layout/applicationFrameLayout/sidebarContext.js";
 import type * as InternalLayoutProps from "./layout/LayoutProps.js";

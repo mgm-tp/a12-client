@@ -78,6 +78,11 @@ const matchesDynamicForm: DynamicMatchCondition = descriptor => {
 	return isDynamicModelsDescriptor(descriptor) && !!descriptor.taskType;
 };
 
+// must be created outside the flows selector: a component created per selector run
+// gets a new identity on every state change, causing the view to remount each time
+const DynamicModelsSelectWithProgress = withProgressIndicator(DynamicModelsSelect);
+const ModelHeaderEngineWithProgress = withProgressIndicator(ModelHeaderEngine);
+
 const dynamicFlows: (state: object) => DynamicFlow[] = state => {
 	const activity = ActivitySelectors.activitiesByMatchCondition(matchesDynamicForm)(state).at(0);
 	const taskType = activity?.descriptor.taskType;
@@ -93,7 +98,7 @@ const dynamicFlows: (state: object) => DynamicFlow[] = state => {
 							{
 								type: "DYNAMIC_ADD_VIEW",
 								region: "/CONTENT",
-								component: withProgressIndicator(DynamicModelsSelect)
+								component: DynamicModelsSelectWithProgress
 							}
 						]
 					}
@@ -106,7 +111,7 @@ const dynamicFlows: (state: object) => DynamicFlow[] = state => {
 							{
 								type: "DYNAMIC_ADD_VIEW",
 								region: "/CONTENT",
-								component: withProgressIndicator(ModelHeaderEngine),
+								component: ModelHeaderEngineWithProgress,
 								models: [{ name: `${taskType}-document`, modelType: "document" }]
 							}
 						]

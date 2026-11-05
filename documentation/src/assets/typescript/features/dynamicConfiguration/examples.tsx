@@ -52,7 +52,7 @@ declare const initialConfig: A12ApplicationConfig;
 // tag::step1[]
 export const finalConfig = combineFeatures(
 	withModel(APPLICATION_MODEL_PLACEHOLDER),
-	withDynamicConfig()
+	withDynamicConfig
 	// ... other features
 )(initialConfig);
 // end::step1[]
@@ -96,13 +96,15 @@ const PersonConfiguration: DynamicConfiguration = {
 					// tag::bad[]
 					{
 						name: "bad",
-						matches: () => true, // new function on every state change!
+						matches: () => true,
 						sceneChange: {
 							onEnter: [
 								{
 									type: "DYNAMIC_ADD_VIEW",
 									region: "/CONTENT",
-									// new component on every state change!
+									// new component identity on every state change —
+									// React remounts the view each time. Keep the component
+									// module-level and pass data via componentProps instead.
 									component: (props: ViewNGProps) => <div>{props.activityId}</div>
 								}
 							]

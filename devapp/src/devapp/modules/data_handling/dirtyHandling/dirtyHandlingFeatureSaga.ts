@@ -33,12 +33,12 @@
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, put, takeLatest } from "typed-redux-saga";
 
-import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import {
 	ActivityActions,
 	ActivitySagas,
 	NotificationActions
 } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 
 import { cancelActivities } from "./dirtyHandlingFeatureActions.js";
 

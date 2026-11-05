@@ -60,6 +60,8 @@ import type { DgClAndValidationDataHolderShape } from "../../../redux/api/types.
 import { assertCondition } from "../../../typeguards.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
 
+import { messageDefaults } from "./mocks/mockMessage.js";
+
 describe("redux.api.reducers", () => {
 	beforeEach(() => {
 		ValidatorProviderFactory.set(
@@ -269,6 +271,7 @@ describe("redux.api.reducers", () => {
 				{ elementName: "anotherField", index: 1 }
 			];
 			const preparedMessage: Message = {
+				...messageDefaults,
 				entityInstance: errorFieldPath,
 				errorCode: "123",
 				errorText: [],

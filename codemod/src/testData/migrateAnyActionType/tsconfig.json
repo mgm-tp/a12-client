@@ -1,6 +1,6 @@
 {
 	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./imports.ts", "aliased.ts", "existing.ts"],
+	"include": ["./imports.ts", "aliased.ts", "declared.ts", "existing.ts", "shadowed.ts", "unrelated.ts", "mixed.ts"],
 	"compilerOptions": {
 		"noEmit": true,
 		"noCheck": true

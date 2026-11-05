@@ -34,7 +34,7 @@ import type { JSX } from "react";
 import { useContext } from "react";
 import { useDispatch } from "react-redux";
 
-import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGComponent, ViewNGProps } from "@com.mgmtp.a12.client/client-core";
 import { ActivityActions, FrameViews } from "@com.mgmtp.a12.client/client-core";
 import {
 	Button,
@@ -45,6 +45,7 @@ import {
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
 import { DescriptionPanel } from "./descriptionPanel.js";
+import type { TitledViewProps } from "./subComponents.js";
 import { ShowDeviceInformation, SidebarContent } from "./subComponents.js";
 
 export function StartDashboard(props: ViewNGProps): JSX.Element {
@@ -173,19 +174,15 @@ export function MobileNavigationDashboardSidebar(): JSX.Element {
 	);
 }
 
-export function createDashboardView(title: string): (props: ViewNGProps) => JSX.Element {
-	return function DashboardViewWithTitle(): JSX.Element {
-		return (
-			<ActionContentbox
-				padding="12px"
-				listenToNavigationContext
-				headingElements={<ContentBoxElements.Title key="title" text={title} />}
-			>
-				{title === "Tile 1" ? getDescription() : "Dummy content"}
-			</ActionContentbox>
-		);
-	};
-}
+export const DashboardTileView: ViewNGComponent<TitledViewProps> = ({ title }) => (
+	<ActionContentbox
+		padding="12px"
+		listenToNavigationContext
+		headingElements={<ContentBoxElements.Title key="title" text={title} />}
+	>
+		{title === "Tile 1" ? getDescription() : "Dummy content"}
+	</ActionContentbox>
+);
 
 function getDescription(): JSX.Element {
 	return (

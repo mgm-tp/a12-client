@@ -49,6 +49,33 @@ When migrating to the new API, remember to remove A12 specific setup code. In ad
 include::assets/typescript/features/composableAppsetup.tsx[tags="composableAppsetup",indent=0]
 ----
 
+== Naming Convention
+
+The prefix of a builder tells you what it does to the config:
+
+[cols="1,3,2"]
+|===
+|Prefix |Meaning |Example
+
+|`addX`
+|Appends to a collection. May be called repeatedly; the order of registration is the order of
+ application.
+|`addView`, `addPlatformSagas`, `addReducerMap`
+
+|`setX`
+|Sets a single value and overrides whatever was set before. The last call wins.
+|`setApplicationResetTriggers`
+
+|`withX`
+|Installs a feature. May only be installed once - installing it twice, or installing two features
+ that configure the same thing, fails at compile time.
+|`withLocalization`, `withModel`, `withPlatformModelLoader`
+|===
+
+A `withX` feature that needs no input from you is passed to `combineFeatures` directly
+(`withLocalization`). One that does takes it as an argument (`withModel(appModel)`); features that
+read their options from the config, such as `withPlatformModelLoader`, are also passed directly.
+
 == Client Extensions
 A12 Client itself not only provides the composable API, but provides some extensions that can be registered with the API. For a description of a specific feature, see the following paragraphs.
 

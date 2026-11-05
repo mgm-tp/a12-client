@@ -114,6 +114,7 @@ export function CustomExtendedSidebar(props: ViewNGProps): JSX.Element {
 					suffixes={[
 						setMaximized ? (
 							<Button
+								key={"maximize"}
 								icon={<Icon>{maximized ? "fullscreen_exit" : "fullscreen"}</Icon>}
 								invert
 								onClick={() => setMaximized(maximized ? "minimized" : "maximized")}

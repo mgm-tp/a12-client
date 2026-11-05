@@ -31,7 +31,7 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";

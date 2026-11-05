@@ -37,13 +37,14 @@ import type {
 } from "@com.mgmtp.a12.utils/utils-localization";
 import type { DateTimeContextType, TimePickerProps } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import type { A12ApplicationConfig, RequireFeatures } from "../../../core/index.js";
+import type { A12ApplicationConfig, RequireFeatures } from "../../../core/application/index.js";
 
 /**
  * @experimental
  */
 export type LocalizedLocale = Locale & { name?: Localizable };
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		localization: {

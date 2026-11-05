@@ -33,10 +33,11 @@
 import type { JSX } from "react";
 import { useContext } from "react";
 
-import type { ViewNGProps } from "@com.mgmtp.a12.client/client-core";
+import type { ViewNGComponent } from "@com.mgmtp.a12.client/client-core";
 import { FrameViews } from "@com.mgmtp.a12.client/client-core";
 import { Button, ActionContentbox, ContentBoxElements } from "@com.mgmtp.a12.widgets/widgets-core";
 
+import type { TitledViewProps } from "./subComponents.js";
 import { SidebarContent } from "./subComponents.js";
 
 export function NullRegionSidebar(): JSX.Element {
@@ -66,29 +67,28 @@ export function NullRegionSidebar(): JSX.Element {
 	);
 }
 
-export function createNullRegionView(title: string): (props: ViewNGProps) => JSX.Element {
-	return function NullRegionViewWithTitle(props: ViewNGProps): JSX.Element {
-		return (
-			<ActionContentbox
-				padding="24px"
-				listenToNavigationContext
-				headingElements={<ContentBoxElements.Title key="title" text={title} />}
-			>
-				{title === "View 1" ? (
-					<div>
-						The null region layout shows all views below each other.
-						<p>
-							Because there are views in the sidebar a back-button is shown, which expands the
-							sidebar.
-						</p>
-						<p>
-							The back-button is shown in navigation bar because the layout shows multiple views at
-							once.
-						</p>
-					</div>
-				) : null}
-				View for activity with id: {props.activityId}
-			</ActionContentbox>
-		);
-	};
-}
+export const NullRegionTileView: ViewNGComponent<TitledViewProps> = props => {
+	const { title } = props;
+	return (
+		<ActionContentbox
+			padding="24px"
+			listenToNavigationContext
+			headingElements={<ContentBoxElements.Title key="title" text={title} />}
+		>
+			{title === "View 1" ? (
+				<div>
+					The null region layout shows all views below each other.
+					<p>
+						Because there are views in the sidebar a back-button is shown, which expands the
+						sidebar.
+					</p>
+					<p>
+						The back-button is shown in navigation bar because the layout shows multiple views at
+						once.
+					</p>
+				</div>
+			) : null}
+			View for activity with id: {props.activityId}
+		</ActionContentbox>
+	);
+};

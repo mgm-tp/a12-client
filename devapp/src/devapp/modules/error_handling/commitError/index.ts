@@ -70,8 +70,7 @@ const dynamicFlows: DynamicFlow[] = [
 						{
 							type: "DYNAMIC_ADD_VIEW",
 							component: withProgressIndicator(CommitErrorHandlingFeature),
-							region: "/CONTENT",
-							constraints: { type: "MasterDetail" }
+							region: "/CONTENT"
 						}
 					]
 				}

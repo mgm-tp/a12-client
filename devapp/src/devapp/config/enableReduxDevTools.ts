@@ -36,7 +36,7 @@ import { actionSanitizer, type ComposeEnhancer } from "@com.mgmtp.a12.client/cli
 
 export function enableReduxDevTools(): ComposeEnhancer {
 	return composeWithDevTools({
-		name: "A12 Client Devapp",
+		name: "A12 Client DevApp",
 		serialize: {
 			replacer: (key, value) =>
 				key === "generatedCodeAccessor" || key === "validatorProvider" ? "" : value

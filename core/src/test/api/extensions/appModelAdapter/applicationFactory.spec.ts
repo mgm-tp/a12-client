@@ -36,8 +36,13 @@ import type { Store } from "redux";
 
 import { AppModelAdapterModule } from "../../../../core/application/internal/adapter/appModelAdapterModule.js";
 import type { A12ApplicationConfig } from "../../../../core/application/internal/factories/applicationConfig.js";
+import {
+	combineFeatures,
+	withModel
+} from "../../../../core/application/internal/factories/applicationFactory.js";
 import { ModuleTestExtensions } from "../../../../core/application/internal/factories/moduleRegistryInstance.js";
 import { ModuleRegistryProvider } from "../../../../core/application/internal/factories/moduleRegistryProvider.js";
+import type { ApplicationModel } from "../../../../core/model/index.js";
 import { APPLICATION_MODEL_PLACEHOLDER } from "../../../../core/model/index.js";
 import { withAppModelAdapter } from "../../../../extensions/appModelAdapter/internal/applicationFactory.js";
 import { toA12Config } from "../../../utils/test-utils.js";
@@ -58,5 +63,28 @@ describe("extensions.appModelAdapter.applicationFactory", () => {
 
 		await result.initialActions?.({} as Store);
 		deepEqual(ModuleRegistryProvider.getInstance().getAllModules(), [AppModelAdapterModule]);
+	});
+
+	const ownModel = {
+		header: { id: "own", modelType: "application", modelVersion: "6.0.0" },
+		content: { modules: [], region: { name: "OWN", layout: { name: "Null" } }, defaultRegion: [] }
+	} as ApplicationModel;
+
+	it("withAppModelAdapter keeps an own application model, adapter first", () => {
+		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
+
+		const result = combineFeatures(withAppModelAdapter, withModel(ownModel))(baseConfig);
+
+		equal(result.configured.appModelAdapter, true);
+		equal(result.config.model, ownModel);
+	});
+
+	it("withAppModelAdapter keeps an own application model, withModel first", () => {
+		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
+
+		const result = combineFeatures(withModel(ownModel), withAppModelAdapter)(baseConfig);
+
+		equal(result.configured.appModelAdapter, true);
+		equal(result.config.model, ownModel);
 	});
 });

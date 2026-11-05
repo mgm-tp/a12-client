@@ -37,7 +37,6 @@
  */
 
 import "./whyDidYouRender/index.js";
-
 import {
 	getModelLoader,
 	renderDevApp,

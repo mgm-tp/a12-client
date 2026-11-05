@@ -30,14 +30,15 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type { A12ApplicationConfig, RequireFeatures } from "../../../core/application/index.js";
 import {
 	addWrapper,
 	combineFeatures,
 	setConfigured
 } from "../../../core/application/internal/factories/applicationFactory.js";
-import type { A12ApplicationConfig, RequireFeatures } from "../../../core/index.js";
 import { NotificationViews } from "../../../core/notification/internal/views.js";
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		notifications?: unknown;
@@ -58,7 +59,7 @@ export type ApplicationWithNotificationConfig = RequireFeatures<
  * NOTE: If your app requires localizations, provide `withLocalization` before this.
  */
 export const addNotificationFrame = <T extends ApplicationWithNotificationConfig>(cfg: T) =>
-	addWrapper<T>(NotificationViews.Frame)(cfg);
+	addWrapper(NotificationViews.Frame)(cfg);
 
 /**
  * @experimental

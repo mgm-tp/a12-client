@@ -95,7 +95,6 @@ const dynamicFlows: DynamicFlow[] = [
 							type: "DYNAMIC_ADD_VIEW",
 							component: DataEditorSourceOverview,
 							region: "/CONTENT",
-							constraints: { type: "MasterDetail" },
 							models: [{ modelType: "document", name: "BookAuthor-document" }]
 						}
 					]
@@ -111,7 +110,6 @@ const dynamicFlows: DynamicFlow[] = [
 							type: "DYNAMIC_ADD_VIEW",
 							component: DataEditorSource,
 							region: "/CONTENT",
-							constraints: { type: "MasterDetail" },
 							models: [{ modelType: "document", name: "BookAuthor-document" }]
 						}
 					]
@@ -126,8 +124,7 @@ const dynamicFlows: DynamicFlow[] = [
 						{
 							type: "DYNAMIC_ADD_VIEW",
 							component: DataEditorConsumer,
-							region: "/MODAL",
-							constraints: { type: "MasterDetail" }
+							region: "/MODAL"
 						}
 					]
 				}

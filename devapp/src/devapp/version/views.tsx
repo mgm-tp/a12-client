@@ -62,7 +62,7 @@ export function VersionMenu(): JSX.Element {
 			<List>
 				<Item
 					text={version}
-					secondaryText={localizer({ key: "version.info.currentversion.label" })}
+					secondaryText={localizer({ key: "version.info.currentVersion.label" })}
 					readonly
 					flipped
 				/>

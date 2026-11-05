@@ -30,38 +30,19 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import mocha from "eslint-plugin-mocha";
-import { defineConfig } from "eslint/config";
+import type { RefObject } from "react";
+import { useRef } from "react";
 
-import sharedConfig from "../eslint.config.ts";
+/**
+ * Stub for the `react-resize-detector` module, installed by the resolve hook in
+ * `./moduleStubs.js`, which also explains why the real module is replaced.
+ */
+export function useResizeDetector<T extends HTMLElement = HTMLElement>(): {
+	ref: RefObject<T | null>;
+	width: undefined;
+	height: undefined;
+} {
+	const ref = useRef<T | null>(null);
 
-export default defineConfig(
-	...sharedConfig,
-	{
-		name: "data/projectService",
-		files: ["eslint.config.ts"],
-		languageOptions: {
-			parserOptions: {
-				projectService: {
-					allowDefaultProject: ["eslint.config.ts"]
-				}
-			}
-		}
-	},
-	{
-		name: "data/testOverrides",
-		files: ["src/test/**/*"],
-		plugins: {
-			mocha
-		},
-		rules: {
-			"@typescript-eslint/no-explicit-any": "off",
-			"@typescript-eslint/no-non-null-assertion": "off",
-			"@typescript-eslint/no-unused-expressions": "off",
-			"@typescript-eslint/no-unused-vars": "off",
-			"mocha/no-setup-in-describe": "warn",
-			"react-hooks/refs": "warn",
-			"react-hooks/immutability": "warn"
-		}
-	}
-);
+	return { ref, width: undefined, height: undefined };
+}

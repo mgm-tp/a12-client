@@ -45,6 +45,8 @@ import type { ComputedFields, DgDocument } from "../../../internal/documentGraph
 import { selectMessagesByDataRef } from "../../../redux/api/selectors.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
 
+import { messageDefaults } from "./mocks/mockMessage.js";
+
 describe("redux.api.selectors", () => {
 	describe("selectMessagesByDataRef", () => {
 		beforeEach(() => {
@@ -67,6 +69,7 @@ describe("redux.api.selectors", () => {
 				"foo/1": {
 					messages: [
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "numberField001", index: 1 }
@@ -85,6 +88,7 @@ describe("redux.api.selectors", () => {
 							severity: "ERROR"
 						},
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "numberField001", index: 1 }
@@ -103,6 +107,7 @@ describe("redux.api.selectors", () => {
 							severity: "ERROR"
 						},
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "stringField001", index: 1 }
@@ -121,6 +126,7 @@ describe("redux.api.selectors", () => {
 							severity: "ERROR"
 						},
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "stringField001", index: 1 }
@@ -159,6 +165,7 @@ describe("redux.api.selectors", () => {
 				"foo/1": {
 					messages: [
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "stringField001", index: 1 }
@@ -184,6 +191,7 @@ describe("redux.api.selectors", () => {
 							severity: "ERROR"
 						},
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "numberField001", index: 1 }
@@ -218,7 +226,7 @@ describe("redux.api.selectors", () => {
 			);
 
 			const expectedFilteredMsg: Message = {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+				// oxlint-disable-next-line typescript/no-non-null-asserted-optional-chain
 				...validationData["foo/1"]?.messages?.[1]!,
 				referencedFields: [
 					[
@@ -237,6 +245,7 @@ describe("redux.api.selectors", () => {
 					errorValues: {},
 					messages: [
 						{
+							...messageDefaults,
 							entityInstance: [
 								{ elementName: "base", index: 1 },
 								{ elementName: "stringField001", index: 1 }
@@ -268,7 +277,7 @@ describe("redux.api.selectors", () => {
 			);
 
 			const expectedExpandedMsg: Message = {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+				// oxlint-disable-next-line typescript/no-non-null-asserted-optional-chain
 				...validationData["foo/1"]?.messages[0]!,
 				referencedFields: [
 					[

@@ -126,7 +126,7 @@ function Repeat(props: BaseInputProps): JSX.Element {
 			);
 		},
 		// Need to listen to data changes, otherwise the table will not be updated
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// oxlint-disable-next-line react/exhaustive-deps
 		[onOpenBook, data]
 	);
 

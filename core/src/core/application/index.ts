@@ -44,9 +44,20 @@ export type {
 	ApplicationWithConfiguredFeature,
 	ApplicationWithConfiguredModel,
 	ApplicationWithConfiguredModelLoader,
+	ApplicationWithDynamicConfigConfig,
+	ApplicationWithModelConfig,
+	ApplicationWithModelLoaderConfig,
 	BaseConfig,
-	RequireFeatures
+	BaseConfigWithModel,
+	BaseConfigWithModelLoader,
+	ClientConfig,
+	OptionalProvider,
+	ProviderConfig,
+	RequireFeatures,
+	UIConfig,
+	ViewModification
 } from "./internal/factories/applicationConfig.js";
+export type { GenericModelLoaderOptions } from "./internal/factories/genericModelLoaderOptions.js";
 export {
 	addAdditionalMiddlewares,
 	addApplicationBusyTriggers,
@@ -56,24 +67,20 @@ export {
 	addDataReducers,
 	addErrorBoundary,
 	addInitialAction,
-	addLayout,
 	addPlatformSagas,
 	addProgressIndicator,
 	addReduxSetupAction,
-	addRegion,
 	addRootReducer,
 	addView,
 	addWrapper,
 	combineFeatures,
-	createA12ApplicationSetup,
-	modifyLayout,
 	modifyView,
 	setConfigured,
-	withApplicationResetTriggers,
+	setApplicationResetTriggers,
 	withDynamicConfig,
 	withModel,
 	withModelLoader,
-	withReducerMap
+	addReducerMap
 } from "./internal/factories/applicationFactory.js";
 export { ApplicationFactories } from "./internal/factories/index.js";
 export type { ApplicationSetup, ComposeEnhancer } from "./internal/factories/index.js";

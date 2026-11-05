@@ -34,15 +34,16 @@ import deepEqual from "fast-deep-equal";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ActivityActions, ActivitySelectors } from "../../../../activity/index.js";
-import { ApplicationModel, ModelSelectors } from "../../../../model/index.js";
-import { ViewSelectors } from "../../../../view/index.js";
-import { InternalViewSelectors } from "../../../../view/internal/selectors.js";
+import { ActivityActions } from "../../../../activity/internal/actions.js";
+import { ActivitySelectors } from "../../../../activity/internal/selectors.js";
+import { ApplicationModel } from "../../../../model/internal/ApplicationModel.js";
+import { ModelSelectors } from "../../../../model/internal/selectors.js";
+import { InternalViewSelectors, ViewSelectors } from "../../../../view/internal/selectors.js";
 
 import type { RegionUiProps } from "../LayoutProps.js";
 import type { ActivityIdMap, ViewWithRegionReference } from "../mobile-navigation.js";
 
-import type { Region } from "./applicationFrameLayout.js";
+import type { Region } from "./ApplicationFrameLayoutProps.js";
 
 interface SubRegion {
 	readonly ref: ApplicationModel.Region.Reference;

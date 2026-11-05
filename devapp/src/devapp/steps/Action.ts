@@ -172,7 +172,7 @@ export namespace Action {
 
 	export interface StartNewTopLevelActivity extends Base {
 		readonly type: "START_ACTIVITY";
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// oxlint-disable-next-line typescript/no-explicit-any
 		readonly descriptor: any;
 		readonly child?: boolean;
 	}

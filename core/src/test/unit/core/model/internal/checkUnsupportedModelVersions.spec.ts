@@ -35,11 +35,11 @@ import { deepStrictEqual } from "node:assert/strict";
 import type { Header, Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api";
 
 import type { SupportedModelVersions } from "../../../../../core/model/index.js";
-import type { Model } from "../../../../../core/model/internal/Model.js";
 import {
 	checkUnsupportedModelVersion,
 	createIncompatibleModelError
 } from "../../../../../core/model/internal/checkUnsupportedModelVersion.js";
+import type { Model } from "../../../../../core/model/internal/Model.js";
 
 declare global {
 	var __A12_MODEL_VERSIONS__: SupportedModelVersions | undefined;

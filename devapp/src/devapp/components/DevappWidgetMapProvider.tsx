@@ -30,44 +30,38 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-// @ts-expect-error No types available
-import jambitTypedReduxSaga from "@jambit/eslint-plugin-typed-redux-saga";
-import { defineConfig } from "eslint/config";
+import type { JSX } from "react";
+import { useContext, useMemo } from "react";
 
-import sharedConfig from "../eslint.config.ts";
+import { ClientWidgetMapContext } from "@com.mgmtp.a12.client/client-core";
+import {
+	ApplicationFrame,
+	type ApplicationFrameProps,
+	type Container,
+	type ResizeOptions
+} from "@com.mgmtp.a12.widgets/widgets-core";
 
-export default defineConfig(
-	...sharedConfig,
-	{
-		name: "devapp/projectService",
-		files: ["eslint.config.ts"],
-		languageOptions: {
-			parserOptions: {
-				projectService: {
-					allowDefaultProject: ["eslint.config.ts"]
-				}
-			}
-		}
-	},
-	{
-		name: "devapp/typedReduxSaga",
-		files: ["src/**/*"],
-		ignores: ["src/test/**/*"],
-		plugins: {
-			"@jambit/typed-redux-saga": jambitTypedReduxSaga
-		},
-		rules: {
-			"@jambit/typed-redux-saga/delegate-effects": "error",
-			"@jambit/typed-redux-saga/use-typed-effects": "error"
-		}
-	},
-	{
-		name: "devapp/specific",
-		files: ["src/devapp/**/*"],
-		rules: {
-			"@typescript-eslint/no-unnecessary-condition": "error",
-			"react-hooks/immutability": "error",
-			"react-hooks/refs": "error"
-		}
-	}
+const appFrameSubResizeOptions: ResizeOptions = {
+	minWidth: 200,
+	maxWidth: 800
+};
+
+const DevappApplicationFrame = (props: ApplicationFrameProps) => (
+	<ApplicationFrame {...props} subResizableOptions={appFrameSubResizeOptions} />
 );
+
+/**
+ * Makes the devapp `ApplicationFrame` with its resizable sidebar available to
+ * the application frame layout rendered as `children`.
+ */
+export function DevappWidgetMapProvider({ children }: Container): JSX.Element {
+	const defaultWidgetMap = useContext(ClientWidgetMapContext);
+	const widgetMap = useMemo(
+		() => ({ ...defaultWidgetMap, ApplicationFrame: DevappApplicationFrame }),
+		[defaultWidgetMap]
+	);
+
+	return (
+		<ClientWidgetMapContext.Provider value={widgetMap}>{children}</ClientWidgetMapContext.Provider>
+	);
+}

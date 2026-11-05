@@ -5,6 +5,14 @@ const originalActions: ReduxAction = [...dispatchedActions];
 
 `;
 
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate declared.ts correctly 1`] = `
+import { Action as ReduxAction } from "redux";
+type Action = string;
+export const dispatchedActions: ReduxAction[] = [];
+export const localAction: Action = "TEST";
+
+`;
+
 exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate existing.ts correctly 1`] = `
 import { Action } from "redux";
 export const dispatchedActions: Action[] = [];
@@ -20,5 +28,27 @@ const actionFactory = actionCreator.async<void, void>("TEST");
 export const fsaAction: Action = actionFactory.started();
 export const fsaCompatAction: Action = actionFactory.started();
 export const reduxAction: Action = actionFactory.started();
+
+`;
+
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate mixed.ts correctly 1`] = `
+import { Action } from "redux";
+import { AnyAction as LocalAnyAction } from "my-own-actions";
+export const reduxActions: Action[] = [];
+export const localActions: LocalAnyAction[] = [];
+
+`;
+
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate shadowed.ts correctly 1`] = `
+import { Action as ReduxAction } from "redux";
+import { Action } from "my-own-actions";
+export const dispatchedActions: ReduxAction[] = [];
+export const localAction: Action = [...dispatchedActions];
+
+`;
+
+exports[`codemod.recipes.migrateAnyActionType > Migrates AnyAction from compat import to Action from redux > should migrate unrelated.ts correctly 1`] = `
+import { AnyAction } from "my-own-actions";
+export const localActions: AnyAction[] = [];
 
 `;

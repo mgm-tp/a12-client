@@ -34,12 +34,6 @@ LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
 
 include::0100_introduction.adoc[leveloffset=1]
 
-include::0101_technologies.adoc[leveloffset=2]
-
-include::0102_principles.adoc[leveloffset=2]
-
-include::0103_packages.adoc[leveloffset=2]
-
 include::0200_getting-started.adoc[leveloffset=1]
 
 include::0201_prerequisites.adoc[leveloffset=2]
@@ -124,5 +118,7 @@ include::1050_breaking-change-management.adoc[leveloffset=1]
 
 include::1100_migration.adoc[leveloffset=1]
 
-include::1101_2026.06.adoc[leveloffset=2]
+include::1101_2026.06-ext2.adoc[leveloffset=2]
+
+include::1102_2026.06.adoc[leveloffset=2]
 

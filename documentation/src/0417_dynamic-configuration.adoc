@@ -45,7 +45,7 @@ The Dynamic Configuration API is currently marked as `@experimental`. While it i
 
 To enable Dynamic Configuration in your composable appsetup:
 
-1. Use `withDynamicConfig()` in your feature composition.
+1. Use `withDynamicConfig` in your feature composition.
 2. Use `APPLICATION_MODEL_PLACEHOLDER` as the model (the traditional Application Model is not used, but the setup API still requires one).
 3. Register your `DynamicConfiguration` modules with the <<module-registry,ModuleRegistry>>.
 
@@ -91,7 +91,7 @@ include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="r
 ----
 
 Built-in layout components include `ApplicationFrameLayoutNG`, `MasterDetailRegionLayoutNG`, `NullRegionLayoutNG`, `StackRegionLayoutNG`, and `DashboardLayoutComponentNG` (same ones as for the Application Model-based layouts).
-Custom layout components receive `LayoutPropsNG` which provides `views`, `regionRef`, and `subRegionRefs`.
+Custom layout components receive `LayoutPropsNG` which provides `views`, `regionRef`, and `subRegionRefs`, plus any `componentProps` declared on the `LayoutNG` object (see <<Performance and Referential Stability>>).
 
 To render a region in a view component, use `DynamicRegionUi`:
 
@@ -119,7 +119,7 @@ include::assets/typescript/features/dynamicConfiguration/simpleModule.ts[tags="f
 
 Scene changes use directives to modify the UI:
 
-`DYNAMIC_ADD_VIEW`:: Adds a view component to a region. The component is referenced directly (not by string name). Optionally includes `models` (model descriptors) and `constraints`.
+`DYNAMIC_ADD_VIEW`:: Adds a view component to a region. The component is referenced directly (not by string name). Optionally includes `componentProps` (additional plain-data props for the component, see <<Performance and Referential Stability>>), `models` (model descriptors) and `constraints`.
 `DYNAMIC_CLEAR_REGION`:: Clears all views from a region. Optionally accepts a new `layout` to apply after clearing.
 
 Unlike the traditional Application Model where views and layouts are referenced by name through a provider, Dynamic Configuration references React components directly — eliminating the need for a mapping of string constants to components (e.g., "viewProvider").
@@ -131,7 +131,7 @@ Each `DynamicMenu` has:
 * `id` — unique menu identifier
 * `label` — a `Localizable` object (typically an i18n resource key like `{ key: "application.menu.person" }`)
 * `selected` (optional) — whether the menu item is currently active
-* `action` (optional) — a callback `(dispatch: Dispatch) => void` that is invoked when the menu is clicked
+* `action` (optional) — a callback `(dispatch: Dispatch) => void`, or a plain action object that is dispatched directly when the menu is clicked
 * `children` (optional) — nested sub-menus
 
 [source,typescript,title="Menu definition"]
@@ -160,33 +160,51 @@ type SelectorOrObject<T> = T | ((state: object) => T);
 include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="selectors",indent=0]
 ----
 
-== Performance and Memoization
+== Performance and Referential Stability
 
-When using selector functions, it is critical to ensure **referential stability**. The framework uses reference equality (`===`) to detect changes — if a selector returns a new object or function reference on every call, it triggers unnecessary re-renders even when the underlying data hasn't changed.
+Selector functions run on every Redux state change. The framework deep-compares each contribution with its previous result and reuses the previous one when nothing changed, so returning **fresh objects, arrays, and strings** from a selector is unproblematic — plain data never causes re-renders by itself.
+
+**Functions are the exception.** They are compared by reference (`===`). A React component or callback created *inside* a selector is a new reference on every state change; for components this is the worst case, because React sees a new component type and **remounts** the view — losing form state, scroll position, and effects.
 
 === The Problem
 
-Selector functions run on every Redux state change. Creating new objects, arrays, functions, or React components inside a selector produces fresh references each time:
-
-[source,typescript,title="Memoization pattern"]
+[source,typescript,title="Component closure inside a selector"]
 ----
 include::assets/typescript/features/dynamicConfiguration/examples.tsx[tags="bad",indent=0]
 ----
 
-=== The Solution
+=== The Solution: `componentProps`
 
-Use memoization to return the same reference when the relevant inputs haven't changed:
+Keep components module-level constants and pass anything state-derived as plain data via `componentProps`. The framework injects these props into the component, and as plain data they are covered by the deep-compare:
 
-[source,typescript,title="Memoization pattern"]
+[source,typescript,title="Variability travels as data"]
 ----
-include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="memoization",indent=0]
+include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="componentProps",indent=0]
 ----
 
-**General strategies:**
+`componentProps` is available on `DYNAMIC_ADD_VIEW` directives and on `LayoutNG` region layouts. The framework-injected props (`activityId` for views, `LayoutPropsNG` for layouts) are applied last and win on collision, and their keys are **rejected by the type** (`ContributedViewProps`, `ContributedLayoutProps`) rather than silently ignored — so a clash is a compile error, not a surprise at runtime.
 
-* Move non-dynamic parts out of the selector — use plain objects for anything that doesn't depend on state.
-* Use a memoization utility keyed on the values that actually change.
-* Ensure stable references for: match condition functions, React components, layout objects, and menu arrays.
+Declare the component's own props once and hand that type to `ViewNGComponent<P>`, which adds them to the framework-injected `ViewNGProps`:
+
+[source,typescript,title="One props type for the component"]
+----
+include::assets/typescript/features/dynamicConfiguration/dynamicModule.tsx[tags="viewDeclaration",indent=0]
+----
+
+Region layouts work the same way through `LayoutNG<P>`, where `P` extends `LayoutPropsNG`.
+
+The component's own props have to be optional: a directive promises only the framework-injected props, so a component that demands an extra key does not fit it.
+
+NOTE: `componentProps` are checked as `ContributedViewProps` / `ContributedLayoutProps` — any plain data except the framework's own keys. Checking them against the props of the component in the same directive would need a generic call site, which a directive literal inside an array does not provide.
+
+When the values change, the component **re-renders** with the new props — it is not remounted, so local component state stays intact.
+
+**Rules of thumb:**
+
+* Contribute components as module-level constants — never create them inside a selector.
+* Pass state-derived context via `componentProps` instead of closing over it in a component.
+* A menu `action` can be a plain action object instead of a callback — prefer that when the action is built inside a selector.
+* Scene `matches` functions are only invoked, never compared — creating them inline inside a selector is fine.
 
 == Caveats and Limitations
 
@@ -207,9 +225,9 @@ With Dynamic Configuration, you are responsible for the rendering of the layout 
 
 The deep-linking system traditionally relies on `ApplicationModel.initialActivity` to determine the starting point. When using Dynamic Configuration, ensure you handle the initial navigation explicitly (see above).
 
-=== Memoization is Required for Dynamic Selectors
+=== Contributed Functions Are Compared by Reference
 
-Unlike Application Models (which are structurally compared), Dynamic Configuration uses reference equality. Forgetting to memoize selector return values can cause excessive re-renders. See <<Performance and Memoization>> for details.
+Selector results are deep-compared, but functions inside them (React components, callbacks) are compared by reference. Creating components inside a selector causes remounts on every state change — keep them module-level and pass state-derived data via `componentProps`. See <<Performance and Referential Stability>> for details.
 
 === No Direct `permission` Property on Menus
 
@@ -277,7 +295,7 @@ This section provides a step-by-step guide for converting an existing JSON Appli
 
 === Step 1: Enable Dynamic Configuration
 
-In your composable appsetup, add `withDynamicConfig()` and replace any direct model import with `APPLICATION_MODEL_PLACEHOLDER`:
+In your composable appsetup, add `withDynamicConfig` and replace any direct model import with `APPLICATION_MODEL_PLACEHOLDER`:
 
 [source,typescript,title="Enable Dynamic Configuration"]
 ----

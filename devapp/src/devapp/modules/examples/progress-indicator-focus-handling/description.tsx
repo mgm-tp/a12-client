@@ -134,8 +134,8 @@ export function DescriptionView(props: ViewNGProps): JSX.Element {
 					</p>
 					<br />
 					<b>Attention: </b> For this case you still need to write a custom progress indicator
-					provider with a custom &quot;ProgressIndicatorComponent&quot; to be able to set the prop
-					&quot;focusOnOpen&quot;.
+					provider that customizes the &quot;ProgressIndicator&quot; widget via the
+					&quot;ClientWidgetMapContext&quot; to be able to set the prop &quot;focusOnOpen&quot;.
 				</Typography.Body>
 				<br />
 				<Button primary onClick={() => createChildActivity("viewWithOwnProgressIndicator")}>

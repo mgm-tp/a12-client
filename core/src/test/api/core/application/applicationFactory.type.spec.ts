@@ -32,8 +32,16 @@
 
 import {
 	type ApplicationWithConfiguredFeature,
-	type RequireFeatures
+	combineFeatures,
+	type RequireFeatures,
+	withDynamicConfig,
+	withModel,
+	withModelLoader
 } from "../../../../core/application/index.js";
+import { createA12ApplicationSetup } from "../../../../core/frame/index.js";
+import type { ApplicationModel } from "../../../../core/model/index.js";
+import type { ModelLoader } from "../../../../core/model/internal/ModelLoader.js";
+import { withPlatformModelLoader } from "../../../../extensions/modelLoader/index.js";
 import { toA12Config } from "../../../utils/test-utils.js";
 
 describe("core.application.applicationFactory", () => {
@@ -62,5 +70,79 @@ describe("core.application.applicationFactory", () => {
 
 		// @ts-expect-error test compile time feature
 		const result: Test = false;
+	});
+
+	describe("model and model loader features", () => {
+		const baseConfig = () => toA12Config({ config: {} });
+		const model = {} as ApplicationModel;
+		const loader = {} as ModelLoader;
+
+		const expectTrue = <_T extends true>() => undefined;
+
+		type HasModelAndLoader<T> = T extends {
+			configured: { model: true; modelLoader: true };
+			config: { model: ApplicationModel; modelLoader: ModelLoader };
+		}
+			? true
+			: false;
+
+		it("should keep the refinements of nested feature applications", () => {
+			const nested = withModel(model)(withModelLoader(loader)(baseConfig()));
+
+			createA12ApplicationSetup(nested);
+			expectTrue<HasModelAndLoader<typeof nested>>();
+		});
+
+		it("should keep the refinements when combined", () => {
+			const loaderFirst = combineFeatures(withModelLoader(loader), withModel(model))(baseConfig());
+			const modelFirst = combineFeatures(withModel(model), withModelLoader(loader))(baseConfig());
+
+			createA12ApplicationSetup(loaderFirst);
+			createA12ApplicationSetup(modelFirst);
+			expectTrue<HasModelAndLoader<typeof loaderFirst>>();
+			expectTrue<HasModelAndLoader<typeof modelFirst>>();
+		});
+
+		it("should not compile if a feature is installed twice", () => {
+			// @ts-expect-error test compile time feature
+			withModelLoader(loader)(withModelLoader(loader)(baseConfig()));
+			// @ts-expect-error test compile time feature
+			withModel(model)(withModel(model)(baseConfig()));
+			// @ts-expect-error test compile time feature
+			combineFeatures(withModelLoader(loader), withModelLoader(loader))(baseConfig());
+		});
+
+		it("should not compile if two model loaders are installed", () => {
+			// @ts-expect-error test compile time feature
+			withPlatformModelLoader(withModelLoader(loader)(baseConfig()));
+			// @ts-expect-error test compile time feature
+			withModelLoader(loader)(withPlatformModelLoader(baseConfig()));
+			// @ts-expect-error test compile time feature
+			combineFeatures(withModelLoader(loader), withPlatformModelLoader)(baseConfig());
+		});
+
+		it("should not compile if the setup is incomplete", () => {
+			// @ts-expect-error test compile time feature
+			createA12ApplicationSetup(withModel(model)(baseConfig()));
+		});
+
+		it("should combine with withDynamicConfig without losing refinements", () => {
+			const combined = combineFeatures(
+				withModelLoader(loader),
+				withDynamicConfig,
+				withModel(model)
+			)(baseConfig());
+
+			createA12ApplicationSetup(combined);
+			expectTrue<HasModelAndLoader<typeof combined>>();
+			expectTrue<typeof combined extends { configured: { dynamicConfig: true } } ? true : false>();
+		});
+
+		it("should not compile if withDynamicConfig is installed twice", () => {
+			// @ts-expect-error test compile time feature
+			withDynamicConfig(withDynamicConfig(baseConfig()));
+			// @ts-expect-error test compile time feature
+			combineFeatures(withDynamicConfig, withDynamicConfig)(baseConfig());
+		});
 	});
 });

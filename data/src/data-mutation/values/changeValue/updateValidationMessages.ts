@@ -128,7 +128,7 @@ export function updateValidationMessages(params: {
 
 	const parseErrorsFromComputations: ParseError[] =
 		computationResult.computedFieldInstancesWithErrors.map(cf => ({
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			// oxlint-disable-next-line typescript/no-non-null-assertion
 			message: cf.errorMessage!,
 			value: cf.stringValue ?? ""
 		}));
@@ -202,7 +202,7 @@ function collectFormallyIncorrectValues(
 				formallyIncorrectValuesMap.set(
 					typedDocPath,
 					// we assume the errorValues object to contain the value for this field instance because we already received the respective ParseError object
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					// oxlint-disable-next-line typescript/no-non-null-assertion
 					validationEntry!.errorValues[DocumentPath.toString(msg.entityInstance)]
 				);
 			}

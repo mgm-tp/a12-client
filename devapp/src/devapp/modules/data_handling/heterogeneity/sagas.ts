@@ -33,14 +33,14 @@
 import type { SagaGenerator } from "typed-redux-saga";
 import { call, put, select, takeLatest } from "typed-redux-saga";
 
-import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
-import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { Activity } from "@com.mgmtp.a12.client/client-core";
 import {
 	ActivityActions,
 	ActivitySagas,
 	ActivitySelectors
 } from "@com.mgmtp.a12.client/client-core";
+import type { Action } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import { LoggerFactory } from "@com.mgmtp.a12.utils/utils-logging";
 
 import { assert } from "../../../utils/types.js";

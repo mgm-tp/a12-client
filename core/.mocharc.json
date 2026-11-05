@@ -1,7 +1,8 @@
 {
   "require": [
     "source-map-support/register",
-    "./lib/test/setup.mjs"
+    "./lib/test/moduleStubs.js",
+    "./lib/test/setup.js"
   ],
   "timeout": 10000,
   "ui": "bdd",

@@ -38,9 +38,9 @@ import type { ActionCreator } from "@com.mgmtp.a12.client/typescript-fsa-redux-5
 import { ApplicationActions } from "../actions.js";
 
 interface Configuration {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly start: ActionCreator<any>[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly end: ActionCreator<any>[];
 }
 

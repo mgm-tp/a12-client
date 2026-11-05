@@ -65,7 +65,7 @@ function MasterDetailRegionLayoutComponentNG(props: LayoutPropsNG): JSX.Element 
 	}
 
 	const animation = getAnimation(
-		// eslint-disable-next-line react-hooks/refs
+		// oxlint-disable-next-line react/refs
 		previousViews.current.length,
 		views.length,
 		sizeContext.currentSize

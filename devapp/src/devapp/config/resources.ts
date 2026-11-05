@@ -44,7 +44,7 @@ import type {
 
 const en: LocalizationTree = {
 	application: {
-		title: "Dev App"
+		title: "Client DevApp"
 	},
 	version: {
 		versionInfo: "Version Information",
@@ -152,7 +152,7 @@ const en: LocalizationTree = {
 		"selected-documents": {
 			title: "Selected persons",
 			warning:
-				"This modal is implemented in the devapp and does not come with the Overview Engine or client"
+				"This modal is implemented in the DevApp and does not come with the Overview Engine or client"
 		}
 	},
 	server: {
@@ -165,7 +165,7 @@ const en: LocalizationTree = {
 
 const de: LocalizationTree = {
 	application: {
-		title: "Beispielanwendung"
+		title: "Client DevApp"
 	},
 	version: {
 		versionInfo: "Versionsinformationen",

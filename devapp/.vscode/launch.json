@@ -7,11 +7,12 @@
 			"name": "Launch (chrome)",
 			"url": "http://localhost:8080",
 			"webRoot": "${workspaceFolder}",
+			// fixed path outside the worktree, so extensions and logins survive across worktrees
+			"userDataDir": "${userHome}/.chrome-debug-profile",
 			"runtimeArgs": [
 				"--remote-debugging-port=9222",
 				"--new-window",
-				"--disable-background-networking",
-				"--profile-directory=debug-profile"
+				"--disable-background-networking"
 			]
 		},
 		{

@@ -48,8 +48,8 @@ import type { ModelState } from "../../core/model/internal/ModelState.js";
 import type { Notification } from "../../core/notification/index.js";
 import { DirtyHandlingFactories } from "../../extensions/dirtyHandling/index.js";
 
-import { newFileSystemModelLoader } from "../mocks/ModelLoader.js";
 import { singleDocumentDataLoaderMock } from "../mocks/application/singleDocumentDataLoaderMock.js";
+import { newFileSystemModelLoader } from "../mocks/ModelLoader.js";
 
 import { createAppModel } from "./appmodel-utils.js";
 import type { WaitForFunc } from "./helpers/waitFor.js";

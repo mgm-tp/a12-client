@@ -62,11 +62,11 @@ import {
 	DEFAULT_TRANSLATIONS,
 	RESOURCE_KEYS as FRAME_RESOURCE_KEYS
 } from "../../languages/index.js";
-import type { HeaderItemProps } from "../../layout/applicationFrameLayout/applicationFrameLayout.js";
 import {
 	ContentWrapper,
 	FallbackLogo
 } from "../../layout/applicationFrameLayout/applicationFrameLayout.js";
+import type { HeaderItemProps } from "../../layout/applicationFrameLayout/ApplicationFrameLayoutProps.js";
 import {
 	SidebarContextMemoWrapper,
 	type SidebarContextProps

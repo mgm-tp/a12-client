@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-dev-documentation-src",
-  "version": "17.0.1",
+  "version": "17.1.0",
   "description": "AsciiDoc documentation for @com.mgmtp.a12.client/client-core",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -11,9 +11,9 @@
     "compile": "tsc",
     "spellcheck": "cspell .",
     "watch": "tsc --watch",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
-    "lint:fix": "node --run lint -- --fix",
-    "lint:onlyErrors": "node --run lint -- --quiet"
+    "lint": "pnpm -w exec oxlint documentation",
+    "lint:fix": "pnpm -w exec oxlint --fix documentation",
+    "lint:onlyErrors": "pnpm -w exec oxlint --quiet documentation"
   },
   "files": [
     "src"
@@ -32,13 +32,11 @@
     "@com.mgmtp.a12.utils/utils-localization-react": "catalog:a12",
     "@com.mgmtp.a12.utils/utils-logging": "catalog:a12",
     "@com.mgmtp.a12.widgets/widgets-core": "catalog:a12",
-    "@jambit/eslint-plugin-typed-redux-saga": "catalog:",
     "@redux-devtools/extension": "catalog:",
     "@types/mocha": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "cspell": "catalog:",
-    "eslint": "catalog:",
     "react-dnd": "catalog:",
     "react-redux": "catalog:",
     "redux": "catalog:",

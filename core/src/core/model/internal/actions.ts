@@ -30,8 +30,8 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { Model as ModelAPI } from "@com.mgmtp.a12.base/base-model-api";
+import { actionCreatorFactory } from "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat";
 import type { ModelGraph } from "@com.mgmtp.a12.dataservices/dataservices-access";
 
 import type { ApplicationModel } from "./ApplicationModel.js";

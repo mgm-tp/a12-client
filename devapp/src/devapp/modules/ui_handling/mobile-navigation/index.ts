@@ -55,7 +55,7 @@ import { withProgressIndicator } from "../../../utils/withProgressIndicator.js";
 import { createDashboardLayout } from "../dashboardLayoutFactory.js";
 
 import {
-	createDashboardView,
+	DashboardTileView,
 	MobileNavigationDashboardSidebar,
 	StartDashboard
 } from "./components/dashboardLayout.js";
@@ -63,7 +63,7 @@ import {
 	FormEngineSidebar,
 	MobileNavigationOverviewEngineSidebar
 } from "./components/masterDetailLayout.js";
-import { createNullRegionView, NullRegionSidebar } from "./components/nullRegionLayout.js";
+import { NullRegionSidebar, NullRegionTileView } from "./components/nullRegionLayout.js";
 import { StackLayoutView } from "./components/stackLayout.js";
 import { createMultipleActivitiesForDashboard } from "./dashboardSaga.js";
 
@@ -158,7 +158,6 @@ const dynamicFlows: DynamicFlow[] = [
 							type: "DYNAMIC_ADD_VIEW",
 							component: PersonOverviewWithProgress,
 							region: "/CONTENT",
-							constraints: { type: "MasterDetail" },
 							models: [{ modelType: "document", name: "Person-document" }]
 						}
 					]
@@ -232,7 +231,8 @@ const dynamicFlows: DynamicFlow[] = [
 					onEnter: [
 						{
 							type: "DYNAMIC_ADD_VIEW",
-							component: createDashboardView("Tile 1"),
+							component: DashboardTileView,
+							componentProps: { title: "Tile 1" },
 							region: "/CONTENT"
 						},
 						{
@@ -251,7 +251,8 @@ const dynamicFlows: DynamicFlow[] = [
 					onEnter: [
 						{
 							type: "DYNAMIC_ADD_VIEW",
-							component: createDashboardView("Tile 2"),
+							component: DashboardTileView,
+							componentProps: { title: "Tile 2" },
 							region: "/CONTENT"
 						}
 					]
@@ -334,17 +335,20 @@ const dynamicFlows: DynamicFlow[] = [
 						},
 						{
 							type: "DYNAMIC_ADD_VIEW",
-							component: createNullRegionView("View 1"),
+							component: NullRegionTileView,
+							componentProps: { title: "View 1" },
 							region: "/CONTENT"
 						},
 						{
 							type: "DYNAMIC_ADD_VIEW",
-							component: createNullRegionView("View 2"),
+							component: NullRegionTileView,
+							componentProps: { title: "View 2" },
 							region: "/CONTENT"
 						},
 						{
 							type: "DYNAMIC_ADD_VIEW",
-							component: createNullRegionView("View 3"),
+							component: NullRegionTileView,
+							componentProps: { title: "View 3" },
 							region: "/CONTENT"
 						},
 						{

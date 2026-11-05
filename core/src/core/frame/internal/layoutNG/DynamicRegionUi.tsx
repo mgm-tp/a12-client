@@ -61,7 +61,14 @@ export function DynamicRegionUi(props: RegionUiPropsNG) {
 	const { layout, views } = useSelector(DynamicModelSelectors.dynamicRegionInfo(regionRef));
 	const subRegionRefs = useSelector(DynamicModelSelectors.dynamicSubRegionRefs(regionRef));
 
-	return <layout.component views={views} regionRef={regionRef} subRegionRefs={subRegionRefs} />;
+	return (
+		<layout.component
+			{...layout.componentProps}
+			views={views}
+			regionRef={regionRef}
+			subRegionRefs={subRegionRefs}
+		/>
+	);
 }
 
 DynamicRegionUi.whyDidYouRender = true;

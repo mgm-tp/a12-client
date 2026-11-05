@@ -39,6 +39,8 @@ import { DocumentPath } from "../../core/api/path/documentPath.js";
 import { KernelMessage } from "../../data-mutation/validation-computation/message.js";
 import { removeOutdatedMessages } from "../../data-mutation/validation-computation/removeOutdatedMessages.js";
 
+import { messageDefaults } from "../redux/api/mocks/mockMessage.js";
+
 describe("data-mutation.validation", () => {
 	describe("removeOutdatedMessages", () => {
 		it("when given no validation data, returns an empty validation data object", () => {
@@ -334,6 +336,7 @@ describe("data-mutation.validation", () => {
 
 function testError(index?: number): Message {
 	return {
+		...messageDefaults,
 		entityInstance: [
 			{ elementName: "foo", index: index ?? 1 },
 			{ elementName: "bar", index: 1 }
@@ -385,6 +388,7 @@ function testError(index?: number): Message {
 
 function testParseError(index?: number): Message {
 	return {
+		...messageDefaults,
 		entityInstance: [
 			{ elementName: "foo", index: index ?? 1 },
 			{ elementName: "bar", index: 1 }

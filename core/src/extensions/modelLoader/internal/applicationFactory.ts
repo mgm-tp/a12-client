@@ -32,33 +32,19 @@
 
 import {
 	setConfigured,
-	withModelLoader
+	setModelLoaderOnConfig
 } from "../../../core/application/internal/factories/applicationFactory.js";
 import type {
-	A12ApplicationConfig,
 	ApplicationWithConfiguredFeature,
 	ApplicationWithConfiguredModelLoader,
-	RequireFeatures
+	ApplicationWithModelLoaderConfig
 } from "../../../core/index.js";
 import type { ModelProcessor } from "../../../core/model/internal/ModelProcessor.js";
 
-import type { GenericModelLoaderOptions } from "./genericModelLoaderOptions.js";
 import { createHttpModelLoader } from "./httpModelLoader/createHttpModelLoader.js";
 import { createPlatformServerModelLoader } from "./platformModelLoader/createPlatformServerModelLoader.js";
 
-declare module "../../../core/index.js" {
-	interface A12ApplicationConfig {
-		modelLoader?: GenericModelLoaderOptions;
-	}
-}
-
-/**
- * @experimental
- */
-export type ApplicationWithModelLoaderConfig = RequireFeatures<
-	A12ApplicationConfig,
-	{ modelLoader?: never }
->;
+export type { ApplicationWithModelLoaderConfig };
 
 /**
  * @experimental
@@ -101,7 +87,7 @@ export const withPlatformModelLoader = <T extends ApplicationWithModelLoaderConf
 	cfg: T
 ): ApplicationWithConfiguredFeature<ApplicationWithConfiguredModelLoader<T>, "modelLoader"> =>
 	setConfigured<ApplicationWithConfiguredModelLoader<T>, "modelLoader">("modelLoader")(
-		withModelLoader<T>(createPlatformServerModelLoader(cfg.modelLoader))(cfg)
+		setModelLoaderOnConfig(createPlatformServerModelLoader(cfg.modelLoader))(cfg)
 	);
 
 /**
@@ -111,5 +97,5 @@ export const withHTTPModelLoader = <T extends ApplicationWithModelLoaderConfig>(
 	cfg: T
 ): ApplicationWithConfiguredFeature<ApplicationWithConfiguredModelLoader<T>, "modelLoader"> =>
 	setConfigured<ApplicationWithConfiguredModelLoader<T>, "modelLoader">("modelLoader")(
-		withModelLoader<T>(createHttpModelLoader(cfg.modelLoader))(cfg)
+		setModelLoaderOnConfig(createHttpModelLoader(cfg.modelLoader))(cfg)
 	);

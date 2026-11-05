@@ -119,8 +119,7 @@ function onMenuClick(dispatch: Dispatch): void {
 	dispatch(
 		ApplicationActions.startMainActivityRequested({
 			action: ActivityActions.create({
-				activityDescriptor: INITIAL_DESCRIPTOR,
-				loadingState: "without"
+				activityDescriptor: INITIAL_DESCRIPTOR
 			}),
 			descriptor: {}
 		})

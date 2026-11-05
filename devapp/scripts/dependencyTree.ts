@@ -32,6 +32,7 @@
 
 import { constants } from "node:buffer";
 import { execSync } from "node:child_process";
+import { env as processEnv } from "node:process";
 
 import pkg from "../package.json" with { type: "json" };
 import type { DependencyTreeTableNode } from "../src/devapp/modules/about/versionInformation/treeTableNode.js";
@@ -42,24 +43,27 @@ interface DependencyTree {
 	readonly dependencies?: Record<string, Omit<DependencyTree, "name">>;
 }
 
-export function createDependencyTreeRoot(isStandaloneBuild: boolean): DependencyTreeTableNode {
+// package.json is not stamped until publish, so the build version has to come from gradle
+const rootVersion = processEnv.RELEASE_VERSION ?? pkg.version;
+
+export function createDependencyTreeRoot(): DependencyTreeTableNode {
 	const dependencyList = JSON.parse(
-		execSync(
-			isStandaloneBuild ? "npm ls --omit dev --omit peer --json" : "pnpm list --prod --json",
-			{
-				maxBuffer: constants.MAX_LENGTH,
-				encoding: "utf8"
-			}
-		)
+		execSync("pnpm list --prod --json", {
+			maxBuffer: constants.MAX_LENGTH,
+			encoding: "utf8"
+		})
 	);
-	const dependencyTree = (isStandaloneBuild ? dependencyList : dependencyList[0]) as DependencyTree;
+	// pnpm list prints all workspace projects, not just the current one
+	const dependencyTree = dependencyList.find(
+		({ name }: DependencyTree) => name === pkg.name
+	) as DependencyTree;
 
 	const rootId = "root";
 
 	return {
 		id: rootId,
 		children: createNodes(rootId, dependencyTree.dependencies),
-		data: [dependencyTree.name, dependencyTree.version]
+		data: [dependencyTree.name, rootVersion]
 	};
 }
 
@@ -70,7 +74,7 @@ function createNodes(
 	return deps
 		? Object.entries(deps).map(([name, { version, dependencies }]) => {
 				// because of workspaces, the version of client/core is just a link
-				const actualVersion = version.startsWith("link:") ? pkg.version : version;
+				const actualVersion = version.startsWith("link:") ? rootVersion : version;
 
 				const id = `${parent}-${name}-${actualVersion}`;
 				return {

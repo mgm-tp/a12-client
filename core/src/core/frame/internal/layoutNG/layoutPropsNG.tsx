@@ -67,9 +67,32 @@ export interface LayoutPropsNG {
 }
 
 /**
+ * The extra props a region layout is given through `componentProps`.
+ *
+ * Any plain data is allowed. The props the core sets itself
+ * ({@link LayoutPropsNG}) are not: the core always wins, so passing one here
+ * would do nothing. They are rejected instead of being ignored quietly.
+ */
+export type ContributedLayoutProps = Record<string, unknown> &
+	Partial<Record<keyof LayoutPropsNG, never>>;
+
+/**
  * Layout specifications
  */
 export interface LayoutNG<P extends LayoutPropsNG = LayoutPropsNG> {
 	/** The React component for the layout */
 	readonly component: ComponentType<P>;
+
+	/**
+	 * Additional props passed to the layout {@link LayoutNG.component}.
+	 *
+	 * Must be plain, serializable data: it is deep-compared like all contributed
+	 * configuration, so values may be rebuilt on every selector run without causing
+	 * re-renders. This makes it the way to bind state-derived context to a layout —
+	 * keep the component itself a module-level constant instead of creating a
+	 * closure inside the selector, which would remount the layout on every state change.
+	 *
+	 * See {@link ContributedLayoutProps}.
+	 */
+	readonly componentProps?: ContributedLayoutProps;
 }

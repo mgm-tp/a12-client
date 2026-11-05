@@ -36,7 +36,7 @@ import type {
 	ViewNG
 } from "@com.mgmtp.a12.client/client-core";
 
-import { DevappApplicationFrameLayout } from "../../../../composableSetup/NewLayoutsModule.js";
+import { DevappApplicationFrameLayout } from "../../../../composableSetup/DevappApplicationFrameLayout.js";
 
 const getClearedAfterViewIndex = (_: LayoutNG, views: ViewNG[]) => {
 	return () => (views.length > 2 ? views.length - 2 : undefined);

@@ -59,27 +59,30 @@ import {
 	addDataReducers,
 	addErrorBoundary,
 	addInitialAction,
-	addLayout,
 	addPlatformSagas,
 	addProgressIndicator,
 	addReduxSetupAction,
-	addRegion,
 	addRootReducer,
 	addView,
 	addWrapper,
 	combineFeatures,
-	modifyLayout,
 	modifyView,
 	setConfigured,
-	withApplicationResetTriggers,
+	setApplicationResetTriggers,
 	withModel,
 	withModelLoader,
-	withReducerMap
+	addReducerMap
 } from "../../../../core/application/internal/factories/applicationFactory.js";
 import type { DataHandler } from "../../../../core/data/index.js";
 import type { Layout } from "../../../../core/frame/internal/layout/LayoutProps.js";
+import {
+	addLayout,
+	addRegion,
+	modifyLayout
+} from "../../../../core/frame/internal/layoutConfig.js";
 import type { ApplicationModel } from "../../../../core/model/index.js";
 import type { ModelLoader } from "../../../../core/model/internal/ModelLoader.js";
+import type { View } from "../../../../core/view/internal/view.js";
 import { toA12Config } from "../../../utils/test-utils.js";
 
 describe("core.application.applicationFactory", () => {
@@ -129,10 +132,10 @@ describe("core.application.applicationFactory", () => {
 		deepEqual(result.config.applicationBusyTriggers?.end, [expected1, expected2]);
 	});
 
-	it("withApplicationResetTriggers", () => {
+	it("setApplicationResetTriggers", () => {
 		const expected = { resetRequested: [], resetConfirmed: {} as Action, reset: [] };
 		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
-		const trigger = withApplicationResetTriggers(expected);
+		const trigger = setApplicationResetTriggers(expected);
 
 		const result = trigger(baseConfig);
 
@@ -192,10 +195,10 @@ describe("core.application.applicationFactory", () => {
 		deepEqual(result.config.dataReducers, [expected1, expected2]);
 	});
 
-	it("withReducerMap", () => {
+	it("addReducerMap", () => {
 		const expected1 = {} as ReducerMap;
 		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
-		const reducer1 = withReducerMap(expected1);
+		const reducer1 = addReducerMap(expected1);
 
 		const result = reducer1(baseConfig);
 
@@ -243,6 +246,7 @@ describe("core.application.applicationFactory", () => {
 
 		deepEqual(baseConfig.config, {});
 		deepEqual(result.config.modelLoader, expected1);
+		equal(result.configured?.modelLoader, true);
 	});
 
 	it("withModel", () => {
@@ -254,6 +258,7 @@ describe("core.application.applicationFactory", () => {
 
 		deepEqual(baseConfig.config, {});
 		deepEqual(result.config.model, expected1);
+		equal(result.configured?.model, true);
 	});
 
 	it("addView", () => {
@@ -267,15 +272,13 @@ describe("core.application.applicationFactory", () => {
 		const result = combineFeatures(view1, view2, view3)(baseConfig);
 
 		deepEqual(baseConfig.config, {});
-		equal(result.config.views?.("view1"), TestComponent1);
-		equal(result.config.views?.("view2"), TestComponent2);
+		equal(result.config.views?.["view1"], TestComponent1);
+		equal(result.config.views?.["view2"], TestComponent2);
 	});
 
 	it("modifyView", () => {
-		const TestComponent1 = () => <></>;
-		const TestComponent2 = () => <></>;
-		const expected1 = mock.fn(_ => TestComponent1);
-		const expected2 = mock.fn(_ => TestComponent2);
+		const expected1 = mock.fn((view: View.ViewComponent) => view);
+		const expected2 = mock.fn((view: View.ViewComponent) => view);
 		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
 		const modify1 = modifyView("view1", expected1);
 		const modify2 = modifyView("view2", expected1);
@@ -283,12 +286,14 @@ describe("core.application.applicationFactory", () => {
 
 		const result = combineFeatures(modify1, modify2, modify3)(baseConfig);
 
-		const mockView = mock.fn();
 		deepEqual(baseConfig.config, {});
-		equal(result.config.viewModifications?.("view1")?.(mockView), TestComponent1);
-		equal(result.config.viewModifications?.("view2")?.(mockView), TestComponent2);
-		equal(expected1.mock.calls[0].arguments[0], mockView);
-		equal(expected2.mock.calls[0].arguments[0], TestComponent1);
+		deepEqual(
+			result.config.viewModifications?.map(({ name }) => name),
+			["view1", "view2", "view2"]
+		);
+		equal(result.config.viewModifications?.[0].modify, expected1);
+		equal(result.config.viewModifications?.[1].modify, expected1);
+		equal(result.config.viewModifications?.[2].modify, expected2);
 	});
 
 	it("addLayout", () => {
@@ -302,15 +307,13 @@ describe("core.application.applicationFactory", () => {
 		const result = combineFeatures(layout1, layout2, layout3)(baseConfig);
 
 		deepEqual(baseConfig.config, {});
-		equal(result.config.layouts?.("layout1"), testLayout1);
-		equal(result.config.layouts?.("layout2"), testLayout2);
+		equal(result.config.layouts?.["layout1"], testLayout1);
+		equal(result.config.layouts?.["layout2"], testLayout2);
 	});
 
 	it("modifyLayout", () => {
-		const testLayout1 = {} as Layout;
-		const testLayout2 = {} as Layout;
-		const expected1 = mock.fn(_ => testLayout1);
-		const expected2 = mock.fn(_ => testLayout2);
+		const expected1 = mock.fn((layout: Layout) => layout);
+		const expected2 = mock.fn((layout: Layout) => layout);
 		const baseConfig: A12ApplicationConfig = toA12Config({ config: {} });
 		const modify1 = modifyLayout("layout1", expected1);
 		const modify2 = modifyLayout("layout2", expected1);
@@ -318,12 +321,14 @@ describe("core.application.applicationFactory", () => {
 
 		const result = combineFeatures(modify1, modify2, modify3)(baseConfig);
 
-		const mockLayout = {} as Layout;
 		deepEqual(baseConfig.config, {});
-		equal(result.config.layoutModifications?.("layout1")?.(mockLayout), testLayout1);
-		equal(result.config.layoutModifications?.("layout2")?.(mockLayout), testLayout2);
-		equal(expected1.mock.calls[0].arguments[0], mockLayout);
-		equal(expected2.mock.calls[0].arguments[0], testLayout1);
+		deepEqual(
+			result.config.layoutModifications?.map(({ name }) => name),
+			["layout1", "layout2", "layout2"]
+		);
+		equal(result.config.layoutModifications?.[0].modify, expected1);
+		equal(result.config.layoutModifications?.[1].modify, expected1);
+		equal(result.config.layoutModifications?.[2].modify, expected2);
 	});
 
 	it("addRegion", () => {

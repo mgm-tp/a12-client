@@ -30,11 +30,10 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { JSX } from "react";
-
 import { type DynamicConfiguration } from "@com.mgmtp.a12.client/client-core";
 
-import { WelcomePageActionBox, WelcomeTagline } from "./welcome.js";
+import { ComposableSetupDetails } from "./setupDetails.js";
+import { ComposableWelcomePage } from "./welcome.js";
 
 export { WelcomePage } from "./welcome.js";
 
@@ -56,62 +55,21 @@ export const LandingPageModule: DynamicConfiguration = {
 							}
 						]
 					}
+				},
+				{
+					name: "about.setup-details.scene",
+					matches: descriptor => descriptor.section === "setup-details",
+					sceneChange: {
+						onEnter: [
+							{
+								type: "DYNAMIC_ADD_VIEW",
+								component: ComposableSetupDetails,
+								region: "/CONTENT"
+							}
+						]
+					}
 				}
 			]
 		}
 	]
 };
-
-function ComposableWelcomePage(): JSX.Element {
-	return (
-		<WelcomePageActionBox title="Welcome — [Composable] Client DevApp">
-			<p>
-				You are using the <strong>composable factory API</strong> devapp entry point with{" "}
-				<strong>pure dynamic configuration</strong>.
-			</p>
-
-			<WelcomeTagline>
-				This entry point uses the composable approach to setting up an A12 application
-				<br />
-				using <code>combineFeatures()</code> and <code>createA12ApplicationSetup()</code>.
-				<br />
-				No application model, no adapters — all UI structure is defined via{" "}
-				<code>DynamicConfiguration</code> modules.
-			</WelcomeTagline>
-
-			<div>
-				<p>
-					<strong>Setup API:</strong> Composable factory (<code>combineFeatures</code> +{" "}
-					<code>createA12ApplicationSetup</code>)
-				</p>
-				<p>
-					<strong>Scene modeling:</strong> Pure Dynamic Config modules (
-					<code>DynamicConfiguration</code>)
-				</p>
-				<p>
-					<strong>What&apos;s different:</strong> No application model JSON is loaded. Regions,
-					flows, scenes, and menus are all defined programmatically through{" "}
-					<code>DynamicConfiguration</code> modules. Document models are still loaded via{" "}
-					<code>withHTTPModelLoader</code> for forms.
-				</p>
-
-				<p>The application demonstrates features like:</p>
-				<ul>
-					<li>Model and Data Loading</li>
-					<li>Layouts (Application Frame, Master Detail, Dashboard, Stack, Null)</li>
-					<li>Regions</li>
-					<li>Deep Linking</li>
-					<li>Heterogeneity</li>
-					<li>Notifications</li>
-					<li>Permissions</li>
-					<li>Dirty Handling</li>
-					<li>Error Handling</li>
-				</ul>
-
-				<p>
-					Other entry point: <a href="./legacy.html">[Legacy] Client DevApp</a>
-				</p>
-			</div>
-		</WelcomePageActionBox>
-	);
-}

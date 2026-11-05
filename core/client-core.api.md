@@ -26,8 +26,7 @@ import type { Header } from '@com.mgmtp.a12.base/base-model-api';
 import { HeaderTriggerProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { IconProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import type { IGeneratedCodeAccessor } from '@com.mgmtp.a12.kernel/kernel-md-facade';
-import { JSX } from 'react/jsx-runtime';
-import { JSX as JSX_2 } from 'react';
+import { JSX } from 'react';
 import { LabelProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { LayoutGridProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { ListItemProps } from '@com.mgmtp.a12.widgets/widgets-core';
@@ -65,10 +64,11 @@ import { TreeContainerProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { TreeNodeProps } from '@com.mgmtp.a12.widgets/widgets-core';
 import { UnknownAction } from 'redux';
 
-// Warning: (ae-forgotten-export) The symbol "ClientConfig" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export interface A12ApplicationConfig<C extends BaseConfig = BaseConfig> extends ClientConfig<C> {
+    dynamicConfig?: unknown;
+    model?: unknown;
+    modelLoader?: GenericModelLoaderOptions;
 }
 
 // @public
@@ -410,22 +410,22 @@ export const ActivitySelectors: {
 };
 
 // @public
-export const addAdditionalMiddlewares: <T extends A12ApplicationConfig>(...middlewares: NonNullable<ApplicationFactories.Config["additionalMiddlewares"]>) => (s: T) => T;
+export const addAdditionalMiddlewares: (...middlewares: NonNullable<ApplicationFactories.Config["additionalMiddlewares"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addApplicationBusyTriggers: <T extends A12ApplicationConfig>(busyTriggers: NonNullable<ApplicationFactories.Config["applicationBusyTriggers"]>) => (s: T) => T;
+export const addApplicationBusyTriggers: (busyTriggers: NonNullable<ApplicationFactories.Config["applicationBusyTriggers"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public (undocumented)
-export const addComposeEnhancer: <T extends A12ApplicationConfig>(enhancer: NonNullable<ApplicationFactories.Config["composeEnhancer"]>) => (s: T) => T;
+export const addComposeEnhancer: (enhancer: NonNullable<ApplicationFactories.Config["composeEnhancer"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addCustomSagas: <T extends A12ApplicationConfig>(...sagas: NonNullable<ApplicationFactories.Config["customSagas"]>) => (s: T) => T;
+export const addCustomSagas: (...sagas: NonNullable<ApplicationFactories.Config["customSagas"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addDataHandlers: <T extends A12ApplicationConfig>(...dataHandlers: NonNullable<ApplicationFactories.Config["dataHandlers"]>) => (s: T) => T;
+export const addDataHandlers: (...dataHandlers: NonNullable<ApplicationFactories.Config["dataHandlers"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addDataReducers: <T extends A12ApplicationConfig>(...dataReducers: NonNullable<ApplicationFactories.Config["dataReducers"]>) => (s: T) => T;
+export const addDataReducers: (...dataReducers: NonNullable<ApplicationFactories.Config["dataReducers"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public (undocumented)
 export const addDeepLinkingSagas: <T extends ApplicationWithDeepLinkingConfig>(cfg: T) => T;
@@ -440,15 +440,15 @@ export const addDirtyHandlingSagas: <T extends ApplicationWithDirtyHandlingConfi
 export const addDirtyHandlingWrapper: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => T;
 
 // @public
-export const addErrorBoundary: <T extends A12ApplicationConfig>(regionReference: ApplicationModel.Region.Reference, viewName: string, errorBoundary: ComponentType<View.ErrorBoundaryProvider.PropsType>) => (s: T) => T;
+export const addErrorBoundary: (regionReference: ApplicationModel.Region.Reference, viewName: string, errorBoundary: ComponentType<View.ErrorBoundaryProvider.PropsType>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addInitialAction: <T extends A12ApplicationConfig>(...actions: readonly ((store: Store) => Promise<void> | void)[]) => (s: T) => T;
+export const addInitialAction: (...actions: readonly ((store: Store) => Promise<void> | void)[]) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // Warning: (ae-forgotten-export) The symbol "Layout" needs to be exported by the entry point index.d.ts
 //
 // @public
-export const addLayout: <T extends A12ApplicationConfig>(name: string, layout: Layout) => (s: T) => T;
+export const addLayout: (name: string, layout: Layout) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public (undocumented)
 export const addLocaleChooser: <T extends ApplicationWithLocalizationSupportConfig>(cfg: T) => T;
@@ -465,33 +465,36 @@ export const addModelProcessors: <T extends ApplicationWithModelLoaderConfig>(..
 export const addNotificationFrame: <T extends ApplicationWithNotificationConfig>(cfg: T) => T;
 
 // @public
-export const addPlatformSagas: <T extends A12ApplicationConfig>(...platformSagas: NonNullable<ApplicationFactories.Config["overridePlatformSagas"]>) => (s: T) => T;
+export const addPlatformSagas: (...platformSagas: NonNullable<ApplicationFactories.Config["overridePlatformSagas"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addProgressIndicator: <T extends A12ApplicationConfig>(regionReference: ApplicationModel.Region.Reference, viewName: string, progressIndicator: ComponentType<View.ProgressComponentProvider.PropsType>) => (s: T) => T;
+export const addProgressIndicator: (regionReference: ApplicationModel.Region.Reference, viewName: string, progressIndicator: ComponentType<View.ProgressComponentProvider.PropsType>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addReduxSetupAction: <T extends A12ApplicationConfig>(...setupActions: NonNullable<ApplicationFactories.Config["setupActions"]>) => (s: T) => T;
+export const addReducerMap: (reducerMap: NonNullable<ApplicationFactories.Config["reducerMap"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
+
+// @public
+export const addReduxSetupAction: (...setupActions: NonNullable<ApplicationFactories.Config["setupActions"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // Warning: (ae-forgotten-export) The symbol "RegionUiProps" needs to be exported by the entry point index.d.ts
 //
 // @public
-export const addRegion: <T extends A12ApplicationConfig>(regionReference: ApplicationModel.Region.Reference, region: ComponentType<RegionUiProps>) => (s: T) => T;
+export const addRegion: (regionReference: ApplicationModel.Region.Reference, region: ComponentType<RegionUiProps>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const addRootReducer: <T extends A12ApplicationConfig>(rootReducer: NonNullable<ApplicationFactories.Config["rootReducer"]>) => (s: T) => T;
+export const addRootReducer: (rootReducer: NonNullable<ApplicationFactories.Config["rootReducer"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public (undocumented)
 export const addSupportedModelVersion: (type: string, versionRange: string) => <T extends ApplicationWithModelLoaderConfig>(cfg: T) => T;
 
 // @public
-export const addView: <T extends A12ApplicationConfig>(name: string, view: View.ViewComponent) => (s: T) => T;
+export const addView: (name: string, view: View.ViewComponent) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public (undocumented)
 export const addWelcomePageSaga: <T extends ApplicationWithDeepLinkingConfig>(cfg: T) => T;
 
 // @public
-export const addWrapper: <T extends A12ApplicationConfig>(AdditionalWrapper: ComponentType<PropsWithChildren>, position?: "inner" | "outer") => (s: T) => T;
+export const addWrapper: (AdditionalWrapper: ComponentType<PropsWithChildren>, position?: "inner" | "outer") => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
 export const APPLICATION_MODEL_PLACEHOLDER: ApplicationModel;
@@ -818,7 +821,9 @@ export type ApplicationWithConfiguredFeature<T extends A12ApplicationConfig, K e
 
 // @public (undocumented)
 export type ApplicationWithConfiguredModel<T extends A12ApplicationConfig> = T & {
-    config: BaseConfigWithModel<T["config"]>;
+    config: Omit<T["config"], "model"> & {
+        model: ApplicationFactories.Config["model"];
+    };
 };
 
 // @public (undocumented)
@@ -841,12 +846,22 @@ export type ApplicationWithDirtyHandlingConfig = RequireFeatures<A12ApplicationC
     dirtyHandling?: never;
 }>;
 
+// @public
+export type ApplicationWithDynamicConfigConfig = RequireFeatures<A12ApplicationConfig, {
+    dynamicConfig?: never;
+}>;
+
 // @public (undocumented)
 export type ApplicationWithLocalizationSupportConfig = RequireFeatures<A12ApplicationConfig, {
     localization?: never;
 }>;
 
-// @public (undocumented)
+// @public
+export type ApplicationWithModelConfig = RequireFeatures<A12ApplicationConfig, {
+    model?: never;
+}>;
+
+// @public
 export type ApplicationWithModelLoaderConfig = RequireFeatures<A12ApplicationConfig, {
     modelLoader?: never;
 }>;
@@ -863,10 +878,28 @@ export interface AsyncActivityActionWithModelsInScenePayload extends ActivityAct
     readonly params: ActivityActionWithModelsInScenePayload;
 }
 
-// Warning: (ae-forgotten-export) The symbol "UIConfig" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type BaseConfig = Omit<ApplicationFactories.Config, "model" | "modelLoader"> & Partial<Pick<ApplicationFactories.Config, "model" | "modelLoader">> & UIConfig;
+
+// @public (undocumented)
+export type BaseConfigWithModel<T extends BaseConfig> = Omit<T, "model"> & {
+    model: ApplicationFactories.Config["model"];
+};
+
+// @public (undocumented)
+export type BaseConfigWithModelLoader<T extends BaseConfig> = Omit<T, "modelLoader"> & {
+    modelLoader: ApplicationFactories.Config["modelLoader"];
+};
+
+// @public
+export interface ClientConfig<C extends BaseConfig = BaseConfig> {
+    // (undocumented)
+    config: C;
+    // (undocumented)
+    configured?: {};
+    // (undocumented)
+    initialActions?: (store: Store) => Promise<void>;
+}
 
 // @public
 export interface ClientWidgetMap {
@@ -949,6 +982,12 @@ export type ComposeEnhancer = (...enhancer: StoreEnhancer[]) => StoreEnhancer;
 type Configuration = DeepLinkingSagas.Configuration;
 
 // @public
+export type ContributedLayoutProps = Record<string, unknown> & Partial<Record<keyof LayoutPropsNG, never>>;
+
+// @public
+export type ContributedViewProps = Record<string, unknown> & Partial<Record<keyof ViewNGProps, never>>;
+
+// @public
 export function createA12ApplicationSetup(appConfig: A12ApplicationConfig<ApplicationFactories.Config>): {
     store: Store<object, UnknownAction, unknown>;
     initialActions: () => Promise<void>;
@@ -978,7 +1017,7 @@ export interface CurrentActivityLocationManager {
 }
 
 // @public
-export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsNG): JSX_2.Element | null;
+export function DashboardLayoutComponentNG(input: DashboardLayoutComponentPropsNG): JSX.Element | null;
 
 // @public (undocumented)
 export namespace DashboardLayoutComponentNG {
@@ -1130,6 +1169,7 @@ export const documentModelProcessor: ModelProcessor;
 // @public (undocumented)
 export interface DynamicAddView extends BaseDirective {
     readonly component: ViewNGComponent;
+    readonly componentProps?: ContributedViewProps;
     readonly constraints?: object;
     readonly models?: Model.Descriptor[];
     // (undocumented)
@@ -1170,7 +1210,7 @@ export interface DynamicFlow {
 }
 
 // @public
-export function DynamicGenericCaseMenu(props: ViewNGProps): JSX_2.Element;
+export function DynamicGenericCaseMenu(props: ViewNGProps): JSX.Element;
 
 // @public (undocumented)
 export namespace DynamicGenericCaseMenu {
@@ -1183,7 +1223,7 @@ export type DynamicMatchCondition = (descriptor: Activity.Descriptor) => boolean
 
 // @public (undocumented)
 export interface DynamicMenu {
-    readonly action?: (dispatch: Dispatch) => void;
+    readonly action?: ((dispatch: Dispatch) => void) | UnknownAction;
     readonly children?: DynamicMenu[];
     // (undocumented)
     readonly id: string;
@@ -1373,8 +1413,15 @@ function isLoaded<T extends Model_2>(value: unknown, typeGuard?: ModelTypeGuard<
 function isNotLoaded(value: unknown): value is NotLoaded;
 
 // @public
+export type LayoutModification = {
+    readonly name: string;
+    readonly modify: (layout: Layout) => Layout;
+};
+
+// @public
 export interface LayoutNG<P extends LayoutPropsNG = LayoutPropsNG> {
     readonly component: ComponentType<P>;
+    readonly componentProps?: ContributedLayoutProps;
 }
 
 // @public (undocumented)
@@ -1442,7 +1489,7 @@ export const LocaleReducers: {
 };
 
 // @public
-export function LocaleSelect(props: LocaleSelectProps): JSX_2.Element;
+export function LocaleSelect(props: LocaleSelectProps): JSX.Element;
 
 // @public
 export const LocaleSelectors: {
@@ -1466,7 +1513,7 @@ export type LocalizedLocale = Locale & {
 export const MasterDetailRegionLayoutNG: LayoutNG<LayoutPropsNG>;
 
 // @public
-export function ModalRegionUiNG(props: RegionUiPropsNG): JSX_2.Element | null;
+export function ModalRegionUiNG(props: RegionUiPropsNG): JSX.Element | null;
 
 // @public (undocumented)
 export namespace ModalRegionUiNG {
@@ -1672,10 +1719,10 @@ export type Modifier<A> = (a: A) => A;
 export const modifyIfPresent: <A>(M: Modifier<A>) => Modifier<A | undefined>;
 
 // @public
-export const modifyLayout: <T extends A12ApplicationConfig>(name: string, fn: (layout: Layout) => Layout) => (s: T) => T;
+export const modifyLayout: (name: string, fn: (layout: Layout) => Layout) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
-export const modifyView: <T extends A12ApplicationConfig>(name: string, fn: (view: View.ViewComponent) => View.ViewComponent) => (s: T) => T;
+export const modifyView: (name: string, fn: (view: View.ViewComponent) => View.ViewComponent) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
 export const modifyWithLens: <S, A>(l: Lens<S, A>) => (modify: Modifier<A>) => (s: S) => S;
@@ -1801,8 +1848,19 @@ interface NotLoaded extends Base {
 // @public
 export const NullRegionLayoutNG: LayoutNG;
 
+// @public
+export type OptionalProvider<Provider extends (...args: never[]) => unknown> = (...args: Parameters<Provider>) => ReturnType<Provider> | undefined;
+
 // @public (undocumented)
 export interface PlatformServerModelLoaderOptions extends GenericModelLoaderOptions {
+}
+
+// @public
+export interface ProviderConfig {
+    errorBoundaries?: OptionalProvider<View.ErrorBoundaryProvider>;
+    progressIndicators?: OptionalProvider<View.ProgressComponentProvider>;
+    viewModifications?: readonly ViewModification[];
+    views?: Readonly<Record<string, View.ViewComponent>>;
 }
 
 // @public
@@ -1843,6 +1901,9 @@ export type Selector<R> = (state: object) => R;
 
 // @public
 export type SelectorOrObject<R> = Selector<R> | R;
+
+// @public
+export const setApplicationResetTriggers: (resetTriggers: NonNullable<ApplicationFactories.Config["applicationResetTriggers"]>) => <T extends A12ApplicationConfig>(cfg: T) => T;
 
 // @public
 export function setConfigured<T extends A12ApplicationConfig, K extends keyof T>(feature: K): (t: T) => ApplicationWithConfiguredFeature<T, K>;
@@ -1889,7 +1950,14 @@ export interface SupportedModelVersions {
 }
 
 // @public
-export function VariantSelection(props: VariantSelectionProps): JSX_2.Element;
+export type UIConfig = ProviderConfig & {
+    rootRegionRef?: ApplicationModel.Region.Reference;
+    dynamicConfig?: boolean;
+    WrapperComponent?: ComponentType<PropsWithChildren>;
+};
+
+// @public
+export function VariantSelection(props: VariantSelectionProps): JSX.Element;
 
 // @public (undocumented)
 export namespace VariantSelection {
@@ -1970,6 +2038,12 @@ export namespace View {
     };
 }
 
+// @public
+export type ViewModification = {
+    readonly name: string;
+    readonly modify: (view: View.ViewComponent) => View.ViewComponent;
+};
+
 // @public (undocumented)
 export interface ViewNG {
     readonly Component: ViewNGComponent;
@@ -1977,8 +2051,8 @@ export interface ViewNG {
     readonly props: ViewNGProps;
 }
 
-// @public (undocumented)
-export type ViewNGComponent = ComponentType<ViewNGProps>;
+// @public
+export type ViewNGComponent<P = unknown> = ComponentType<ViewNGProps & P>;
 
 // @public (undocumented)
 export interface ViewNGProps {
@@ -2007,6 +2081,7 @@ export namespace ViewViews {
         readonly global?: boolean;
         readonly labelKey?: string;
         readonly progress: "none" | "loading" | "error";
+        // @deprecated
         readonly ProgressIndicatorComponent?: ComponentType<ProgressIndicatorProps>;
         readonly style?: CSSProperties;
     }
@@ -2022,9 +2097,6 @@ export namespace ViewViews {
 }
 
 // @public
-export const withApplicationResetTriggers: <T extends A12ApplicationConfig>(resetTriggers: NonNullable<ApplicationFactories.Config["applicationResetTriggers"]>) => (s: T) => T;
-
-// @public
 export const withDataServicesConfiguration: <T extends ApplicationWithDataServicesConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "dataServicesConfig">;
 
 // @public (undocumented)
@@ -2034,7 +2106,7 @@ export const withDeepLinking: <T extends ApplicationWithDeepLinkingConfig>(cfg: 
 export const withDirtyHandling: <T extends ApplicationWithDirtyHandlingConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "dirtyHandling">;
 
 // @public
-export const withDynamicConfig: <T extends A12ApplicationConfig>() => (s: T) => T;
+export const withDynamicConfig: <T extends ApplicationWithDynamicConfigConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "dynamicConfig">;
 
 // @public (undocumented)
 export const withHTTPModelLoader: <T extends ApplicationWithModelLoaderConfig>(cfg: T) => ApplicationWithConfiguredFeature<ApplicationWithConfiguredModelLoader<T>, "modelLoader">;
@@ -2043,24 +2115,16 @@ export const withHTTPModelLoader: <T extends ApplicationWithModelLoaderConfig>(c
 export const withLocalization: <T extends ApplicationWithLocalizationSupportConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "localization">;
 
 // @public
-export const withModel: <T extends A12ApplicationConfig>(model: ApplicationFactories.Config["model"]) => (input: T) => ApplicationWithConfiguredModel<T>;
+export const withModel: (model: ApplicationFactories.Config["model"]) => <T extends ApplicationWithModelConfig>(cfg: T) => ApplicationWithConfiguredFeature<ApplicationWithConfiguredModel<T>, "model">;
 
 // @public
-export const withModelLoader: <T extends A12ApplicationConfig>(modelLoader: ApplicationFactories.Config["modelLoader"]) => (input: T) => ApplicationWithConfiguredModelLoader<T>;
+export const withModelLoader: (modelLoader: ApplicationFactories.Config["modelLoader"]) => <T extends ApplicationWithModelLoaderConfig>(cfg: T) => ApplicationWithConfiguredFeature<ApplicationWithConfiguredModelLoader<T>, "modelLoader">;
 
 // @public
 export const withNotifications: <T extends ApplicationWithNotificationConfig>(cfg: T) => ApplicationWithConfiguredFeature<T, "notifications">;
 
 // @public (undocumented)
 export const withPlatformModelLoader: <T extends ApplicationWithModelLoaderConfig>(cfg: T) => ApplicationWithConfiguredFeature<ApplicationWithConfiguredModelLoader<T>, "modelLoader">;
-
-// @public
-export const withReducerMap: <T extends A12ApplicationConfig>(reducerMap: NonNullable<ApplicationFactories.Config["reducerMap"]>) => (s: T) => T;
-
-// Warnings were encountered during analysis:
-//
-// src/core/application/internal/factories/applicationConfig.ts:88:2 - (ae-forgotten-export) The symbol "BaseConfigWithModelLoader" needs to be exported by the entry point index.d.ts
-// src/core/application/internal/factories/applicationConfig.ts:99:2 - (ae-forgotten-export) The symbol "BaseConfigWithModel" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

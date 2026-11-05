@@ -45,7 +45,7 @@ import {
 	ApplicationActions
 } from "@com.mgmtp.a12.client/client-core";
 
-import { DevappApplicationFrameLayout } from "../../../composableSetup/NewLayoutsModule.js";
+import { DevappApplicationFrameLayout } from "../../../composableSetup/DevappApplicationFrameLayout.js";
 import { PersonForm } from "../../../mocks/SimpleForm/forms/person-form.js";
 import { PersonOverview } from "../../../mocks/SimpleOverview/overviews/person-overview.js";
 

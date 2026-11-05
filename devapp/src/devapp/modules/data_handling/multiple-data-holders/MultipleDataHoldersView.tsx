@@ -60,9 +60,11 @@ export function MultipleDataHoldersView({ activityId, ariaLevel }: ViewNGProps) 
 		useSelector(ActivitySelectors.activityPropById(activityId, a => a.dataHolders)) ?? [];
 
 	const dhListA = dataHolders.find(dh => isTodoDataHolder(dh) && dh.descriptor.listId === "A") as
-		Activity.DataHolder<TodoData> | undefined;
+		| Activity.DataHolder<TodoData>
+		| undefined;
 	const dhListB = dataHolders.find(dh => isTodoDataHolder(dh) && dh.descriptor.listId === "B") as
-		Activity.DataHolder<TodoData> | undefined;
+		| Activity.DataHolder<TodoData>
+		| undefined;
 
 	const todosA = dhListA?.data?.todos ?? [];
 	const todosB = dhListB?.data?.todos ?? [];

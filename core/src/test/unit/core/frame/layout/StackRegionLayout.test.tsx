@@ -40,8 +40,8 @@ import { query } from "@com.mgmtp.a12.devtools/react";
 import StackRegionLayout from "../../../../../core/frame/internal/layout/StackRegionLayout.js";
 import type { View } from "../../../../../core/view/index.js";
 import LayoutProviderMock from "../../../../mocks/frame/LayoutProviderMock.js";
-import { regionUiProviderMock } from "../../../../mocks/frame/RegionUiMock.js";
 import { progressComponentProviderMock } from "../../../../mocks/frame/progressComponentFactory.js";
+import { regionUiProviderMock } from "../../../../mocks/frame/RegionUiMock.js";
 import {
 	modelWithOutSubRegions,
 	modelWithSubRegionsAndMockLayout

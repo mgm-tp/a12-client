@@ -30,9 +30,9 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { RESOURCE_KEYS } from "./keys.js";
+import type { LOCALE_RESOURCE_KEYS } from "./keys.js";
 
-export const en: typeof RESOURCE_KEYS = {
+export const en: typeof LOCALE_RESOURCE_KEYS = {
 	application: {
 		title: ""
 	},

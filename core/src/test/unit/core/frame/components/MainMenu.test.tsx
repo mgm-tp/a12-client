@@ -1041,7 +1041,7 @@ function handleAsyncBehavior<T>(focusSpy: Mock<(opts: FocusOptions) => void>): P
 
 function createFakeComponent(text: string, propsSpy?: Mock<(props: unknown) => void>) {
 	return (props: unknown) => {
-		// eslint-disable-next-line useEffectNoDeps/use-effect-no-deps
+		// oxlint-disable-next-line useEffectNoDeps/use-effect-no-deps
 		useEffect(() => (propsSpy ? propsSpy(props) : undefined));
 		return <div>{text}</div>;
 	};

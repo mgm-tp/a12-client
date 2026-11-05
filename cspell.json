@@ -47,6 +47,7 @@
 		"mgmtp",
 		"navigationcontentboxcontext",
 		"osgi",
+		"oxlint",
 		"rsbuild",
 		"Rsdoctor",
 		"rspack",

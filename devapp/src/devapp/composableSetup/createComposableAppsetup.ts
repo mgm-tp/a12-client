@@ -48,11 +48,11 @@ import {
 	addWrapper,
 	combineFeatures,
 	createA12ApplicationSetup,
-	withApplicationResetTriggers,
+	setApplicationResetTriggers,
 	withDynamicConfig,
 	withModel,
 	withModelLoader,
-	withReducerMap
+	addReducerMap
 } from "@com.mgmtp.a12.client/client-core";
 import { withDeepLinking } from "@com.mgmtp.a12.client/client-core/deepLinking";
 import { withDirtyHandling } from "@com.mgmtp.a12.client/client-core/dirtyHandling";
@@ -75,7 +75,7 @@ import { stateHistoryRecorder } from "../steps/middlewares.js";
 import { initialization, resetApplication, resetRequested } from "../store/actions.js";
 import { DevAppReducers } from "../store/reducer.js";
 
-import { NewLayoutsModule } from "./NewLayoutsModule.js";
+import { DevappLayoutModule } from "./DevappLayoutModule.js";
 
 // NOTE: this factory is also called from step tests and should therefore NOT interact with web apis (e.g. window) directly.
 export function createComposableApplication(modelLoader: ModelLoader) {
@@ -111,10 +111,10 @@ export function createComposableApplication(modelLoader: ModelLoader) {
 				// Model loading (document models only — no application model needed with dynamic config)
 				combineFeatures(withModel(APPLICATION_MODEL_PLACEHOLDER), withModelLoader(modelLoader)),
 				// Client extensions
-				combineFeatures(withLocalization, withDirtyHandling, withDeepLinking, withDynamicConfig()),
+				combineFeatures(withLocalization, withDirtyHandling, withDeepLinking, withDynamicConfig),
 				// Redux setup
 				combineFeatures(
-					withReducerMap({ counter: DevAppReducers.counter }),
+					addReducerMap({ counter: DevAppReducers.counter }),
 					addRootReducer(DevAppReducers.SetCaseReducer),
 					addAdditionalMiddlewares(
 						createInitializationMiddleware(),
@@ -130,7 +130,7 @@ export function createComposableApplication(modelLoader: ModelLoader) {
 						start: [initialization.started],
 						end: [initialization.done, initialization.failed]
 					}),
-					withApplicationResetTriggers({
+					setApplicationResetTriggers({
 						resetRequested: [resetRequested],
 						resetConfirmed: resetApplication(),
 						reset: [resetApplication]
@@ -157,7 +157,7 @@ function handleModuleRegistrationBeforeSetup() {
 		ModuleRegistryProvider.getInstance().addModule(m);
 	});
 
-	ModuleRegistryProvider.getInstance().addModule(NewLayoutsModule);
+	ModuleRegistryProvider.getInstance().addModule(DevappLayoutModule);
 
 	if (isDevelopmentMode()) {
 		DevModeModules.forEach(m => {

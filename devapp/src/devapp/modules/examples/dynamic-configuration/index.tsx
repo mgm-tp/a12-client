@@ -30,16 +30,16 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type { Dispatch } from "redux";
+
 import type {
 	Activity,
 	DynamicConfiguration,
 	DynamicFlow,
-	DynamicMatchCondition,
 	DynamicMenu,
 	DynamicRegion,
-	LayoutPropsNG,
-	RegionReferenceNG,
-	ViewNGProps
+	DynamicScene,
+	RegionReferenceNG
 } from "@com.mgmtp.a12.client/client-core";
 import {
 	ActivityActions,
@@ -47,17 +47,12 @@ import {
 	ApplicationActions
 } from "@com.mgmtp.a12.client/client-core";
 
-import { memoize } from "../../../3rd-party-licenses/memoize.js";
-
 import { DynamicLayoutComponent } from "./DynamicConfigLayout.js";
+import { dynamicRegionName } from "./dynamicRegionName.js";
 import { DynamicView } from "./DynamicView.js";
 import { uiSlice } from "./uiState.js";
 
 const MODULE_ID = `examples.DC`;
-
-function dynamicRegionName(id: string): string {
-	return `DYNAMIC-${id}`;
-}
 
 /**
  * An example module that showcases the {@link DynamicConfiguration} API.
@@ -65,25 +60,34 @@ function dynamicRegionName(id: string): string {
  * Instead of setting an application model and a view provider that matches the view names from scenes to react components,
  * this module contributes everything dynamically, e.g. based on state.
  *
- * ### Note on memoization & performance
+ * ### Note on stability & performance
  *
- * Since the contributions are selectors, they will run on every state change. Therefore it is important to ensure stable return values, i.e.
- * returning the same value (===) when the state change was not relevant to the output.
+ * Since the contributions are selectors, they will run on every state change. The client core deep-compares
+ * the results and reuses the previous result when nothing changed, so freshly created objects, arrays and
+ * strings are unproblematic. Functions however are compared by reference (===): a component or callback that
+ * is re-created inside a selector makes every state change look like a relevant change, causing excessive
+ * re-renderings (and re-mounts, in the case of components).
  *
- * Since in this example, the return values contain functions,
- * memoization is used when necessary to prevent performance problems due to excessive re-renderings.
+ * Therefore all contributed components in this example are declared at module level, and everything
+ * activity-specific reaches them as plain data:
  *
- * If possible, stable return values can also be achieved by moving non-dynamic parts out of the selector, e.g.
- * when the contributed menu entry is always the same (it does not depend on any state).
+ * - The layout component receives the id of its activity via the layout's `componentProps`
+ *   (see {@link DynamicLayoutComponent}).
+ * - The view component receives the id of its activity as a prop and selects everything else from the
+ *   state (see {@link DynamicView}).
+ *
+ * The match conditions of the scenes need no such care: they are only invoked, never compared,
+ * so creating them inside the selector is fine.
  *
  * ### Contributions
  *
  * #### Regions
  *
- * Each relevant (as in: relevant for this example) activity creates its own region, defining its own layout component.
+ * Each relevant (as in: relevant for this example) activity creates its own region. The region name
+ * contains the id of the activity, since region names must be unique.
  *
- * Since the layout component receives the id of the activity as a prop, layout specific data (like a UI state) can be
- * stored in the activity (see {@link DynamicLayoutComponent}).
+ * The layout of the region receives the id of its activity via `componentProps`, so layout specific
+ * data (like a UI state) can be stored in the activity (see {@link DynamicLayoutComponent}).
  *
  * #### Flows
  *
@@ -111,74 +115,58 @@ export const DynamicConfigurationExampleModule: DynamicConfiguration = {
 	dataReducers: () => [uiSlice.dataReducer]
 };
 
-const createMemoizedLayout = memoize((activityId: string) => {
-	return function DynamicLayout(props: LayoutPropsNG) {
-		return <DynamicLayoutComponent {...props} activityId={activityId} />;
-	};
-});
-
-const createMemoizedView = memoize((hideContentbox: boolean) => {
-	return function DynamicViewWrapper(props: ViewNGProps) {
-		return (
-			<DynamicView
-				{...props}
-				hideContentbox={hideContentbox}
-				dynamicRegionRef={dynamicRegionName(props.activityId)}
-			/>
-		);
-	};
-});
-
-const createMemoizedMatcher = memoize((initiatingActivityId?: string) => {
-	const matcher: DynamicMatchCondition = descriptor =>
-		descriptor.shouldShowUpInActivity === initiatingActivityId;
-
-	return matcher;
-});
-
 function dynamicRegions(state: object): DynamicRegion[] {
-	return selectRelevantActivities(state).map(activity => {
-		const { id } = activity;
+	return selectRelevantActivities(state).map(activityRegion);
+}
 
-		return {
-			name: dynamicRegionName(id),
-			layout: {
-				component: createMemoizedLayout(id)
-			}
-		};
-	});
+function activityRegion(activity: Activity): DynamicRegion {
+	return {
+		name: dynamicRegionName(activity.id),
+		layout: {
+			component: DynamicLayoutComponent,
+			componentProps: { activityId: activity.id }
+		}
+	};
 }
 
 function dynamicFlows(state: object): DynamicFlow[] {
 	return [
 		{
 			name: `${MODULE_ID}.flow`,
-			scenes: selectRelevantActivities(state).map(activity => {
-				const { initiatingActivityId } = activity;
-
-				const viewRegion: RegionReferenceNG = initiatingActivityId
-					? dynamicRegionName(initiatingActivityId)
-					: "/CONTENT";
-
-				return {
-					name: `scene-${activity.id}`,
-					matches: createMemoizedMatcher(initiatingActivityId),
-					sceneChange: {
-						onEnter: [
-							{
-								type: "DYNAMIC_ADD_VIEW",
-								component: createMemoizedView(initiatingActivityId !== undefined),
-								region: viewRegion
-							}
-						]
-					}
-				};
-			})
+			scenes: selectRelevantActivities(state).map(activityScene)
 		}
 	];
 }
 
-const createMemoizedMenu = memoize((activityCount: number): DynamicMenu[] => {
+function activityScene(activity: Activity): DynamicScene {
+	const { initiatingActivityId } = activity;
+
+	const viewRegion: RegionReferenceNG = initiatingActivityId
+		? dynamicRegionName(initiatingActivityId)
+		: "/CONTENT";
+
+	function matchesInitiatingActivity(descriptor: Activity.Descriptor): boolean {
+		return descriptor.shouldShowUpInActivity === initiatingActivityId;
+	}
+
+	return {
+		name: `scene-${activity.id}`,
+		matches: matchesInitiatingActivity,
+		sceneChange: {
+			onEnter: [
+				{
+					type: "DYNAMIC_ADD_VIEW",
+					component: DynamicView,
+					region: viewRegion
+				}
+			]
+		}
+	};
+}
+
+function dynamicMenus(state: object): DynamicMenu[] {
+	const activityCount = selectRelevantActivities(state).length;
+
 	return [
 		{
 			id: `${MODULE_ID}.dynamicMenu`,
@@ -190,27 +178,23 @@ const createMemoizedMenu = memoize((activityCount: number): DynamicMenu[] => {
 				}
 			},
 			selected: activityCount > 0,
-			action: dispatch => {
-				dispatch(
-					ApplicationActions.startMainActivityRequested({
-						action: ActivityActions.create({
-							activityDescriptor: {
-								feature: "dynamicConfiguration"
-							},
-							loadingState: "without"
-						}),
-						descriptor: {}
-					})
-				);
-			}
+			action: startDynamicConfigurationActivity
 		}
 	];
-});
+}
 
-function dynamicMenus(state: object): DynamicMenu[] {
-	const activities = selectRelevantActivities(state);
-
-	return createMemoizedMenu(activities.length);
+function startDynamicConfigurationActivity(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: {
+					feature: "dynamicConfiguration"
+				},
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
 }
 
 function selectRelevantActivities(state: object): Activity[] {

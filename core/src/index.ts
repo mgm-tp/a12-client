@@ -29,7 +29,11 @@
  * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
-
+/**
+ * Only for API-Extractor: This file is the entry point for the API-Extractor
+ * tool (it only supports one). The actual entry points are exports in the
+ * package.json.
+ */
 export * from "./core/index.js";
 export * from "./extensions/dataServicesAdapter/index.js";
 export * from "./extensions/deep-linking/index.js";

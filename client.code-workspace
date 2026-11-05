@@ -27,6 +27,14 @@
 		{
 			"name": "documentation",
 			"path": "documentation"
+		},
+		{
+			"name": "scripting",
+			"path": "scripting"
+		},
+		{
+			"name": "scripting-devapp",
+			"path": "scripting-devapp"
 		}
 	],
 	"settings": {
@@ -37,7 +45,9 @@
 			"core": true,
 			"data": true,
 			"devapp": true,
-			"documentation": true
+			"documentation": true,
+			"scripting": true,
+			"scripting-devapp": true
 		}
 	}
 }

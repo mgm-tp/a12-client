@@ -32,6 +32,7 @@
 
 import type { JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
 import type {
 	DynamicConfiguration,
@@ -51,8 +52,6 @@ import {
 	type MultiselectProps,
 	Multiselect
 } from "@com.mgmtp.a12.widgets/widgets-core";
-
-import { memoize } from "../../../3rd-party-licenses/memoize.js";
 
 import {
 	isPermissionExampleDescriptor,
@@ -129,85 +128,50 @@ const PERMISSION_FLOWS: DynamicFlow[] = [
 	}
 ];
 
-const createMemoizedMenu = memoize(
-	(selected: boolean, permissions: string[]) => {
-		const childMenus: DynamicMenu[] = [
-			{
-				id: "chooser",
-				selected,
-				label: {
-					key: "examples.ui-handling.permissions.menu.chooser"
-				},
-				action(dispatch) {
-					dispatch(
-						ApplicationActions.startMainActivityRequested({
-							action: ActivityActions.create({
-								activityDescriptor: permissionExampleDescriptor,
-								loadingState: "without"
-							}),
-							descriptor: {}
-						})
-					);
-				}
-			}
-		];
+function startChooserActivity(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: permissionExampleDescriptor,
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
 
-		if (permissions.includes("modeler") || permissions.includes("tester")) {
-			childMenus.push({
-				id: "modeler_tester",
-				label: {
-					key: "examples.ui-handling.permissions.menu.label",
-					args: { permission: { type: "plain", value: "Modeler + Tester" } }
+function notifyPermissionAction(permission: string): (dispatch: Dispatch) => void {
+	return function notifyPermission(dispatch: Dispatch): void {
+		dispatch(
+			NotificationActions.add({
+				title: {
+					key: "examples.ui-handling.permissions.menu.action",
+					args: { permission: { type: "plain", value: permission } }
 				},
-				action(dispatch) {
-					dispatch(
-						NotificationActions.add({
-							title: {
-								key: "examples.ui-handling.permissions.menu.action",
-								args: { permission: { type: "plain", value: "Modeler + Tester" } }
-							},
-							severity: "info",
-							duration: 2000
-						})
-					);
-				}
-			});
-		}
+				severity: "info",
+				duration: 2000
+			})
+		);
+	};
+}
 
-		if (permissions.includes("systemAdmin")) {
-			childMenus.push({
-				id: "systemAdmin",
-				label: {
-					key: "examples.ui-handling.permissions.menu.label",
-					args: { permission: { type: "plain", value: "SystemAdmin" } }
-				},
-				action(dispatch) {
-					dispatch(
-						NotificationActions.add({
-							title: {
-								key: "examples.ui-handling.permissions.menu.action",
-								args: { permission: { type: "plain", value: "SystemAdmin" } }
-							},
-							severity: "info",
-							duration: 2000
-						})
-					);
-				}
-			});
-		}
-
-		return [
-			{
-				id: "ui_handling.permissions.dynamicMenu",
-				label: {
-					key: "examples.ui-handling.permissions.menu.entry"
-				},
-				children: childMenus
-			}
-		];
+const MODELER_TESTER_MENU: DynamicMenu = {
+	id: "modeler_tester",
+	label: {
+		key: "examples.ui-handling.permissions.menu.label",
+		args: { permission: { type: "plain", value: "Modeler + Tester" } }
 	},
-	(s, p) => `${s}.${p.join(".")}`
-);
+	action: notifyPermissionAction("Modeler + Tester")
+};
+
+const SYSTEM_ADMIN_MENU: DynamicMenu = {
+	id: "systemAdmin",
+	label: {
+		key: "examples.ui-handling.permissions.menu.label",
+		args: { permission: { type: "plain", value: "SystemAdmin" } }
+	},
+	action: notifyPermissionAction("SystemAdmin")
+};
 
 export const PermissionModule: DynamicConfiguration = {
 	id: "ui_handling.permissions",
@@ -219,7 +183,30 @@ export const PermissionModule: DynamicConfiguration = {
 
 		const permissions = selectPermissions(state);
 
-		return createMemoizedMenu(isSelected, permissions);
+		const childMenus: DynamicMenu[] = [
+			{
+				id: "chooser",
+				selected: isSelected,
+				label: {
+					key: "examples.ui-handling.permissions.menu.chooser"
+				},
+				action: startChooserActivity
+			},
+			...(permissions.includes("modeler") || permissions.includes("tester")
+				? [MODELER_TESTER_MENU]
+				: []),
+			...(permissions.includes("systemAdmin") ? [SYSTEM_ADMIN_MENU] : [])
+		];
+
+		return [
+			{
+				id: "ui_handling.permissions.dynamicMenu",
+				label: {
+					key: "examples.ui-handling.permissions.menu.entry"
+				},
+				children: childMenus
+			}
+		];
 	},
 	flows: PERMISSION_FLOWS,
 	dataReducers: () => [permissionReducer]

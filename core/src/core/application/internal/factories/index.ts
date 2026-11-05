@@ -182,16 +182,16 @@ export namespace ApplicationFactories {
 
 		/** A set of triggers to set the application busy and non-busy */
 		readonly applicationBusyTriggers?: {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			readonly start: ActionCreator<any>[];
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			readonly end: ActionCreator<any>[];
 		};
 
 		/** A set of triggers to reset the application state */
 		readonly applicationResetTriggers?: {
 			/** Set of action which request a resetting of the store */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			readonly resetRequested: ActionCreator<any>[];
 
 			/**
@@ -202,7 +202,7 @@ export namespace ApplicationFactories {
 			readonly resetConfirmed: Action;
 
 			/** Action which triggers the final reset of the store */
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			readonly reset: ActionCreator<any>[];
 		};
 
@@ -356,7 +356,7 @@ function createStore(
 	const middlewareEnhancer = applyMiddleware(...middlewares);
 	const enhancer = composeEnhancer ? composeEnhancer(middlewareEnhancer) : middlewareEnhancer;
 
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
+	// oxlint-disable-next-line typescript/no-deprecated
 	return createReduxStore(reducer, preloadedState, enhancer);
 }
 

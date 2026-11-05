@@ -45,6 +45,7 @@ import { KernelMessage } from "../../../data-mutation/validation-computation/mes
 import { DocumentRuntimeServiceFactory } from "../../../data-mutation/validation-computation/validationRuntimeService.js";
 import { ValidatorProviderFactory } from "../../../data-mutation/validation-computation/validatorProviderFactory.js";
 import type { DgDocument, DgLinkInternal } from "../../../internal/documentGraph.js";
+import { messageDefaults } from "../../redux/api/mocks/mockMessage.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
 
 describe("core.api.initializeDataComponent", () => {
@@ -296,6 +297,7 @@ describe("core.api.initializeDataComponent", () => {
 				document: doc,
 				path: computedErrorFieldPath,
 				errorMessage: {
+					...messageDefaults,
 					entityInstance: computedErrorFieldPath,
 					errorCode: "formalValidation",
 					errorText: [],

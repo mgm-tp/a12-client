@@ -87,7 +87,8 @@ export function ErrorHandlingTemplate(props: ErrorHandlingTemplateProps) {
 	const savingState = useSelector(ActivitySelectors.savingStateById(activityId));
 
 	const error = useSelector(ActivitySelectors.error(activityId)) as
-		SampleApplicationError | undefined;
+		| SampleApplicationError
+		| undefined;
 
 	return (
 		<ActionContentbox

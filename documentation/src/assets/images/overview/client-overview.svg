@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Overview diagram for the A12 Client introduction — see the a12-docs-component-introduction
+  skill's references/diagram-conventions.md for the conventions this file follows.
+
+  Embedded from documentation/src/0100_introduction.adoc as:
+    image::assets/images/overview/client-overview.svg[...]
+
+  This diagram is deliberately container-level only (composition and context, no internal call
+  flow). It complements — and does not duplicate — documentation/src/0501_walkthrough.adoc, whose
+  own client-architecture.svg already shows the module-level Activity/Scene/View mechanism in
+  detail (component-team input: that diagram may be outdated — see draft-notes.md in the
+  a12-docs-component-introduction skill's scratch output for this intro).
+-->
+
+<svg
+   viewBox="0 0 1300 796"
+   width="1300"
+   height="796"
+   role="img"
+   aria-labelledby="t d"
+   font-family="'Segoe UI', Inter, system-ui, sans-serif"
+   version="1.1"
+   id="svg45"
+   sodipodi:docname="client-overview.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview45"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.3538462"
+     inkscape:cx="546.59091"
+     inkscape:cy="203.86364"
+     inkscape:window-width="1882"
+     inkscape:window-height="1027"
+     inkscape:window-x="38"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg45" />
+  <title
+     id="t">Client overview</title>
+  <desc
+     id="d">Client works on an Application Model, which describes the application's modules, flows, scenes, and
+		menus, or on a Dynamic Configuration, the code-first and currently experimental alternative; either one describes
+		the UI structure and the interaction behavior, and is an input to the process shown. The diagram shows the browser
+		process of an A12 client application, with Client running inside it
+		alongside the Engines and Widgets it orchestrates. Client's own parts, drawn as four white boxes, are Application
+		Setup, which bootstraps the runtime and composes it with an Application Model or a Dynamic Configuration; the Redux
+		store and Activities, which hold the Activity Descriptor, DataHolders, and loading state of each use case and drive
+		the Activity, Scene, and View cascade with its replay algorithm; the Application Frame, Regions, and Views, where a
+		provider mechanism maps names to UI components and a layout renders the views assigned to a region; and the
+		ModuleRegistry and its extensions, the pluggable extension points for project or third-party code. In the same
+		process, drawn as blue boxes, run the A12 libraries: the Kernel, used for Document Model navigation
+		and for evaluating validation and computation rules; Data Services, used for document and query access; Widgets,
+		used for the field, layout, and other UI widgets shown inside a view; the Engines, which Client orchestrates by rendering them
+		inside the Views it assigns to Regions; and the foundation libraries Base and Utils,
+		used as a connector, localization, and logging layer. Also in the same process, drawn as grey boxes, run the
+		third-party libraries React, Redux, and Redux-Saga. Below them, drawn as a dashed amber box, is the project's own
+		code: its Application Model or Dynamic Configuration modules, custom widgets, and business logic. Outside the
+		process boundary, reached through Data Services and the Kernel, is the Backend, which supplies documents and
+		models. The diagram shows composition and context only; it does not show which part calls which.</desc>
+  <defs
+     id="defs1">
+    <marker
+       id="arw"
+       viewBox="0 0 10 10"
+       refX="5"
+       refY="5"
+       markerWidth="7"
+       markerHeight="7"
+       orient="auto-start-reverse"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M0,1 L9,5 L0,9 z"
+         fill="#64748b"
+         id="path1" />
+    </marker>
+    <style
+       id="style1">
+			.zone {
+				font-size: 11px;
+				font-weight: 600;
+				letter-spacing: .09em;
+				fill: #94a3b8
+			}
+
+			.card {
+				fill: #f8fafc;
+				stroke: #cbd5e1;
+				stroke-width: 1
+			}
+
+			.block {
+				fill: #ffffff;
+				stroke: #cbd5e1;
+				stroke-width: 1
+			}
+
+			.lib {
+				fill: #eef4ff;
+				stroke: #93b4e8;
+				stroke-width: 1
+			}
+
+			.tp {
+				fill: #f1f2f4;
+				stroke: #a9b1bd;
+				stroke-width: 1
+			}
+
+			.own {
+				fill: #fffdf5;
+				stroke: #d6b877;
+				stroke-width: 1;
+				stroke-dasharray: 5 3
+			}
+
+			.name {
+				font-size: 14px;
+				fill: #0f172a
+			}
+
+			.libnm {
+				font-size: 14px;
+				fill: #1e3a8a
+			}
+
+			.tpnm {
+				font-size: 14px;
+				fill: #334155
+			}
+
+			.lead {
+				font-size: 16px;
+				font-weight: 600;
+				fill: #0f172a
+			}
+
+			.sub {
+				font-size: 12px;
+				fill: #64748b
+			}
+
+			.cap {
+				font-size: 11px;
+				fill: #64748b;
+				font-style: italic
+			}
+
+			.libcp {
+				font-size: 11px;
+				fill: #3b6bb5;
+				font-style: italic
+			}
+
+			.band {
+				font-size: 11px;
+				font-weight: 600;
+				letter-spacing: .06em;
+				fill: #94a3b8
+			}
+
+			.edge {
+				stroke: #64748b;
+				stroke-width: 1.4;
+				fill: none;
+				marker-end: url(#arw)
+			}
+		</style>
+  </defs>
+  <!-- ── what it works on ───────────────────────────────────── -->
+  <text
+     class="zone"
+     x="20"
+     y="170"
+     id="text46">WORKS ON</text>
+  <g
+     class="card"
+     id="g46">
+    <rect
+       x="20"
+       y="182"
+       width="200"
+       height="62"
+       rx="8"
+       id="rect46" />
+  </g>
+  <text
+     class="name"
+     x="36"
+     y="206"
+     id="text47">Application Model</text>
+  <text
+     class="cap"
+     x="36"
+     y="224"
+     id="text48">modules, flows, scenes,</text>
+  <text
+     class="cap"
+     x="36"
+     y="236"
+     id="text49">and menus</text>
+  <g
+     class="card"
+     id="g49">
+    <rect
+       x="20"
+       y="256"
+       width="200"
+       height="62"
+       rx="8"
+       id="rect49" />
+  </g>
+  <text
+     class="name"
+     x="36"
+     y="280"
+     id="text50">Dynamic Configuration</text>
+  <text
+     class="cap"
+     x="36"
+     y="298"
+     id="text51">the code-first alternative</text>
+  <text
+     class="cap"
+     x="36"
+     y="310"
+     id="text52">(experimental)</text>
+  <text
+     class="cap"
+     x="20"
+     y="336"
+     id="text53">Either one describes the UI structure</text>
+  <text
+     class="cap"
+     x="20"
+     y="348"
+     id="text54">and the interaction behavior.</text>
+  <path
+     class="edge"
+     d="M 222,213 H 248"
+     id="path46" />
+  <path
+     class="edge"
+     d="M 222,287 H 248"
+     id="path49" />
+  <!-- ── the process ─────────────────────────────────────────── -->
+  <rect
+     x="250"
+     y="70"
+     width="800"
+     height="596"
+     rx="14"
+     fill="#fcfdfe"
+     stroke="#94a3b8"
+     stroke-width="1.5"
+     id="rect1" />
+  <text
+     class="lead"
+     x="274"
+     y="104"
+     id="text1">The project's application</text>
+  <text
+     class="sub"
+     x="274"
+     y="122"
+     id="text2">Client runs inside it, alongside the Engines and Widgets it orchestrates</text>
+  <text
+     class="band"
+     x="274"
+     y="150"
+     id="text3">CLIENT</text>
+  <g
+     class="block"
+     id="g3">
+    <rect
+       x="274"
+       y="160"
+       width="360"
+       height="72"
+       rx="8"
+       id="rect3" />
+  </g>
+  <text
+     class="name"
+     x="290"
+     y="184"
+     id="text4">Application Setup</text>
+  <text
+     class="cap"
+     x="290"
+     y="202"
+     id="text5">bootstraps the runtime, composes it</text>
+  <text
+     class="cap"
+     x="290"
+     y="218"
+     id="text6">with an Application Model / Dynamic Configuration</text>
+  <g
+     class="block"
+     id="g6">
+    <rect
+       x="674"
+       y="160"
+       width="360"
+       height="72"
+       rx="8"
+       id="rect6" />
+  </g>
+  <text
+     class="name"
+     x="690"
+     y="184"
+     id="text7">Redux Store and Activities</text>
+  <text
+     class="cap"
+     x="690"
+     y="202"
+     id="text8">descriptor, DataHolders, and loading state,</text>
+  <text
+     class="cap"
+     x="690"
+     y="218"
+     id="text9">driving the Activity/Scene/View cascade, with replay</text>
+  <g
+     class="block"
+     id="g9">
+    <rect
+       x="274"
+       y="248"
+       width="360"
+       height="72"
+       rx="8"
+       id="rect9" />
+  </g>
+  <text
+     class="name"
+     x="290"
+     y="270"
+     id="text10">Application Frame, Regions,</text>
+  <text
+     class="name"
+     x="290"
+     y="286"
+     id="text11">and Views</text>
+  <text
+     class="cap"
+     x="290"
+     y="304"
+     id="text12">provider-mapped views, layouts (e.g. master-detail)</text>
+  <g
+     class="block"
+     id="g12">
+    <rect
+       x="674"
+       y="248"
+       width="360"
+       height="72"
+       rx="8"
+       id="rect12" />
+  </g>
+  <text
+     class="name"
+     x="690"
+     y="270"
+     id="text13">ModuleRegistry and</text>
+  <text
+     class="name"
+     x="690"
+     y="286"
+     id="text14">Extensions</text>
+  <text
+     class="cap"
+     x="690"
+     y="304"
+     id="text15">pluggable extension points</text>
+  <text
+     class="band"
+     x="274"
+     y="354"
+     id="text16">IN THE SAME PROCESS</text>
+  <g
+     class="lib"
+     id="g16">
+    <rect
+       x="274"
+       y="362"
+       width="142"
+       height="72"
+       rx="8"
+       id="rect16" />
+  </g>
+  <text
+     class="libnm"
+     x="290"
+     y="384"
+     id="text17">Kernel</text>
+  <text
+     class="libcp"
+     x="290"
+     y="400"
+     id="text18">Document Model</text>
+  <text
+     class="libcp"
+     x="290"
+     y="412"
+     id="text19">navigation, validation</text>
+  <text
+     class="libcp"
+     x="290"
+     y="424"
+     id="text19b">and computation</text>
+  <g
+     class="lib"
+     id="g19">
+    <rect
+       x="426"
+       y="362"
+       width="142"
+       height="72"
+       rx="8"
+       id="rect19" />
+  </g>
+  <text
+     class="libnm"
+     x="442"
+     y="384"
+     id="text20">Data Services</text>
+  <text
+     class="libcp"
+     x="442"
+     y="400"
+     id="text21">document and query</text>
+  <text
+     class="libcp"
+     x="442"
+     y="412"
+     id="text21b">access</text>
+  <g
+     class="lib"
+     id="g21">
+    <rect
+       x="578"
+       y="362"
+       width="142"
+       height="72"
+       rx="8"
+       id="rect21" />
+  </g>
+  <text
+     class="libnm"
+     x="594"
+     y="384"
+     id="text22">Widgets</text>
+  <text
+     class="libcp"
+     x="594"
+     y="400"
+     id="text23">field, layout, and</text>
+  <text
+     class="libcp"
+     x="594"
+     y="412"
+     id="text24">other UI widgets</text>
+  <text
+     class="libcp"
+     x="594"
+     y="424"
+     id="text24b">shown in a view</text>
+  <g
+     class="lib"
+     id="g24">
+    <rect
+       x="730"
+       y="362"
+       width="142"
+       height="72"
+       rx="8"
+       id="rect24" />
+  </g>
+  <text
+     class="libnm"
+     x="746"
+     y="384"
+     id="text24c">Engines</text>
+  <text
+     class="libcp"
+     x="746"
+     y="400"
+     id="text24d">rendered inside the</text>
+  <text
+     class="libcp"
+     x="746"
+     y="412"
+     id="text24e">Views Client assigns</text>
+  <g
+     class="lib"
+     id="g25">
+    <rect
+       x="882"
+       y="362"
+       width="142"
+       height="72"
+       rx="8"
+       id="rect25" />
+  </g>
+  <text
+     class="libnm"
+     x="898"
+     y="384"
+     id="text25">Base and Utils</text>
+  <text
+     class="libcp"
+     x="898"
+     y="400"
+     id="text26">connector,</text>
+  <text
+     class="libcp"
+     x="898"
+     y="412"
+     id="text27">localization, logging</text>
+  <text
+     class="libcp"
+     x="898"
+     y="424"
+     id="text27b">foundation libraries</text>
+  <g
+     class="tp"
+     id="g27">
+    <rect
+       x="274"
+       y="448"
+       width="240"
+       height="56"
+       rx="8"
+       id="rect27" />
+  </g>
+  <text
+     class="tpnm"
+     x="290"
+     y="470"
+     id="text28">React</text>
+  <text
+     class="cap"
+     x="290"
+     y="488"
+     id="text29">component rendering</text>
+  <g
+     class="tp"
+     id="g29">
+    <rect
+       x="530"
+       y="448"
+       width="240"
+       height="56"
+       rx="8"
+       id="rect29" />
+  </g>
+  <text
+     class="tpnm"
+     x="546"
+     y="470"
+     id="text30">Redux</text>
+  <text
+     class="cap"
+     x="546"
+     y="488"
+     id="text31">the application's store</text>
+  <g
+     class="tp"
+     id="g31">
+    <rect
+       x="786"
+       y="448"
+       width="240"
+       height="56"
+       rx="8"
+       id="rect31" />
+  </g>
+  <text
+     class="tpnm"
+     x="802"
+     y="470"
+     id="text32">Redux-Saga</text>
+  <text
+     class="cap"
+     x="802"
+     y="488"
+     id="text33">asynchronous control flow</text>
+  <text
+     class="band"
+     x="274"
+     y="538"
+     id="text34">PROJECT CODE</text>
+  <g
+     class="own"
+     id="g34">
+    <rect
+       x="274"
+       y="546"
+       width="752"
+       height="58"
+       rx="8"
+       id="rect34" />
+  </g>
+  <text
+     class="name"
+     x="290"
+     y="570"
+     id="text35">Your project's code</text>
+  <text
+     class="cap"
+     x="290"
+     y="588"
+     id="text36">Application Model or Dynamic Configuration modules, custom widgets, business
+		logic</text>
+  <text
+     class="cap"
+     x="274"
+     y="632"
+     id="text37">Composition and context only: which part calls which is not shown.</text>
+  <!-- ── context column, right ───────────────────────────────── -->
+  <text
+     class="zone"
+     x="1072.4795"
+     y="163.49878"
+     id="text38">REACHED THROUGH</text>
+  <g
+     class="card"
+     id="g38"
+     transform="translate(6,-18.390625)">
+    <rect
+       x="1068"
+       y="190"
+       width="196"
+       height="64"
+       rx="8"
+       id="rect38" />
+  </g>
+  <text
+     class="name"
+     x="1083.2614"
+     y="191.91943"
+     id="text39">Backend</text>
+  <text
+     class="cap"
+     x="1083.6033"
+     y="206.79443"
+     id="text40">documents and models,</text>
+  <text
+     class="cap"
+     x="1083.6033"
+     y="218.79443"
+     id="text41">via Data Services and the Kernel</text>
+  <path
+     class="edge"
+     d="m 1049.8679,203.60937 19.7003,0"
+     id="path41"
+     sodipodi:nodetypes="cc"
+     style="display:inline;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;paint-order:normal" />
+  <!-- ── legend ───────────────────────────────────────────────── -->
+  <g
+     class="block"
+     id="g41">
+    <rect
+       x="274"
+       y="716"
+       width="14"
+       height="14"
+       rx="3"
+       id="rect41" />
+  </g>
+  <text
+     class="cap"
+     x="296"
+     y="727"
+     id="text42">Client's own parts</text>
+  <g
+     class="lib"
+     id="g42">
+    <rect
+       x="450"
+       y="716"
+       width="14"
+       height="14"
+       rx="3"
+       id="rect42" />
+  </g>
+  <text
+     class="cap"
+     x="472"
+     y="727"
+     id="text43">A12 libraries in the same process</text>
+  <g
+     class="tp"
+     id="g43">
+    <rect
+       x="660"
+       y="716"
+       width="14"
+       height="14"
+       rx="3"
+       id="rect43" />
+  </g>
+  <text
+     class="cap"
+     x="682"
+     y="727"
+     id="text44">third-party libraries</text>
+  <g
+     class="own"
+     id="g44">
+    <rect
+       x="840"
+       y="716"
+       width="14"
+       height="14"
+       rx="3"
+       id="rect44" />
+  </g>
+  <text
+     class="cap"
+     x="862"
+     y="727"
+     id="text45">the project's own code</text>
+</svg>

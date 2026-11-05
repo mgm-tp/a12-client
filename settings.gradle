@@ -1,4 +1,6 @@
-rootProject.name = 'Client'
+enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+
+rootProject.name = 'client'
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -13,10 +15,15 @@ dependencyResolutionManagement {
 include ':coreTestModels', ':devappModels', ':devappServices',
     'appmodel-migration', 'codemod', 'core', 'data', 'devapp', 'documentation'
 
-['security', 'docker'].each { name ->
+['security', 'docker', 'scripting', 'scripting-devapp'].each { name ->
     if (file(name).exists()) {
         include(name)
     }
+}
+
+if (file('scripting-devapp/resources/server').exists()) {
+    include ':scriptingDevappServices'
+    project(':scriptingDevappServices').projectDir = file('scripting-devapp/resources/server')
 }
 
 project(':coreTestModels').projectDir = file('core/resources/testModels')

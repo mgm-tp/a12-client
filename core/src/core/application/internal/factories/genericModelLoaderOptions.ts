@@ -30,31 +30,16 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { defineConfig, globalIgnores } from "eslint/config";
+import type { ModelProcessor } from "../../../model/internal/ModelProcessor.js";
+import type { SupportedModelVersions } from "../../../model/internal/supportedModelVersions.js";
 
-import sharedConfig from "../eslint.config.ts";
+export interface GenericModelLoaderOptions {
+	/**
+	 * Configures post-processing of models for the `ModelLoader` API
+	 *
+	 * By default, only document models are processed.
+	 */
+	readonly modelProcessors?: ModelProcessor[];
 
-export default defineConfig(
-	globalIgnores(["src/testData"], "codemod/ignores"),
-	...sharedConfig,
-	{
-		name: "codemod/projectService",
-		files: ["eslint.config.ts"],
-		languageOptions: {
-			parserOptions: {
-				projectService: {
-					allowDefaultProject: ["eslint.config.ts"]
-				}
-			}
-		}
-	},
-	{
-		name: "codemod/specific",
-		files: ["src/**/*"],
-		rules: {
-			"no-console": "off",
-			"@typescript-eslint/no-non-null-assertion": "warn",
-			"@typescript-eslint/no-unused-expressions": "off"
-		}
-	}
-);
+	readonly supportedModelVersions?: SupportedModelVersions;
+}

@@ -30,45 +30,29 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { FunctionComponent } from "react";
-
 import type {
 	DynamicConfiguration,
 	DynamicFlow,
-	DynamicMatchCondition,
 	DynamicMenu,
-	ViewNGComponent,
-	ViewNGProps
+	ViewNGComponent
 } from "@com.mgmtp.a12.client/client-core";
 import { ActivitySelectors, ApplicationActions } from "@com.mgmtp.a12.client/client-core";
 
-declare const DashboardView: FunctionComponent<ViewNGProps & { variant: string }>;
-declare function memoize<T extends (...args: never[]) => unknown>(fn: T): T;
-
-// tag::memoization[]
 const DESCRIPTOR = { feature: "dashboard" };
 
-// Memoize component factories to ensure referential stability
-const createMemoizedView = memoize((variant: string): ViewNGComponent => (props: ViewNGProps) => (
-	<DashboardView {...props} variant={variant} />
-));
+// module-level constants: the component and the menu action keep a stable
+// identity, everything state-derived travels as plain data
+// tag::viewDeclaration[]
+interface DashboardProps {
+	readonly variant?: string;
+}
 
-const createMemoizedMatcher = memoize(
-	(variant: string): DynamicMatchCondition =>
-		descriptor =>
-			descriptor.feature === "dashboard" && descriptor.variant === variant
-);
-
-const createMemoizedMenu = memoize((isSelected: boolean): DynamicMenu[] => [
-	{
-		id: "dashboard-menu",
-		label: { key: "application.menu.dashboard" },
-		selected: isSelected,
-		action: dispatch =>
-			dispatch(ApplicationActions.startMainActivityRequested({ descriptor: DESCRIPTOR }))
-	}
-]);
-// end::memoization[]
+// the view gets the framework props plus its own DashboardProps
+declare const DashboardView: ViewNGComponent<DashboardProps>;
+// end::viewDeclaration[]
+const openDashboardAction = ApplicationActions.startMainActivityRequested({
+	descriptor: DESCRIPTOR
+});
 
 // tag::selectors[]
 const dynamicFlows = (state: object): DynamicFlow[] => {
@@ -82,15 +66,23 @@ const dynamicFlows = (state: object): DynamicFlow[] => {
 			name: "dashboard.flow",
 			scenes: dashboardActivities.map(activity => ({
 				name: `dashboard.${activity.descriptor.variant}`,
-				matches: createMemoizedMatcher(activity.descriptor.variant as string),
+				// match conditions are only invoked, never compared —
+				// creating them inline is fine
+				matches: descriptor =>
+					descriptor.feature === "dashboard" && descriptor.variant === activity.descriptor.variant,
 				sceneChange: {
+					// tag::componentProps[]
 					onEnter: [
 						{
 							type: "DYNAMIC_ADD_VIEW" as const,
 							region: "/CONTENT",
-							component: createMemoizedView(activity.descriptor.variant as string)
+							// the component is a module-level constant ...
+							component: DashboardView,
+							// ... and the state-derived variant travels as plain data
+							componentProps: { variant: activity.descriptor.variant }
 						}
 					]
+					// end::componentProps[]
 				}
 			}))
 		}
@@ -99,8 +91,15 @@ const dynamicFlows = (state: object): DynamicFlow[] => {
 
 const dynamicMenus = (state: object): DynamicMenu[] => {
 	const activities = ActivitySelectors.activitiesByDescriptor(DESCRIPTOR)(state);
-	const isSelected = activities.length > 0;
-	return createMemoizedMenu(isSelected);
+	return [
+		{
+			id: "dashboard-menu",
+			label: { key: "application.menu.dashboard" },
+			selected: activities.length > 0,
+			// a plain action object is deep-compared like all other data
+			action: openDashboardAction
+		}
+	];
 };
 // end::selectors[]
 

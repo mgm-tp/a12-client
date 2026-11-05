@@ -60,6 +60,8 @@ import { DataActions } from "../../../redux/api/actions.js";
 import type { DgClAndValidationDataHolderShape } from "../../../redux/api/types.js";
 import { KernelFixtures } from "../../setup/testValidationRuntime.js";
 
+import { messageDefaults } from "./mocks/mockMessage.js";
+
 describe("redux.api.reducers", () => {
 	beforeEach(() => {
 		ValidatorProviderFactory.set(
@@ -206,6 +208,7 @@ describe("redux.api.reducers", () => {
 			];
 
 			const testMessage: Message = {
+				...messageDefaults,
 				entityInstance: errorField,
 				errorCode: "foo",
 				errorText: [],

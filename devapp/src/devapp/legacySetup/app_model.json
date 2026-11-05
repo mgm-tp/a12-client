@@ -62,6 +62,31 @@
             ]
           },
           {
+            "name": "setup-details.flow",
+            "scenes": [
+              {
+                "name": "setup-details.scene",
+                "matchConditions": [
+                  {
+                    "key": "section",
+                    "mustEqual": "setup-details"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "SetupDetailsView",
+                      "region": [
+                        "CONTENT"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
             "name": "master-detail-flow.flow",
             "scenes": [
               {

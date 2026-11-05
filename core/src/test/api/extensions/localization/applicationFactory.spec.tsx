@@ -94,7 +94,7 @@ describe("extensions.localizations.applicationFactory", () => {
 			};
 
 			const result = addLocaleChooser(config);
-			equal(result.config.layoutModifications?.("FrameLayout"), undefined);
+			equal(result.config.layoutModifications, undefined);
 		});
 
 		it("is not adding the locale chooser if 'addLocaleChooser' is 'on-demand' and only one locale is supported", () => {
@@ -107,7 +107,7 @@ describe("extensions.localizations.applicationFactory", () => {
 			};
 
 			const result = addLocaleChooser(config);
-			equal(result.config.layoutModifications?.("FrameLayout"), undefined);
+			equal(result.config.layoutModifications, undefined);
 		});
 
 		it("is adding the locale chooser if 'addLocaleChooser' is 'on-demand' and multiple locales are supported", () => {
@@ -186,7 +186,10 @@ function AssertContext<T>({ context, assertion }: AssertContextProps<T>) {
 function assertLocaleChooser(config: ApplicationWithLocalizationSupportConfig) {
 	const result = addLocaleChooser(config);
 
-	const NewLayout = result.config.layoutModifications?.("ApplicationFrame")?.({
+	const modification = result.config.layoutModifications?.find(
+		({ name }) => name === "ApplicationFrame"
+	);
+	const NewLayout = modification?.modify({
 		component: FrameViews.ApplicationFrameLayout
 	}).component;
 	assertObject(NewLayout);

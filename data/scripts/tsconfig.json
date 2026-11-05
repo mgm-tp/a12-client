@@ -1,6 +1,6 @@
 {
 	"extends": "@com.mgmtp.a12.devtools/tsconfig",
-	"include": ["./**/*.cjs"],
+	"include": ["./*.js", "./**/*.cjs"],
 	"compilerOptions": {
 		"types": ["node"],
 		"allowJs": true,

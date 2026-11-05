@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-data",
-  "version": "17.0.1",
+  "version": "17.1.0",
   "description": "Experimental data access code",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -12,14 +12,14 @@
     "build": "node --run compile && pnpm \"/^validate:.+/\"",
     "test": "mocha",
     "compile": "tsc",
-    "validate:cycles": "devtools detect-cycles \"./src/**/*.@(ts|tsx)\"",
+    "validate:cycles": "depcruise --config scripts/dependency-cruiser.js --output-type err-long src",
     "validate:tsc": "devtools verify-ts-compat ./tsconfig.lib.json -p",
     "validate:api": "api-extractor run --verbose",
     "update:api": "api-extractor run --local",
     "watch": "tsc --project ./tsconfig.dev.json --watch",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config . --cache",
-    "lint:fix": "node --run lint -- --fix",
-    "lint:onlyErrors": "node --run lint -- --quiet"
+    "lint": "pnpm -w exec oxlint data",
+    "lint:fix": "pnpm -w exec oxlint --fix data",
+    "lint:onlyErrors": "pnpm -w exec oxlint --quiet data"
   },
   "dependencies": {
     "@com.mgmtp.a12.client/typescript-fsa-redux-5-compat": "catalog:a12",
@@ -38,8 +38,7 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash.merge": "catalog:",
     "@types/mocha": "catalog:",
-    "eslint": "catalog:",
-    "eslint-plugin-mocha": "catalog:",
+    "dependency-cruiser": "catalog:",
     "mocha": "catalog:",
     "rimraf": "catalog:",
     "source-map-support": "catalog:",

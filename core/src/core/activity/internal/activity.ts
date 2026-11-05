@@ -111,7 +111,11 @@ export namespace Activity {
 	 * The type of error can be one of the predefined ones or any kind of error that extends the {@link Error.Base} type.
 	 */
 	export type Error<T extends Error.Base = never> =
-		Error.InternalClient | Error.Validation | Error.PageNotFound | Error.Saving | T;
+		| Error.InternalClient
+		| Error.Validation
+		| Error.PageNotFound
+		| Error.Saving
+		| T;
 
 	export namespace Error {
 		/**
@@ -342,7 +346,7 @@ export namespace Activity {
 
 			readonly modelId: string;
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// oxlint-disable-next-line typescript/no-explicit-any
 			readonly [key: string]: any;
 		}
 

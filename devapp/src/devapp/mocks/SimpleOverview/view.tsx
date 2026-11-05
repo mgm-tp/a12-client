@@ -50,7 +50,7 @@ import { useDocumentListData } from "./hooks.js";
 import { SimpleOverviewActions } from "./index.js";
 
 export interface SimpleOverviewProps extends Omit<EngineFrameProps, "type"> {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly columns: BaseColumnType<any>[];
 	readonly title?: string;
 }

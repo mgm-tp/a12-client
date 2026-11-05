@@ -32,8 +32,8 @@
 
 import { deepStrictEqual, strictEqual, throws } from "node:assert/strict";
 
-import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 import { DocumentServiceFactory } from "@com.mgmtp.a12.kernel/kernel-md-facade";
+import { DocumentRtServiceFactoryA12internal } from "@com.mgmtp.a12.kernel/kernel-md-facade/a12internal";
 
 import { DocServiceFactory } from "../../../data-mutation/validation-computation/docServiceFactory.js";
 import { DocumentRuntimeServiceFactory } from "../../../data-mutation/validation-computation/validationRuntimeService.js";

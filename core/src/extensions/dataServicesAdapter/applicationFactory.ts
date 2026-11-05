@@ -35,18 +35,19 @@ import {
 	loadDataServicesConfiguration
 } from "@com.mgmtp.a12.dataservices/dataservices-access";
 
-import {
-	addInitialAction,
-	combineFeatures,
-	setConfigured,
-	withReducerMap
-} from "../../core/application/internal/factories/applicationFactory.js";
 import type {
 	A12ApplicationConfig,
 	ApplicationWithConfiguredFeature,
 	RequireFeatures
-} from "../../core/index.js";
+} from "../../core/application/index.js";
+import {
+	addInitialAction,
+	combineFeatures,
+	setConfigured,
+	addReducerMap
+} from "../../core/application/internal/factories/applicationFactory.js";
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../core/index.js" {
 	interface A12ApplicationConfig {
 		dataServicesConfig?: unknown;
@@ -65,13 +66,13 @@ export type ApplicationWithDataServicesConfig = RequireFeatures<
  * @experimental
  */
 export const addDataServicesInitialAction = <T extends ApplicationWithDataServicesConfig>(cfg: T) =>
-	addInitialAction<T>(loadDataServicesConfiguration)(cfg);
+	addInitialAction(loadDataServicesConfiguration)(cfg);
 
 /**
  * @experimental
  */
 export const addDataServicesReducerMap = <T extends ApplicationWithDataServicesConfig>(cfg: T) =>
-	withReducerMap<T>(DataServicesReducerMap)(cfg);
+	addReducerMap(DataServicesReducerMap)(cfg);
 
 /**
  * @experimental

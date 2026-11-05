@@ -30,24 +30,17 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import { defineConfig, globalIgnores } from "eslint/config";
+import { type ComponentType, type PropsWithChildren } from "react";
 
-import sharedConfig from "./eslint.config.ts";
-
-export default defineConfig(
-	...sharedConfig,
-	globalIgnores(
-		[
-			"appmodel-migration",
-			"codemod",
-			"core",
-			"data",
-			"devapp",
-			"docker",
-			"documentation",
-			"publish",
-			"security"
-		],
-		"root/ignores"
-	)
-);
+export function combineWrappers(
+	AdditionalWrapper: ComponentType<PropsWithChildren>,
+	Wrapper: ComponentType<PropsWithChildren>
+): ComponentType<PropsWithChildren> {
+	return function WithAdditionalWrapper(p: PropsWithChildren) {
+		return (
+			<Wrapper>
+				<AdditionalWrapper {...p} />
+			</Wrapper>
+		);
+	};
+}

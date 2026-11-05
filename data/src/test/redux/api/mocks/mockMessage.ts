@@ -34,6 +34,15 @@ import type { EntityInstancePath, Message } from "@com.mgmtp.a12.kernel/kernel-m
 
 import { KernelMessage } from "../../../../data-mutation/validation-computation/message.js";
 
+/**
+ * Kernel 31.3 (A12K-4496) adds the required property `groupsOfPossiblyCausingEntities` to
+ * `Message`. Spread these defaults into a message fixture so it satisfies that API while
+ * still compiling against the released 31.1 one, where the property does not exist yet:
+ * properties coming from a spread are not subject to the excess property check.
+ * Inline the property and drop this once the catalog moves to a kernel that has it.
+ */
+export const messageDefaults = { groupsOfPossiblyCausingEntities: [] };
+
 export function message(options: {
 	type: "parseError" | "ruleError";
 	entityInstance: EntityInstancePath;
@@ -41,6 +50,7 @@ export function message(options: {
 	const { type, entityInstance } = options;
 
 	return {
+		...messageDefaults,
 		entityInstance,
 		errorCode: type === "parseError" ? "formalValidation" : "rule",
 		errorText: [],

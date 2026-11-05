@@ -81,7 +81,11 @@ export namespace ViewViews {
 
 		/**
 		 * A custom progress indicator component.
-		 * If given this component will be rendered instead of the default one.
+		 *
+		 * @deprecated since Client 16.1.0, without effect since Client 17.0.0.
+		 *
+		 * This property will be removed with A12 2027.06.
+		 * Customize the ProgressIndicator widget via the `ClientWidgetMapContext` instead.
 		 */
 		readonly ProgressIndicatorComponent?: ComponentType<WidgetProgressIndicatorProps>;
 	}

@@ -35,8 +35,8 @@ import { GeneratedCodeAccessorFactory } from "@com.mgmtp.a12.kernel/kernel-md-fa
 
 import { Model } from "../../../../core/model/index.js";
 
-import type { ModelFetcher } from "../ModelFetcher.js";
 import { createNotFoundError } from "../createError.js";
+import type { ModelFetcher } from "../ModelFetcher.js";
 
 import { RequestBuilder } from "./requestBuilder.js";
 

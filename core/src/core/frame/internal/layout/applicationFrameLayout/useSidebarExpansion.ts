@@ -38,7 +38,7 @@ import { isOnSmallDevice } from "../../../../view/internal/size-context.js";
 
 import type { ActivityIdMap } from "../mobile-navigation.js";
 
-import type { Region } from "./applicationFrameLayout.js";
+import type { Region } from "./ApplicationFrameLayoutProps.js";
 
 interface SidebarExpansionState {
 	subExpanded: boolean;
@@ -118,7 +118,7 @@ export function useSidebarExpansion(
 
 		prevRef.current = { currentSize, activityIdMap, content, sidebar };
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// oxlint-disable-next-line react/exhaustive-deps
 	}, [currentSize, activityIdMap, content, sidebar]);
 
 	return { subExpanded, setSubExpanded, subExpandedState, setSubExpandedState };

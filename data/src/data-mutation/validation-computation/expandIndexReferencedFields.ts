@@ -118,7 +118,8 @@ function expandRepeatableGroup(
 	if (currentPaths.length === 0) {
 		// Handle repeatable root group
 		const groupInstances = getValue(document, DocumentPath.toString([segment])) as
-			GroupInstance[] | undefined;
+			| GroupInstance[]
+			| undefined;
 		const numberOfRows = groupInstances?.length ?? 1;
 
 		const newPaths: EntityInstancePath[] = [];

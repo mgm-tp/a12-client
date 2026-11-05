@@ -30,25 +30,26 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
+import type {
+	A12ApplicationConfig,
+	ApplicationWithConfiguredModel,
+	RequireFeatures
+} from "../../../core/application/index.js";
 import { AppModelAdapterModule } from "../../../core/application/internal/adapter/appModelAdapterModule.js";
 import {
 	addInitialAction,
 	combineFeatures,
 	setConfigured,
-	withModel
+	setModelOnConfig
 } from "../../../core/application/internal/factories/applicationFactory.js";
 import { ModuleRegistryProvider } from "../../../core/application/internal/factories/moduleRegistryProvider.js";
-import type {
-	A12ApplicationConfig,
-	ApplicationWithConfiguredModel,
-	RequireFeatures
-} from "../../../core/index.js";
 import { APPLICATION_MODEL_PLACEHOLDER } from "../../../core/model/internal/appModelPlaceholder.js";
 import { addSupportedModelVersion } from "../../modelLoader/internal/applicationFactory.js";
 
 const MODEL_TYPE = "application";
 const SUPPORTED_MODEL_VERSIONS = "6.0";
 
+// Do not change this target: the engines augment the package root too, and augmentations of different barrels merge depending on import order.
 declare module "../../../core/index.js" {
 	interface A12ApplicationConfig {
 		appModelAdapter?: unknown;
@@ -65,9 +66,14 @@ export type ApplicationWithAppModelAdapterConfig = RequireFeatures<
 
 /**
  * @experimental
+ *
+ * Makes sure an application model is present for the adapter to merge the models it loads into.
+ * A model configured elsewhere is kept - the placeholder is a default, not an override.
  */
 export const withAppModelDummy = <T extends ApplicationWithAppModelAdapterConfig>(cfg: T) =>
-	withModel<T>(APPLICATION_MODEL_PLACEHOLDER)(cfg);
+	(cfg.config.model
+		? cfg
+		: setModelOnConfig(APPLICATION_MODEL_PLACEHOLDER)(cfg)) as ApplicationWithConfiguredModel<T>;
 
 /**
  * @experimental
@@ -79,7 +85,7 @@ export const withAppModelModelSupport = <T extends ApplicationWithAppModelAdapte
  * @experimental
  */
 export const withAppModelAdapterModule = <T extends ApplicationWithAppModelAdapterConfig>(cfg: T) =>
-	addInitialAction<T>(() => {
+	addInitialAction(() => {
 		ModuleRegistryProvider.getInstance().addModule(AppModelAdapterModule);
 	})(cfg);
 

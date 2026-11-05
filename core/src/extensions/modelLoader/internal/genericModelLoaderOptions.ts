@@ -30,16 +30,4 @@
  * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
  */
 
-import type { ModelProcessor } from "../../../core/model/internal/ModelProcessor.js";
-import type { SupportedModelVersions } from "../../../core/model/internal/supportedModelVersions.js";
-
-export interface GenericModelLoaderOptions {
-	/**
-	 * Configures post-processing of models for the `ModelLoader` API
-	 *
-	 * By default, only document models are processed.
-	 */
-	readonly modelProcessors?: ModelProcessor[];
-
-	readonly supportedModelVersions?: SupportedModelVersions;
-}
+export type { GenericModelLoaderOptions } from "../../../core/application/internal/factories/genericModelLoaderOptions.js";

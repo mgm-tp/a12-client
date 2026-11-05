@@ -37,7 +37,43 @@ Heterogeneity is an experimental feature in A12 that allows the handling of sets
 
 First, the involved parts are described. Then it is shown how to create a setup using the commerce sample domain.
 
-In the following, the terms _Type_ and _Document Model_ are used synonymously. However, they serve different purposes. _Document Model_ is the well-known way in which the inner structure of Documents are defined. _Type_ is a new way to describe Dependencies between entities without caring about their inner structure. Types "live" inside the Model Graph.
+In the following, the terms _Type_ and _Document Model_ are used synonymously. However, they serve different purposes. A _Document Model_ is the well-known way in which the inner structure of Documents are defined. A _Type_ is a new way to describe dependencies between entities without caring about their inner structure. Types "live" inside the Model Graph.
+
+
+[#/features/heterogeneity/responsibilities]
+== What Client Provides
+
+Heterogeneity spans several A12 components, and Client's own contribution to it is small.
+It helps to know where each part comes from before setting a project up:
+
+[cols="2,3"]
+|===
+| Concern | Provided by
+
+| The Subtype Dependency between Document Models
+| Document modeling: declared as an annotation on the supertype and exposed at runtime through the Model Graph.
+
+| Listing the Documents of a super type together with those of all its subtypes
+| An A12 backend, in response to an Overview Model whose Document Model is the super type.
+
+| Holding the Model Graph in the client state
+| `client-core` itself, which keeps the Model Graph in the Redux store; see <</features/modelgraph, Model Graph>>.
+
+| Picking the Form Model that matches the type of the edited Document
+| `client-core` itself, through the Document Model constraint on a Form Model reference in a Scene.
+
+| Letting the user choose a type
+| The `Heterogeneity` extension of `client-core`, which contributes the variant selection building blocks described under <</features/heterogeneity/building-blocks, Example Setup (Detailed)>>.
+
+| A ready-made dialog that asks for the type of a new Document
+| The CRUD component, which wires those building blocks into a pre-configured overview and form setup.
+|===
+
+So the extension itself provides neither a dialog nor any behavior of its own.
+It provides the two pieces from which a type selection is built, a mapper and a UI component, and leaves it to the application, or to the CRUD component, to decide where and when a type is selected.
+
+Unlike most extension modules of `client-core`, the `heterogeneity` extension registers nothing with the ModuleRegistry.
+You import what you need from the entry point `@com.mgmtp.a12.client/client-core/heterogeneity` and use it directly.
 
 
 == Subtype Dependency
@@ -73,7 +109,7 @@ To list a heterogeneous set of Documents, you can assign the common super type a
 
 In heterogeneous overview, newly created Documents can be of different types.
 
-The CRUD extension detects that the type associated with the Overview Model has sub types. It then displays a dialog to select the type of the new Document. The offered types are the same as those used for heterogeneous overviews.
+The CRUD component, or a custom project component, detects that the type associated with the Overview Model has sub types. It then displays a dialog to select the type of the new Document. The offered types are the same as those used for heterogeneous overviews.
 
 
 == Document Model-Dependent Forms
@@ -109,6 +145,7 @@ You can find all models in the source code of the Client DevApp in the folder `c
 - Set the Model Graph. See <</features/modelgraph, Model Graph>> documentation on how to do it.
 
 
+[#/features/heterogeneity/building-blocks]
 == Example Setup (Detailed)
 
 In order to tailor the heterogeneity functionality to project specific needs,
@@ -116,10 +153,27 @@ you can combine the provided building blocks, or replace them with your own impl
 
 All modeling in Document or Application Models is done exactly in the same way as described in the CRUD example above. Therefore, here, only the coding API is explained.
 
-The currently available building blocks are:
+The entry point `@com.mgmtp.a12.client/client-core/heterogeneity` exports the following:
 
-- Variant selection mapper: a function that maps given types to a tree of selection options
-- Variant selection UI: a component to render an UI to select a type for given selection options
+[cols="2,3"]
+|===
+| Export | Purpose
+
+| `defaultVariantSelectionMapper`
+| Creates a variant selection mapper from a Model Graph and a Localizer.
+
+| `VariantSelectionMapper`, `VariantSelectionItem`
+| The type of a mapper and of the tree items it returns, for writing a mapper of your own.
+
+| `VariantSelection`
+| The React component that renders the selection UI.
+
+| `HETEROGENEITY_RESOURCE_KEYS`
+| The localization resource keys of the extension, for supplying your own type labels.
+|===
+
+The two steps are separate on purpose: a mapper decides which types are offered and how they are arranged, and the UI component renders that result.
+You can replace either one without touching the other.
 
 [NOTE]
 ====
@@ -128,15 +182,37 @@ You can find the fully working example in the source code of the Client DevApp i
 
 === Variant Selection Mapper
 
-The provided default variant selection mapper is a function that accepts a single root type and creates a tree of selection options from it.
+A variant selection mapper takes one start type and returns the tree of selection options below it, as `VariantSelectionItem` objects.
+The start type defines which part of the type hierarchy you want to render.
+The returned tree defines the available options, whether each of them can be selected, and their nesting, order, and labels.
+An item can be selected exactly when it carries a `documentModelId`, and the tree shown in the UI does not have to mirror the hierarchy in the Model Graph.
 
-The root type defines, which part of the type hierarchy you want to render.
+`defaultVariantSelectionMapper` is created from the Model Graph and a Localizer, and behaves as follows:
 
-The resulting tree defines the available options, if they are abstract or concrete, as well as their nesting, order, and labels.
+* It creates one item for every type reachable from the start type through the `subTypes` dependency, nested accordingly.
+* An abstract type yields an item without a `documentModelId`, so that it is shown but cannot be selected.
+  An abstract start type is left out entirely, and its subtypes become the top-level items.
+* Siblings are sorted by their label.
+* Labels are computed through the A12 localization API from the display labels of the model.
+* If the Model Graph does not contain a type that is declared as a subtype, the mapper fails with an error naming that type.
 
-You can pass the result of the mapping to the default variant selection React component to render a selection UI.
+[NOTE]
+====
+If a Document Model defines no display labels in its header, the default mapper falls back to the model ID.
+To override the labels, or to provide them for models without display labels, localize `HETEROGENEITY_RESOURCE_KEYS.variant_selection.variant_label` in your own localization service.
+The key provides the placeholder `$modelId$`.
+====
 
-The provided callback of the default selection UI will be invoked with the name of the selected type, which can then be used to e.g. start a new Activity.
+In order to change the enablement, nesting, order or labels of types, you can replace or compose the default mapper.
+
+
+=== Variant Selection UI
+
+`VariantSelection` renders the items of a mapper as a simple, static tree, built from the Tree Widget of the Widgets library.
+It takes the top-level items as `variants`, expects nested items inside their parent, and calls `onSelect` with the ID of the selected Document Model.
+Items without a `documentModelId` are rendered, but are neither interactive nor focusable.
+
+That Document Model ID is what you then act on, for example by starting a new Activity for the selected type.
 
 [WARNING]
 ====
@@ -148,6 +224,4 @@ When starting a new Activity for a heterogeneous Scene containing Engines, make 
 include::assets/typescript/features/heterogeneity.tsx[tags="example",indent=0]
 ----
 
-In order to change the enablement, nesting, order or labels of types, you can replace/compose the default mapper.
-
-In order to change the rendering, you can replace/compose the default React component.
+In order to change the rendering, you can replace or compose the default React component.

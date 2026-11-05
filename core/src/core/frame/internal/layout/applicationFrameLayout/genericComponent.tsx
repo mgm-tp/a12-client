@@ -38,17 +38,19 @@ import { localizableFromModel } from "@com.mgmtp.a12.utils/utils-localization";
 import { LocalizerContext } from "@com.mgmtp.a12.utils/utils-localization-react";
 import { SizeContext, type MenuItem } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import { ActivityActions, ActivitySelectors } from "../../../../activity/index.js";
+import { ActivityActions } from "../../../../activity/internal/actions.js";
+import { ActivitySelectors } from "../../../../activity/internal/selectors.js";
 import { ClientWidgetMapContext } from "../../../../ClientWidgetMap.js";
 import {
 	dynamicSceneByReference,
 	dynamicSceneReferenceByActivityId
 } from "../../../../configurationNG/internal/dynamicSelectors.js";
-import { ApplicationModel } from "../../../../model/index.js";
+import { ApplicationModel } from "../../../../model/internal/ApplicationModel.js";
 import { InternalModelSelectors, ModelSelectors } from "../../../../model/internal/selectors.js";
-import type { View, ViewNGProps } from "../../../../view/index.js";
-import { ViewSelectors } from "../../../../view/index.js";
+import { ViewSelectors } from "../../../../view/internal/selectors.js";
 import { isOnSmallDevice } from "../../../../view/internal/size-context.js";
+import type { View } from "../../../../view/internal/view.js";
+import type { ViewNGProps } from "../../../../view/internal/viewNG.js";
 
 import { SidebarContext } from "./sidebarContext.js";
 

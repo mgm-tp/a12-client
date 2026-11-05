@@ -71,7 +71,7 @@ export interface Configuration {
 	 * If any of these given type of actions are dispatched,
 	 * the current deep link is applied.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly applyTriggers?: ActionCreator<any>[];
 
 	/**
@@ -84,14 +84,14 @@ export interface Configuration {
 	 * * {@link ActivityActions.commit}.done
 	 * * {@link ActivityActions.setData}
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly updateTriggers?: ActionCreator<any>[];
 
 	/**
 	 * If any of these given type of actions are dispatched,
 	 * the current deep link is cleared.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// oxlint-disable-next-line typescript/no-explicit-any
 	readonly clearTriggers?: ActionCreator<any>[];
 }
 

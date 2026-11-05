@@ -37,7 +37,7 @@ import { initializeKeys } from "@com.mgmtp.a12.utils/utils-localization";
  *
  * Please note that adding new keys to this object is not considered as a breaking change.
  */
-export const RESOURCE_KEYS = {
+export const LOCALE_RESOURCE_KEYS = {
 	application: {
 		/** Key of the title of the application frame */
 		title: ""
@@ -52,4 +52,4 @@ export const RESOURCE_KEYS = {
 	}
 };
 
-initializeKeys(RESOURCE_KEYS);
+initializeKeys(LOCALE_RESOURCE_KEYS);

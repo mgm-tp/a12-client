@@ -73,7 +73,7 @@ export function mergeInto(args: {
 		if (Object.prototype.hasOwnProperty.call(partDocs, docId)) {
 			docs = {
 				...docs,
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				// oxlint-disable-next-line typescript/no-non-null-assertion
 				[docId]: mergeDgDocument({ doc: docs[docId], newDoc: partDocs[docId]! })
 			};
 		}
@@ -90,7 +90,7 @@ export function mergeInto(args: {
 				...(partialDg.links.linkIdsByDocId[docId] ?? []),
 				...(linkIdsByDocId[docId] ?? [])
 			];
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			// oxlint-disable-next-line typescript/no-non-null-assertion
 			const sortedList = mergedList.sort((a, b) => byId[a]!.rank - byId[b]!.rank);
 
 			linkIdsByDocId = {

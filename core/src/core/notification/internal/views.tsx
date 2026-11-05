@@ -61,6 +61,5 @@ export namespace NotificationViews {
 	 * The frame that will display the notifications.
 	 * Wrapping your entire view with this is recommended.
 	 */
-	// eslint-disable-next-line no-useless-assignment
 	export const Frame: ComponentType<Frame.PropsType> = NotificationFrame;
 }

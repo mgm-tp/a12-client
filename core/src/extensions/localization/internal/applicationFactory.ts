@@ -34,9 +34,9 @@ import type { ApplicationWithConfiguredFeature } from "../../../core/application
 import {
 	addWrapper,
 	combineFeatures,
-	modifyLayout,
 	setConfigured
 } from "../../../core/application/internal/factories/applicationFactory.js";
+import { modifyLayout } from "../../../core/frame/internal/layoutConfig.js";
 
 import { type ApplicationWithLocalizationSupportConfig } from "./applicationConfig.js";
 import { addLocalizationSupportToApplicationFrameLayout } from "./localeChooser.js";
@@ -47,7 +47,7 @@ import { makeLocalizationContextProvider } from "./localizationContextProvider.j
  */
 export const addLocalizationContextProvider = <T extends ApplicationWithLocalizationSupportConfig>(
 	cfg: T
-) => addWrapper<T>(makeLocalizationContextProvider(cfg))(cfg);
+) => addWrapper(makeLocalizationContextProvider(cfg))(cfg);
 
 /**
  * @experimental
@@ -60,10 +60,7 @@ export const addLocaleChooser = <T extends ApplicationWithLocalizationSupportCon
 	) {
 		return cfg;
 	}
-	return modifyLayout<T>(
-		"ApplicationFrame",
-		addLocalizationSupportToApplicationFrameLayout(cfg)
-	)(cfg);
+	return modifyLayout("ApplicationFrame", addLocalizationSupportToApplicationFrameLayout(cfg))(cfg);
 };
 
 /**

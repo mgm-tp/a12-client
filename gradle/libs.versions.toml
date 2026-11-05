@@ -1,9 +1,10 @@
 # Run gradle versionCatalogUpdate --interactive to update this file
 [versions]
-dataservices = "39.0.0"
-build-utilities = "0.4.2"
-integration = "0.1.8"
-prepare-models = "0.10.0"
+dataservices = "39.1.0"
+business-scripting = "0.13.1"
+build-utilities = "0.7.0"
+integration = "0.1.11"
+prepare-models = "0.12.0"
 # Gradle plugins (third-party)
 docker = "10.0.0"
 spotless = "8.7.0"
@@ -19,6 +20,8 @@ dataservices-bom = { module = "com.mgmtp.a12.dataservices:dataservices-parent", 
 # --- A12 libraries (versions provided by the dataservices BOM) ---
 dataservices-modelgraph = { module = "com.mgmtp.a12.dataservices:dataservices-modelgraph-fs-impl" }
 dataservices-server-app = { module = "com.mgmtp.a12.dataservices:dataservices-server-app" }
+# --- A12 Business Scripting (server-side callable scripts; own release line) ---
+business-scripting-dataservices-starter = { module = "com.mgmtp.a12.scripting:business-scripting-dataservices-starter", version.ref = "business-scripting" }
 kernel-md-facade = { module = "com.mgmtp.a12.kernel:kernel-md-facade" }
 # --- Other ---
 docker-plugin = { module = "com.bmuschko:gradle-docker-plugin", version.ref = "docker" }

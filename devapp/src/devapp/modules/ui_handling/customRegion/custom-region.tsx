@@ -33,12 +33,13 @@
 import type { JSX } from "react";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import type { Dispatch } from "redux";
 
 import type {
 	Activity,
 	DynamicConfiguration,
 	DynamicMatchCondition,
-	DynamicMenu,
+	DynamicScene,
 	ViewNGProps
 } from "@com.mgmtp.a12.client/client-core";
 import {
@@ -54,8 +55,6 @@ import {
 	ContentBoxElements
 } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import { memoize } from "../../../3rd-party-licenses/memoize.js";
-
 import { CustomModalLayout } from "./modal-layout.js";
 
 export const CustomRegionModule: DynamicConfiguration = {
@@ -65,73 +64,69 @@ export const CustomRegionModule: DynamicConfiguration = {
 		return [
 			{
 				name: `ui_handling.custom-region.flow`,
-				scenes: selectRelevantActivities(state).map(({ descriptor, id }) => {
-					const { modal, variant } = descriptor;
-
-					return {
-						name: `ui_handling.custom-region.scene.${id}`,
-						matches: createMemoizedMatcher(modal, variant),
-						sceneChange: {
-							onEnter: [
-								{
-									type: "DYNAMIC_ADD_VIEW",
-									component: CustomRegion,
-									region: modal === "true" ? "GLOBAL" : "/CONTENT",
-									constraints:
-										variant === "custom_size"
-											? { width: 400, height: 600 }
-											: variant === "fullscreen"
-												? { fullscreen: true }
-												: undefined
-								}
-							]
-						}
-					};
-				})
+				scenes: selectRelevantActivities(state).map(activityScene)
 			}
 		];
 	},
 	menus(state) {
 		const selected = selectRelevantActivities(state).length > 0;
 
-		return createMemoizedMenu(selected);
+		return [
+			{
+				id: `ui_handling.custom-region.dynamicMenu`,
+				label: { key: "examples.ui-handling.customRegion.menuEntry" },
+				selected,
+				action: startCustomRegionActivity
+			}
+		];
 	}
 };
 
-const createMemoizedMenu = memoize((selected: boolean) => [
-	{
-		id: `ui_handling.custom-region.dynamicMenu`,
-		label: { key: "examples.ui-handling.customRegion.menuEntry" },
-		selected,
-		action: dispatch => {
-			dispatch(
-				ApplicationActions.startMainActivityRequested({
-					action: ActivityActions.create({
-						activityDescriptor: {
-							section: "UiHandling",
-							feature: "CustomRegion"
-						},
-						loadingState: "without"
-					}),
-					descriptor: {}
-				})
-			);
+function activityScene({ descriptor, id }: Activity): DynamicScene {
+	const { modal, variant } = descriptor;
+
+	// match conditions are only invoked, never compared, so they need no stable identity
+	const matches: DynamicMatchCondition = d =>
+		d.section === "UiHandling" &&
+		d.feature === "CustomRegion" &&
+		d.modal === modal &&
+		d.variant === variant;
+
+	return {
+		name: `ui_handling.custom-region.scene.${id}`,
+		matches,
+		sceneChange: {
+			onEnter: [
+				{
+					type: "DYNAMIC_ADD_VIEW",
+					component: CustomRegion,
+					region: modal === "true" ? "GLOBAL" : "/CONTENT",
+					constraints:
+						variant === "custom_size"
+							? { width: 400, height: 600 }
+							: variant === "fullscreen"
+								? { fullscreen: true }
+								: undefined
+				}
+			]
 		}
-	} satisfies DynamicMenu
-]);
+	};
+}
 
-const createMemoizedMatcher = memoize(
-	(modal?: string, variant?: string) => {
-		const matcher: DynamicMatchCondition = descriptor =>
-			descriptor.section === "UiHandling" &&
-			descriptor.feature === "CustomRegion" &&
-			descriptor.modal === modal &&
-			descriptor.variant === variant;
-
-		return matcher;
-	},
-	(m, v) => `${m}${v}`
-);
+function startCustomRegionActivity(dispatch: Dispatch): void {
+	dispatch(
+		ApplicationActions.startMainActivityRequested({
+			action: ActivityActions.create({
+				activityDescriptor: {
+					section: "UiHandling",
+					feature: "CustomRegion"
+				},
+				loadingState: "without"
+			}),
+			descriptor: {}
+		})
+	);
+}
 
 function selectRelevantActivities(state: object): Activity[] {
 	return Object.values(ActivitySelectors.activities()(state)).flatMap(a =>

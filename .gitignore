@@ -42,7 +42,6 @@ cyclonedx.json
 # Atlas Bundles
 atlas-archives
 
-.eslintcache
 
 # core
 /platform-server.log*

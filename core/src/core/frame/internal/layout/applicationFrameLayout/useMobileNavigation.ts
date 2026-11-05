@@ -34,7 +34,7 @@ import { useMemo } from "react";
 
 import type { SizeDetectorProps } from "@com.mgmtp.a12.widgets/widgets-core";
 
-import { ApplicationModel } from "../../../../model/index.js";
+import { ApplicationModel } from "../../../../model/internal/ApplicationModel.js";
 import { isOnSmallDevice } from "../../../../view/internal/size-context.js";
 
 import {

@@ -34,8 +34,19 @@ import type { ComponentType } from "react";
 
 /**
  * @experimental
+ *
+ * A view contributed through `DynamicConfiguration`.
+ *
+ * `P` declares the component's own props on top of the core-injected
+ * {@link ViewNGProps}, so the shape is written once and used both for the
+ * component and for the `componentProps` that feed it:
+ *
+ * ```tsx
+ * interface GreetingProps { readonly greeting?: string }
+ * const Greeting: ViewNGComponent<GreetingProps> = props => <span>{props.greeting}</span>;
+ * ```
  */
-export type ViewNGComponent = ComponentType<ViewNGProps>;
+export type ViewNGComponent<P = unknown> = ComponentType<ViewNGProps & P>;
 
 /**
  * @experimental
@@ -50,6 +61,18 @@ export interface ViewNGProps {
 	 */
 	readonly ariaLevel?: number;
 }
+
+/**
+ * @experimental
+ *
+ * The extra props a view is given through `componentProps`.
+ *
+ * Any plain data is allowed. The props the core sets itself
+ * ({@link ViewNGProps}) are not: the core always wins, so passing one here
+ * would do nothing. They are rejected instead of being ignored quietly.
+ */
+export type ContributedViewProps = Record<string, unknown> &
+	Partial<Record<keyof ViewNGProps, never>>;
 
 /**
  * @experimental
