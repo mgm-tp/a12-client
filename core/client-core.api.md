@@ -2013,6 +2013,7 @@ export namespace ViewViews {
         readonly global?: boolean;
         readonly labelKey?: string;
         readonly progress: "none" | "loading" | "error";
+        // @deprecated
         readonly ProgressIndicatorComponent?: ComponentType<ProgressIndicatorProps>;
         readonly style?: CSSProperties;
     }
@@ -2065,8 +2066,8 @@ export const withReducerMap: <T extends A12ApplicationConfig>(reducerMap: NonNul
 
 // Warnings were encountered during analysis:
 //
-// src/core/application/internal/factories/applicationConfig.ts:88:2 - (ae-forgotten-export) The symbol "BaseConfigWithModelLoader" needs to be exported by the entry point index.d.ts
-// src/core/application/internal/factories/applicationConfig.ts:99:2 - (ae-forgotten-export) The symbol "BaseConfigWithModel" needs to be exported by the entry point index.d.ts
+// src/core/application/internal/factories/applicationConfig.ts:60:2 - (ae-forgotten-export) The symbol "BaseConfigWithModelLoader" needs to be exported by the entry point index.d.ts
+// src/core/application/internal/factories/applicationConfig.ts:71:2 - (ae-forgotten-export) The symbol "BaseConfigWithModel" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

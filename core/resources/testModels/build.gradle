@@ -11,15 +11,6 @@ plugins {
     alias(libs.plugins.prepare.models)
 }
 
-tasks.register('cleanTestModels', Delete) {
-    delete layout.buildDirectory
-    delete layout.projectDirectory.dir('../../target/models')
-}
-
-tasks.named('clean') {
-    dependsOn tasks.named('cleanTestModels')
-}
-
 tasks.named('assemble') {
     dependsOn tasks.named('prepareModels')
 }

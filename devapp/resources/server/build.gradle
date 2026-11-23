@@ -17,16 +17,6 @@ dependencies {
     implementation libs.dataservices.server.app
 }
 
-layout.buildDirectory = layout.projectDirectory.dir('../../target/server')
-
-tasks.register("_clean", Delete) {
-    delete layout.buildDirectory
-}
-
-tasks.named("clean") {
-    dependsOn tasks.named("_clean")
-}
-
 springBoot {
     mainClass = 'com.mgmtp.a12.dataservices.server.app.ServerApplication'
 }

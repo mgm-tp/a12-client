@@ -1,12 +1,12 @@
 {
   "name": "@com.mgmtp.a12.client/client-dev-documentation-src",
-  "version": "16.2.2",
+  "version": "16.3.0",
   "description": "AsciiDoc documentation for @com.mgmtp.a12.client/client-core",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
   "type": "module",
   "scripts": {
-    "clean": "rimraf ./build",
+    "clean": "git clean -fx -e build .",
     "build": "docu",
     "compile": "tsc",
     "spellcheck": "cspell .",
@@ -36,7 +36,6 @@
     "react-dnd": "catalog:",
     "redux-saga": "catalog:",
     "redux": "catalog:",
-    "rimraf": "catalog:",
     "typed-redux-saga": "catalog:",
     "typescript-fsa": "catalog:",
     "typescript": "catalog:"

@@ -1,6 +1,6 @@
 {
   "name": "@com.mgmtp.a12.client/client-devapp",
-  "version": "16.2.2",
+  "version": "16.3.0",
   "description": "Client Devapp",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
@@ -10,7 +10,7 @@
     "./src/devapp/whyDidYouRender/index.ts"
   ],
   "scripts": {
-    "clean": "rimraf ./lib ./dist ./target",
+    "clean": "git clean -fx -e build .",
     "build": "node --run compile && node --run assemble",
     "compile": "tsc",
     "test": "mocha",
@@ -66,7 +66,6 @@
     "@types/semver": "catalog:",
     "concurrently": "catalog:",
     "mocha": "catalog:",
-    "rimraf": "catalog:",
     "semver": "catalog:",
     "source-map-loader": "catalog:",
     "source-map-support": "catalog:",

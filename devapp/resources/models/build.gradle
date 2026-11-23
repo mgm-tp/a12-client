@@ -23,15 +23,6 @@ tasks.named('jar') {
     enabled = false
 }
 
-tasks.register('_clean', Delete) {
-    delete layout.buildDirectory
-    delete prepareModels.outputDir
-}
-
-tasks.named('clean') {
-    dependsOn tasks.named('_clean')
-}
-
 tasks.register('generateModelGraph', JavaExec) {
     dependsOn tasks.named('prepareModels')
 

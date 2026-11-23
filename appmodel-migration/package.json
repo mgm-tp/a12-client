@@ -1,12 +1,12 @@
 {
   "name": "@com.mgmtp.a12.client/client-application-model-migration",
-  "version": "16.2.2",
+  "version": "16.3.0",
   "description": "ApplicationModel migration CLI tool",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
   "type": "module",
   "scripts": {
-    "clean": "rimraf ./lib ./target cyclonedx.json",
+    "clean": "git clean -fx -e build .",
     "build": "pnpm run \"/^compile:[a-z]*$/\"",
     "compile": "tsc",
     "compile:schema": "node ./scripts/compile-schema.cjs",
@@ -25,7 +25,6 @@
     "@types/node": "catalog:",
     "c8": "catalog:",
     "mocha": "catalog:",
-    "rimraf": "catalog:",
     "source-map-support": "catalog:",
     "typescript": "catalog:"
   },

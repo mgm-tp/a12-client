@@ -1,34 +1,6 @@
-/*
- * SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
- *
- * Copyright (c) 2012-2026 mgm technology partners GmbH
- *
- * Dual License
- * ------------
- * This source file is part of the mgm A12 Platform and available under
- * a choice of two different licenses:
- *
- * 1. Open-Source License - EUPL v1.2
- *    You may redistribute and/or modify this file under the terms of the
- *    European Union Public License, version 1.2 - see https://eupl.eu/.
- *
- * 2. Commercial License
- *    Alternatively, you may obtain a commercial license from
- *    mgm technology partners GmbH, that permits use of this software
- *    under different terms (including support and maintenance services).
- *
- *    Please contact a12-license@mgm-tp.com for more information.
- *
- * You must select and comply with exactly one of the above license options.
- *
- * Warranty Disclaimer (applies to either option)
- * ----------------------------------------------
- * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
- * WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NON-INFRINGEMENT, EXCEPT WHERE SUCH DISCLAIMERS ARE HELD TO BE
- * LEGALLY INVALID. SEE THE RESPECTIVE LICENSE TEXT FOR DETAILS.
- */
+// SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial
+// Copyright (c) 2012-2026 mgm technology partners GmbH
+// See LICENSE file for details. For commercial licensing: a12-license@mgm-tp.com
 
 /**
  * This layout uses the ApplicationFrame widget to create an application frame.
@@ -124,12 +96,10 @@ function removeViewsAndFunctionsFromStateProps({
 		...props,
 		sidebar: {
 			...sidebar,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			views: views1.map(({ ProgressComponent, ...v }) => v)
 		},
 		content: {
 			...content,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			views: views2.map(({ ProgressComponent, ...v }) => v)
 		}
 	};
@@ -442,7 +412,7 @@ export class ApplicationFrameLayoutComponent extends Component<
 			logo,
 			logoURL,
 			// TODO: Remove with A12-17777
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			// oxlint-disable-next-line typescript/no-deprecated
 			widgetMap,
 			mainMenuComponent,
 			modalRegion,
@@ -566,7 +536,7 @@ export class ApplicationFrameLayoutComponent extends Component<
 								}));
 							}}
 							// TODO: Remove with A12-17777
-							// eslint-disable-next-line @typescript-eslint/no-deprecated
+							// oxlint-disable-next-line typescript/no-deprecated
 							widgetMap={widgetMap}
 							mainMenuComponent={mainMenuComponent}
 							permissions={this.props.permissions}
@@ -688,7 +658,7 @@ function PageTemplate(props: PageTemplate.PropsType): JSX.Element {
 	const { Icon, Button, ApplicationHeader, ApplicationFrame } = useContext(ClientWidgetMapContext);
 
 	// TODO: Remove with A12-17777
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
+	// oxlint-disable-next-line typescript/no-deprecated
 	const { widgetMap } = props;
 
 	const hamburgerButtonRef = useRef<HTMLElement | null>(null);
@@ -799,7 +769,7 @@ export interface SidebarContextMemoWrapperProps extends Container {
 export const SidebarContextMemoWrapper: ComponentType<SidebarContextMemoWrapperProps> = props => {
 	const cv = props.contextValue;
 	const deps = [cv?.subExpanded, cv?.setSubExpanded, cv?.subExpandedState, cv?.setSubExpandedState];
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// oxlint-disable-next-line react/exhaustive-deps
 	const memoProps = useMemo(() => props.contextValue, deps);
 	return <SidebarContext.Provider value={memoProps}>{props.children}</SidebarContext.Provider>;
 };
@@ -993,5 +963,5 @@ export function FallbackLogo(props: { logoURL?: string }): JSX.Element | null {
 }
 
 function createMenuIdFromRegionReference(ref: ApplicationModel.Region.Reference): string {
-	return ref.length === 0 ? "root" : `root.${ref.map(String.prototype.toLowerCase).join(".")}`;
+	return ref.length === 0 ? "root" : `root.${ref.map(part => part.toLowerCase()).join(".")}`;
 }

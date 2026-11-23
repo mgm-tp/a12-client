@@ -1,11 +1,11 @@
 {
   "name": "@com.mgmtp.a12.client/client-core",
-  "version": "16.2.2",
+  "version": "16.3.0",
   "description": "Client Core Library",
   "author": "mgm technology partners",
   "license": "(EUPL-1.2 OR LicenseRef-commercial)",
   "scripts": {
-    "clean": "rimraf ./lib ./target cyclonedx.json",
+    "clean": "git clean -fx -e build .",
     "build": "node --run compile && node --run typedoc && pnpm \"/^validate:.+/\"",
     "test": "mocha",
     "test:coverage": "c8 mocha",
@@ -68,7 +68,6 @@
     "redux": "catalog:",
     "redux-saga": "catalog:",
     "redux-saga-test-plan": "catalog:",
-    "rimraf": "catalog:",
     "source-map-support": "catalog:",
     "styled-components": "catalog:",
     "typed-redux-saga": "catalog:",

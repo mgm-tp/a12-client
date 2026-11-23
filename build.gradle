@@ -45,11 +45,8 @@ spotless {
     format 'asciidoc', {
         target '**/*.adoc'
         targetExclude("**/node_modules/**", "**/lib/**", "**/build/**")
-        licenseHeaderFile(rootProject.file('license_header.txt'), '^[=\\[]')
-        // transform C-style header to asciidoc block comments
-        replaceRegex 'Convert C-style block start to asciidoc block comment start', '^/\\*', '////'
-        replaceRegex 'Convert C-style block end to asciidoc block comment end', '^ \\*/', '////\n'
-        replaceRegex 'Remove asterisk prefixes', '^ \\* ?', ''
+        def headerLines = rootProject.file('license_header.txt').readLines().collect { it.replaceFirst(~/^\/\/ ?/, '') }
+        licenseHeader("////\n${headerLines.join('\n')}\n////\n\n", '^[=\\[]')
     }
 }
 
@@ -88,11 +85,14 @@ tasks.register('pnpmInstall', LeadingBuildTask) {
 
 tasks.register('verify', LeadingBuildTask) {
     dependsOn tasks.named('pnpmInstall')
+    // the type-aware rules read sibling declarations out of `lib`, which `_assemble`
+    // produces; without them cross-package types resolve to `error` and the
+    // `no-unsafe-*` family reports findings that are not there
+    mustRunAfter tasks.named('_assemble')
     doLast { execCommandLine 'node', '--run', 'verify' }
 }
 
 tasks.register('_clean', LeadingBuildTask) {
-    dependsOn tasks.named('pnpmInstall')
     doLast { execCommandLine 'node', '--run', 'clean' }
 }
 
@@ -100,8 +100,13 @@ tasks.named('clean') {
     dependsOn tasks.named('_clean')
 }
 
+// the clean scripts also remove node_modules
+tasks.named('pnpmInstall') {
+    mustRunAfter tasks.named('_clean')
+}
+
 tasks.register('_assemble', LeadingBuildTask) {
-    dependsOn tasks.named('verify'),
+    dependsOn tasks.named('pnpmInstall'),
         project(':coreTestModels').tasks.named('assemble'),
         project(':devappModels').tasks.named('assemble')
     // the devapp bundle bakes the version in at build time and package.json is not stamped
@@ -114,13 +119,18 @@ tasks.named('assemble') {
 }
 
 tasks.register('_check', LeadingBuildTask) {
+    // The JS tests run from `lib` and read generated model fixtures from
+    // `core/target/models`, both produced by `_assemble`. Ordering only, so a bare
+    // `check` does not pull in a frontend build the way `dependsOn` would.
+    mustRunAfter tasks.named('_assemble'), tasks.named('verify')
+
     doLast {
         execCommandLine(['node', '--run', 'test'])
     }
 }
 
 tasks.named('check') {
-    dependsOn tasks.named('_check')
+    dependsOn tasks.named('_check'), tasks.named('verify')
 }
 
 // review builds resolve to the plain -SNAPSHOT version, so stamping would rewrite all
